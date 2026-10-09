@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { BackupProgress, BinDeleteProgress, ExportProgress, ImportProgress, PeopleStatus, SmartSearchStatus, UpdateStatus, LibraryChangeReason, PhotoVaultApi, VerifyProgress } from '@shared/types'
+import type { BackupProgress, BinDeleteProgress, ExportProgress, ImportProgress, PeopleStatus, SmartSearchStatus, UpdateStatus, PhoneCopyProgress, LibraryChangeReason, PhotoVaultApi, VerifyProgress } from '@shared/types'
 
 // The only surface the renderer gets: typed calls into the main process. No Node, no fs.
 const api: PhotoVaultApi = {
@@ -64,6 +64,14 @@ const api: PhotoVaultApi = {
   saveCopy: (id) => ipcRenderer.invoke('asset:saveCopy', id),
   setBackupLabel: (id, label) => ipcRenderer.invoke('backup:label', id, label),
   restoreSnapshot: (name) => ipcRenderer.invoke('db:restoreSnapshot', name),
+  listPhones: () => ipcRenderer.invoke('phone:list'),
+  copyFromPhone: (device) => ipcRenderer.invoke('phone:copy', device),
+  cancelPhoneCopy: () => ipcRenderer.invoke('phone:cancel'),
+  onPhoneProgress: (cb) => {
+    const listener = (_e: unknown, p: PhoneCopyProgress): void => cb(p)
+    ipcRenderer.on('phone:progress', listener)
+    return () => ipcRenderer.removeListener('phone:progress', listener)
+  },
   updateStatus: () => ipcRenderer.invoke('update:status'),
   checkForUpdates: () => ipcRenderer.invoke('update:check'),
   setUpdateToken: (token) => ipcRenderer.invoke('update:setToken', token),

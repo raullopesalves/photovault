@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { FileArchive, FolderOpen } from 'lucide-react'
+import { FileArchive, FolderOpen, Smartphone } from 'lucide-react'
 
-export type ImportKind = 'folder' | 'zip'
+export type ImportKind = 'folder' | 'zip' | 'phone'
 
 /** A button that offers the two import sources: a folder, or ZIP archives (e.g. Google Takeout). */
 export function ImportMenu(props: { onImport: (kind: ImportKind) => void; className: string; children: ReactNode; placement?: 'above' | 'below' }) {
@@ -43,6 +43,7 @@ export function ImportMenu(props: { onImport: (kind: ImportKind) => void; classN
         >
           <MenuItem icon={<FolderOpen className="size-4" />} title="Folder…" body="Photos on a disk, phone backup, extracted export" onClick={() => pick('folder')} />
           <MenuItem icon={<FileArchive className="size-4" />} title="ZIP archives…" body="Google Takeout or any ZIP — select several at once" onClick={() => pick('zip')} />
+          <MenuItem icon={<Smartphone className="size-4" />} title="Phone or camera…" body="Connected by USB — copies only what is new" onClick={() => pick('phone')} />
         </div>
       )}
     </div>

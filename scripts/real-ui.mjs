@@ -204,6 +204,14 @@ try {
     await page.waitForTimeout(800)
   }
 
+  if (process.argv.includes('--phone')) {
+    await page.click('button[aria-haspopup="menu"]')
+    await page.click('[role="menuitem"]:has-text("Phone or camera")')
+    await page.waitForTimeout(6000)
+    await page.screenshot({ path: join(shots, 'phone.png') })
+    await page.click('button:has-text("Cancel")')
+  }
+
   if (process.argv.includes('--people')) {
     await page.click('nav >> text=People')
     await page.click('button:has-text("Find people in my photos")')

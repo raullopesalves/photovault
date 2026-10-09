@@ -42,6 +42,9 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
               <button onClick={() => props.onImport('zip')} className="h-9 rounded-lg bg-stone-200/70 px-4 text-[13.5px] font-medium dark:bg-stone-800">
                 Google Takeout / ZIP
               </button>
+              <button onClick={() => props.onImport('phone')} className="h-9 rounded-lg bg-stone-200/70 px-4 text-[13.5px] font-medium dark:bg-stone-800">
+                Phone or camera
+              </button>
             </div>
           </div>
         )}

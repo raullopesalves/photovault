@@ -25,6 +25,8 @@ import { exportOriginals } from '@core/library/export'
 import { playableVideo } from './videos'
 import { editPreview, editState, renderEdited, saveEdits } from './editing'
 import { prepareShare } from './share'
+import { cancelPhoneCopy, copyPhone } from './phoneImport'
+import { listPhones } from '@core/sources/phone'
 import { checkForUpdates, installUpdateNow, setUpdateToken, updateStatus } from './updater'
 import type { LibraryController } from './controller'
 import { loadSettings, saveSettings, type StoredSettings } from './settings'
@@ -502,6 +504,9 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
     return r.canceled || r.filePaths.length === 0 ? null : r.filePaths
   })
+  ipcMain.handle('phone:list', () => listPhones())
+  ipcMain.handle('phone:copy', (e, device: unknown) => copyPhone(lib().root, str(device, 'device'), (p) => e.sender.send('phone:progress', p)))
+  ipcMain.handle('phone:cancel', () => cancelPhoneCopy())
   ipcMain.handle('import:start', (_e, sources: unknown) => {
     lib()
     if (!Array.isArray(sources) || sources.length === 0 || sources.length > 500) throw new Error('Invalid sources')

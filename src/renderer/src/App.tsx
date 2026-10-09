@@ -4,6 +4,7 @@ import type { AppState, ImportProgress, ThemePreference } from '@shared/types'
 import { api } from './lib/format'
 import { Sidebar, type View } from './components/Sidebar'
 import { ImportSheet } from './components/ImportSheet'
+import { PhoneDialog } from './components/PhoneDialog'
 import { Welcome } from './views/Welcome'
 import { PhotosView } from './views/PhotosView'
 import { ImportsView } from './views/ImportsView'
@@ -34,6 +35,7 @@ export default function App() {
   const [version, setVersion] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
+  const [phoneOpen, setPhoneOpen] = useState(false)
 
   const refreshState = useCallback(async () => setState(await api.getState()), [])
 
@@ -80,8 +82,9 @@ export default function App() {
     err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err)
 
   /** Starts an import from given paths, or asks for a folder / ZIP archives. */
-  const startImport = useCallback(async (sources: string[] | 'folder' | 'zip' = 'folder') => {
+  const startImport = useCallback(async (sources: string[] | 'folder' | 'zip' | 'phone' = 'folder') => {
     setImportError(null)
+    if (sources === 'phone') return setPhoneOpen(true)
     const paths = Array.isArray(sources) ? sources : await api.chooseImportSources(sources)
     if (!paths || paths.length === 0) return
     try {
@@ -186,6 +189,16 @@ export default function App() {
         {view === 'hidden' && <HiddenView version={version} library={library} />}
         {view === 'bin' && <BinView version={version} library={library} />}
       </main>
+
+      {phoneOpen && (
+        <PhoneDialog
+          onClose={() => setPhoneOpen(false)}
+          onImport={(folder) => {
+            setPhoneOpen(false)
+            void startImport([folder])
+          }}
+        />
+      )}
 
       {sheetOpen && (
         <ImportSheet

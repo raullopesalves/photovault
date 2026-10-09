@@ -531,6 +531,26 @@ export interface PeopleStatus {
   error: string | null
 }
 
+export interface PhoneDevice {
+  name: string
+  /** Photo folders found on it, e.g. "Internal storage\DCIM"; empty while the phone is locked or access is not allowed. */
+  folders: string[]
+}
+
+export interface PhoneCopyProgress {
+  device: string
+  /** Where the copies go; imported from there afterwards. */
+  folder: string
+  total: number
+  done: number
+  copied: number
+  skipped: number
+  failed: number
+  bytes: number
+  current: string
+  finished?: boolean
+}
+
 export interface UpdateStatus {
   state: 'idle' | 'needs-token' | 'checking' | 'up-to-date' | 'downloading' | 'ready' | 'error'
   /** Running version. */
@@ -724,6 +744,11 @@ export interface PhotoVaultApi {
   setBackupLabel(id: number, label: string | null): Promise<void>
   /** Replaces the catalogue with a snapshot (the current one is kept first) and reopens the library. */
   restoreSnapshot(name: string): Promise<void>
+  listPhones(): Promise<PhoneDevice[]>
+  /** Copies the phone's photos into a folder next to the library; returns that folder to import. */
+  copyFromPhone(device: string): Promise<PhoneCopyProgress>
+  cancelPhoneCopy(): Promise<void>
+  onPhoneProgress(cb: (p: PhoneCopyProgress) => void): () => void
   updateStatus(): Promise<UpdateStatus>
   checkForUpdates(): Promise<UpdateStatus>
   /** Saves the read-only GitHub token used to fetch updates from the private repository (null removes it). */
