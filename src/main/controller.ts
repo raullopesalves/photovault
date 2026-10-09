@@ -6,6 +6,7 @@ import { ImportService } from '@core/import/service'
 import { Library } from '@core/library/library'
 import { VerifyService } from '@core/library/verify'
 import { WatchService } from '@core/library/watch'
+import { restoreSnapshotFile } from '@core/library/dbSnapshots'
 import { buildSearchIndexInBackground } from '@core/repo/search'
 import { nearDuplicatesCached, primeNearDuplicateGroups } from '@core/repo/nearDuplicates'
 import { HeavyWork } from './heavyWork'
@@ -235,7 +236,69 @@ export class LibraryController {
         .catch((err) => opened.logger.error('db.snapshot_failed', { error: errorMessage(err) }))
         .then(() => this.runAutoBackups())
     }, 5000)
+    this.protectTimer = setInterval(() => void this.protectionTick(opened), 60_000)
     this.lastError = null
+  }
+
+  private protectTimer: ReturnType<typeof setInterval> | null = null
+  private lastMonthlyCheck = 0
+
+  /**
+   * Runs every minute while a library is open:
+   *  - a backup drive that was plugged back in (rotating drives) is brought up to date at once;
+   *  - once a day, the monthly checks: the library's own files are re-verified when the last full check is older
+   *    than 30 days, and each connected backup drive is re-verified on the same schedule.
+   * Nothing runs while an import or another backup/verification is in progress.
+   */
+  private async protectionTick(library: Library): Promise<void> {
+    const backups = this.backups
+    if (this.library !== library || !backups || backups.current()) return
+    const imp = this.imports?.current()
+    if (imp && !['completed', 'failed', 'cancelled', 'interrupted'].includes(imp.phase)) return
+    if (this.verify?.current()?.status === 'running') return
+    try {
+      const st = backups.status()
+      for (const t of st.targets) {
+        if (t.auto && t.reachable && t.missingAssets > 0) {
+          library.logger.info('backup.drive_reconnected', { target: t.path, missing: t.missingAssets })
+          await backups.run(t.id)
+          return
+        }
+      }
+      if (Date.now() - this.lastMonthlyCheck < 24 * 3600_000) return
+      this.lastMonthlyCheck = Date.now()
+      const month = 30 * 86_400_000
+      const old = (iso: string | null): boolean => !iso || Date.now() - Date.parse(iso) > month
+      if (st.totalFiles > 0 && old(st.lastLibraryCheck)) {
+        library.logger.info('verify.monthly', { last: st.lastLibraryCheck })
+        this.verify?.start()
+        return
+      }
+      for (const t of st.targets) {
+        if (t.reachable && t.lastCompletedAt && old(t.lastVerifiedAt)) {
+          library.logger.info('backup.monthly_verify', { target: t.path })
+          await backups.run(t.id, { verifyAll: true })
+          return
+        }
+      }
+    } catch (err) {
+      library.logger.warn('protection.tick_failed', { error: errorMessage(err) })
+    }
+  }
+
+  /** Puts a catalogue snapshot back (the current catalogue is kept first) and reopens the library. */
+  restoreSnapshot(name: string): void {
+    const library = this.library
+    if (!library) throw new Error('No library is open.')
+    const root = library.root
+    library.logger.warn('db.restore', { snapshot: name })
+    this.close()
+    try {
+      restoreSnapshotFile(root, name)
+    } finally {
+      this.open(root, false)
+    }
+    this.library?.logger.warn('db.restored', { snapshot: name })
   }
 
   tryOpen(root: string): void {
@@ -253,6 +316,8 @@ export class LibraryController {
   }
 
   close(): void {
+    if (this.protectTimer) clearInterval(this.protectTimer)
+    this.protectTimer = null
     this.smart?.stop()
     this.smart = null
     this.people?.stop()

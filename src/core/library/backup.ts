@@ -21,6 +21,7 @@ interface TargetRow {
   last_completed_at: string | null
   last_verified_at: string | null
   last_error: string | null
+  label: string | null
 }
 
 interface FileRow {
@@ -105,6 +106,10 @@ export class BackupService {
     this.library.db.run('DELETE FROM backup_targets WHERE id = ?', [id])
   }
 
+  setLabel(id: number, label: string | null): void {
+    this.library.db.run('UPDATE backup_targets SET label = ? WHERE id = ?', [label?.trim().slice(0, 60) || null, id])
+  }
+
   setAuto(id: number, auto: boolean): void {
     this.library.db.run('UPDATE backup_targets SET auto = ? WHERE id = ?', [auto ? 1 : 0, id])
   }
@@ -123,9 +128,18 @@ export class BackupService {
            FROM backup_files b JOIN files f ON f.id = b.file_id WHERE b.target_id = ? AND f.sha256 = b.sha256`,
         [t.id]
       )
+      const missing =
+        db.get<{ n: number }>(
+          `SELECT COUNT(*) AS n FROM assets a WHERE a.trashed_at IS NULL AND NOT EXISTS (
+             SELECT 1 FROM files f JOIN backup_files b ON b.file_id = f.id AND b.target_id = ? AND b.status = 'ok' AND b.sha256 = f.sha256
+              WHERE f.asset_id = a.id AND f.storage_location_id = ?)`,
+          [t.id, loc]
+        )?.n ?? 0
       return {
         id: t.id,
         path: t.path,
+        label: t.label ?? null,
+        missingAssets: missing,
         auto: t.auto === 1,
         reachable: accessible(t.path),
         filesBackedUp: c?.ok ?? 0,
@@ -143,7 +157,8 @@ export class BackupService {
           WHERE f.storage_location_id = ?`,
         [loc]
       )?.n ?? 0
-    return { totalFiles: totals?.files ?? 0, totalBytes: totals?.bytes ?? 0, totalAssets: totals?.assets ?? 0, protectedAssets, targets }
+    const lastCheck = db.get<{ t: string | null }>("SELECT MAX(completed_at) AS t FROM verifications WHERE status = 'completed'")?.t ?? null
+    return { lastLibraryCheck: lastCheck, totalFiles: totals?.files ?? 0, totalBytes: totals?.bytes ?? 0, totalAssets: totals?.assets ?? 0, protectedAssets, targets }
   }
 
   /** Copies every original that the target does not have yet (verified), then refreshes the database snapshot. */

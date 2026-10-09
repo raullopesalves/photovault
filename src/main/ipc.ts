@@ -541,6 +541,11 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     return target
   })
   ipcMain.handle('backup:remove', (_e, id: unknown) => controller.backups?.removeTarget(int(id, 'id', 1)))
+  ipcMain.handle('backup:label', (_e, id: unknown, label: unknown) => controller.backups?.setLabel(int(id, 'id', 1), typeof label === 'string' ? label : null))
+  ipcMain.handle('db:restoreSnapshot', (_e, name: unknown) => {
+    controller.restoreSnapshot(str(name, 'snapshot'))
+    changed('opened')
+  })
   ipcMain.handle('backup:auto', (_e, id: unknown, auto: unknown) => controller.backups?.setAuto(int(id, 'id', 1), auto === true))
   ipcMain.handle('backup:run', (_e, id: unknown, verifyAll: unknown) => {
     lib()

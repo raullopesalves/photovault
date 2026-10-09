@@ -611,6 +611,14 @@ export const migrations: Migration[] = [
       -- Faces the user marked by hand (no recognisable vector when the detector could not confirm them).
       ALTER TABLE faces ADD COLUMN manual INTEGER NOT NULL DEFAULT 0;
     `
+  },
+  {
+    version: 18,
+    name: 'backup_labels',
+    sql: `
+      -- A name for each backup location (e.g. "Drive at home", "Drive at work") for rotating drives.
+      ALTER TABLE backup_targets ADD COLUMN label TEXT;
+    `
   }
 ]
 

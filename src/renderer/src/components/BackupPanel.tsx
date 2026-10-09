@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { CircleAlert, Database as DbIcon, FolderOpen, HardDriveDownload, LoaderCircle, Plus, ShieldCheck, X } from 'lucide-react'
 import type { BackupProgress, BackupStatus, DbSnapshot } from '@shared/types'
 import { api, bytes, etaLabel, isoLocal, n, plural } from '../lib/format'
-import { ConfirmDialog } from './Dialog'
+import { ConfirmDialog, PromptDialog } from './Dialog'
 
 const btn = 'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-medium transition disabled:opacity-40'
 const soft = `${btn} bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700`
@@ -13,6 +13,7 @@ export function BackupPanel(props: { version: number }) {
   const [progress, setProgress] = useState<BackupProgress | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [removing, setRemoving] = useState<number | null>(null)
+  const [naming, setNaming] = useState<{ id: number; label: string } | null>(null)
 
   const refresh = (): void => void api.backupStatus().then(setStatus)
   useEffect(refresh, [props.version])
@@ -89,12 +90,27 @@ export function BackupPanel(props: { version: number }) {
                 {running ? <LoaderCircle className="size-5 animate-spin" /> : <HardDriveDownload className="size-5" />}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[14px] font-medium" title={t.path}>
-                  {t.path}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setNaming({ id: t.id, label: t.label ?? '' })}
+                    className="truncate text-left text-[14px] font-medium hover:text-accent-600"
+                    title={`${t.path} — click to name this drive`}
+                  >
+                    {t.label ?? t.path}
+                  </button>
+                  {t.reachable && t.missingAssets === 0 && (
+                    <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">up to date</span>
+                  )}
+                  {t.missingAssets > 0 && t.lastCompletedAt && (
+                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10.5px] font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+                      {plural(t.missingAssets, 'item')} not on it yet
+                    </span>
+                  )}
                 </div>
+                {t.label && <div className="truncate text-[11.5px] text-stone-400">{t.path}</div>}
                 <div className="mt-0.5 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
                   {!t.reachable
-                    ? 'Not connected — plug in the drive and press “Back up now”.'
+                    ? `Not connected${t.lastCompletedAt ? ` — last updated ${ago(t.lastCompletedAt)}` : ''}. Plug it in: it is brought up to date automatically.`
                     : `${n(t.filesBackedUp)} of ${n(status.totalFiles)} originals copied and verified · ${bytes(t.bytesBackedUp)}`}
                   {t.lastCompletedAt && ` · last backup ${isoLocal(t.lastCompletedAt)}`}
                   {t.lastVerifiedAt && ` · fully verified ${isoLocal(t.lastVerifiedAt)}`}
@@ -155,7 +171,36 @@ export function BackupPanel(props: { version: number }) {
         )
       })}
 
+      {status.targets.length > 0 && (
+        <div className="rounded-xl bg-white px-5 py-4 text-xs leading-relaxed text-stone-500 shadow-sm shadow-stone-900/5 dark:bg-stone-900 dark:text-stone-400">
+          <span className="font-medium text-stone-700 dark:text-stone-300">Keep a copy away from home.</span> A fire or theft takes a backup drive that sits next
+          to the computer too. With two drives, keep one elsewhere (work, family) and swap them every month or so — each is brought up to date the moment it
+          is plugged in. {status.targets.length === 1 && 'Add a second drive here to start rotating.'}
+          <div className="mt-2">
+            Checks: your library's files are re-read and compared with their fingerprints automatically every month
+            {status.lastLibraryCheck ? ` (last complete check ${ago(status.lastLibraryCheck)})` : ' (first check soon)'}; connected backup drives are verified on the
+            same schedule.
+          </div>
+        </div>
+      )}
+
       <SnapshotsCard version={props.version} />
+
+      {naming && (
+        <PromptDialog
+          title="Name this backup drive"
+          label="For example “Drive at home” or “Drive at Mum's”. Helps when rotating drives."
+          initial={naming.label}
+          placeholder="Name"
+          confirm="Save"
+          onClose={() => setNaming(null)}
+          onSubmit={async (value) => {
+            await api.setBackupLabel(naming.id, value || null)
+            setNaming(null)
+            refresh()
+          }}
+        />
+      )}
 
       {removing !== null && (
         <ConfirmDialog
@@ -177,6 +222,7 @@ export function BackupPanel(props: { version: number }) {
 function SnapshotsCard(props: { version: number }) {
   const [snaps, setSnaps] = useState<DbSnapshot[] | null>(null)
   const [busy, setBusy] = useState(false)
+  const [restoring, setRestoring] = useState<DbSnapshot | null>(null)
   const refresh = (): void => void api.dbSnapshots().then(setSnaps)
   useEffect(refresh, [props.version])
   const latest = snaps?.[0]
@@ -192,9 +238,20 @@ function SnapshotsCard(props: { version: number }) {
           before upgrades.{' '}
           {latest ? `${plural(snaps?.length ?? 0, 'snapshot')} kept · latest ${isoLocal(latest.createdAt)} (${latest.reason}).` : 'No snapshot yet.'}
         </p>
-        <p className="mt-1 text-xs leading-relaxed text-stone-400 dark:text-stone-500">
-          To restore one: close Photo Vault, then replace database\photovault.db with the snapshot (keep a copy of the current one).
-        </p>
+        {snaps && snaps.length > 0 && (
+          <div className="mt-3 max-h-56 space-y-1 overflow-y-auto">
+            {snaps.map((s) => (
+              <div key={s.name} className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-[12.5px] hover:bg-stone-50 dark:hover:bg-stone-800/60">
+                <span className="w-40 shrink-0 tabular-nums">{isoLocal(s.createdAt)}</span>
+                <span className="flex-1 text-stone-500 dark:text-stone-400">{REASONS[s.reason] ?? s.reason}</span>
+                <span className="text-stone-400">{bytes(s.sizeBytes)}</span>
+                <button onClick={() => setRestoring(s)} className="rounded-md px-2 py-0.5 font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">
+                  Restore
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex shrink-0 gap-2">
         <button onClick={() => void api.openSnapshotsFolder()} className={soft}>
@@ -213,6 +270,45 @@ function SnapshotsCard(props: { version: number }) {
           Snapshot now
         </button>
       </div>
+      {restoring && (
+        <ConfirmDialog
+          title={`Restore the catalogue from ${isoLocal(restoring.createdAt)}?`}
+          body="Albums, people, dates, labels and everything else go back to how they were then. Your current catalogue is saved first, so this can be undone by restoring that copy. Photo files are not touched; photos imported after this point stay on disk and come back when you import their source again."
+          confirm="Restore"
+          destructive
+          onClose={() => setRestoring(null)}
+          onConfirm={async () => {
+            const s = restoring
+            setRestoring(null)
+            setBusy(true)
+            try {
+              await api.restoreSnapshot(s.name)
+            } finally {
+              setBusy(false)
+              refresh()
+            }
+          }}
+        />
+      )}
     </div>
   )
+}
+
+const REASONS: Record<string, string> = {
+  daily: 'Daily',
+  import: 'After an import',
+  'before-delete': 'Before a permanent delete',
+  manual: 'Taken by you',
+  'before-upgrade': 'Before an app update',
+  'before-restore': 'Before a restore',
+  unknown: 'Snapshot'
+}
+
+/** "3 days ago", "today". */
+function ago(iso: string): string {
+  const days = Math.floor((Date.now() - Date.parse(iso)) / 86_400_000)
+  if (days <= 0) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 60) return `${days} days ago`
+  return `${Math.round(days / 30)} months ago`
 }

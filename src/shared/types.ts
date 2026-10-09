@@ -584,6 +584,10 @@ export interface DbSnapshot {
 export interface BackupTargetInfo {
   id: number
   path: string
+  /** The user's name for it ("Drive at home"); null = show the path. */
+  label: string | null
+  /** Library items that do not have a verified copy here yet. */
+  missingAssets: number
   auto: boolean
   /** The drive/folder is currently connected. */
   reachable: boolean
@@ -597,6 +601,8 @@ export interface BackupTargetInfo {
 }
 
 export interface BackupStatus {
+  /** When the library's own files were last checked completely (null = never). */
+  lastLibraryCheck: string | null
   totalFiles: number
   totalBytes: number
   totalAssets: number
@@ -692,6 +698,10 @@ export interface PhotoVaultApi {
   /** "Not this person" for the selected photos. */
   removeFromPerson(personId: number, assetIds: number[]): Promise<number>
   onPeopleStatus(cb: (s: PeopleStatus) => void): () => void
+  /** Names a backup location ("Drive at home"). */
+  setBackupLabel(id: number, label: string | null): Promise<void>
+  /** Replaces the catalogue with a snapshot (the current one is kept first) and reopens the library. */
+  restoreSnapshot(name: string): Promise<void>
   smartSearchStatus(): Promise<SmartSearchStatus>
   /** Turns smart search on (downloads the model once, then indexes in the background) or off. */
   setSmartSearch(enabled: boolean): Promise<void>
