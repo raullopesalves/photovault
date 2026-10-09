@@ -131,3 +131,19 @@ describe('sharing', () => {
     rmSync(r.folder, { recursive: true, force: true })
   })
 })
+
+describe('place names', () => {
+  it('names located photos after the nearest town, searchably, and updates when moved', async () => {
+    const { fillPlaces } = await import('@core/geo/fillPlaces')
+    await makeJpeg(join(sb.source, 'a.jpg'), { color: '#123456', gps: { lat: '38/1 43/1 20/1', latRef: 'N', lon: '9/1 8/1 21/1', lonRef: 'W' } })
+    await runImport(lib, sb.source)
+    const a = idOf('a.jpg')
+    expect(fillPlaces(lib)).toBe(1)
+    expect(assetDetail(lib, a)!.place).toBe('Lisbon, Portugal')
+    expect(assetIdsInRange(lib, { text: 'lisbon' }, 0, 10)).toEqual([a])
+    setLocation(lib, [a], { lat: 41.1496, lon: -8.611 })
+    fillPlaces(lib)
+    expect(assetDetail(lib, a)!.place).toBe('Porto, Portugal')
+    expect(assetIdsInRange(lib, { text: 'lisbon' }, 0, 10)).toEqual([])
+  })
+})

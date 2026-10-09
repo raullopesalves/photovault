@@ -1,6 +1,7 @@
 import type { AssetQuery, MapCluster } from '@shared/types'
 import type { Library } from '../library/library'
 import { assetWhere } from './filters'
+import { placeLabel } from '../geo/places'
 
 /**
  * Server-side clustering for the map: items with a location inside the visible box are bucketed into a grid
@@ -45,7 +46,8 @@ export function mapClusters(library: Library, view: { south: number; west: numbe
     lon: r.lon,
     count: r.count,
     bounds: [r.south, r.west, r.north, r.east] as [number, number, number, number],
-    coverId: rows.length <= 400 ? coverStmt(r) : r.cover
+    coverId: rows.length <= 400 ? coverStmt(r) : r.cover,
+    place: rows.length <= 400 ? placeLabel(r.lat, r.lon) : null
   }))
 }
 

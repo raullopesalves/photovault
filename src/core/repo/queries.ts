@@ -23,6 +23,7 @@ import { assetWhere } from './filters'
 import { refreshSearchIndex } from './search'
 import { peopleOfAsset } from './people'
 import { tagsOf } from './annotate'
+import { placeLabel } from '../geo/places'
 import type { Library } from '../library/library'
 import { isBrowserDisplayable } from '../media/formats'
 
@@ -311,6 +312,9 @@ export function assetDetail(library: Library, id: number): AssetDetail | null {
     people: peopleOfAsset(library, id),
     tags: tagsOf(library, id),
     locationSource: (r as { location_source?: string | null }).location_source ?? null,
+    place:
+      (r as { place?: string | null }).place ||
+      (r.latitude !== null && r.longitude !== null ? placeLabel(r.latitude, r.longitude) : null),
     exposure: exposureFrom(raw),
     albums: albumsOfAsset(library, id),
     backups: db

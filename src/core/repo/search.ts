@@ -8,7 +8,7 @@ import type { Library } from '../library/library'
  * (re)builds those rows lazily — in the background after open/imports, and before any text query.
  */
 const TEXT_SQL = `
-  a.original_filename || ' ' || COALESCE(a.camera_make, '') || ' ' || COALESCE(a.camera_model, '') || ' ' ||
+  a.original_filename || ' ' || COALESCE(a.place, '') || ' ' || COALESCE(a.camera_make, '') || ' ' || COALESCE(a.camera_model, '') || ' ' ||
   COALESCE(a.description, '') || ' ' || COALESCE(a.sort_day, '') || ' ' || a.mime_type || ' ' ||
   COALESCE((SELECT group_concat(COALESCE(p.original_filename, '') || ' ' || COALESCE(p.album, '') || ' ' || COALESCE(p.relative_path, ''), ' ')
               FROM provenance p WHERE p.asset_id = a.id), '') || ' ' ||

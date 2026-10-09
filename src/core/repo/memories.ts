@@ -3,6 +3,7 @@ import type { GeometryCollection, Topology } from 'topojson-specification'
 import type { Memory } from '@shared/types'
 import countriesTopo from 'world-atlas/countries-110m.json'
 import type { Library } from '../library/library'
+import { nearestPlace } from '../geo/places'
 
 /**
  * Memories, all computed from the catalogue on demand (no extra storage):
@@ -167,18 +168,27 @@ export function memories(library: Library, today = new Date()): Memory[] {
     const all = trip.days.flatMap(([, l]) => l)
     if (all.length >= 10 && (trip.days.length >= 2 || all.length >= 25)) {
       const located = all.filter((r) => r.lat !== null && r.lon !== null)
-      const counts = new Map<string, number>()
-      for (const r of located.filter((_, i) => i % Math.max(1, Math.floor(located.length / 40)) === 0)) {
-        const c = countryAt(r.lat as number, r.lon as number)
-        if (c) counts.set(c, (counts.get(c) ?? 0) + 1)
+      // Name it after the city if one dominates, else the country; list the main towns.
+      const countries = new Map<string, number>()
+      const cities = new Map<string, number>()
+      const sample = located.filter((_, i) => i % Math.max(1, Math.floor(located.length / 60)) === 0)
+      for (const r of sample) {
+        const p = nearestPlace(r.lat as number, r.lon as number)
+        const c = p?.country ?? countryAt(r.lat as number, r.lon as number)
+        if (c) countries.set(c, (countries.get(c) ?? 0) + 1)
+        if (p) cities.set(p.city, (cities.get(p.city) ?? 0) + 1)
       }
-      const country = [...counts].sort((a, b) => b[1] - a[1])[0]?.[0]
+      const topCities = [...cities].sort((a, b) => b[1] - a[1])
+      const country = [...countries].sort((a, b) => b[1] - a[1])[0]?.[0]
+      const cityTrip = topCities[0] && topCities[0][1] >= sample.length * 0.6 ? topCities[0][0] : null
+      const towns = topCities.filter(([, n]) => n >= Math.max(2, sample.length * 0.08)).slice(0, 3).map(([c]) => c)
       const first = trip.days[0]![0]
       const last = trip.days[trip.days.length - 1]![0]
       trips.push({
         key: `trip-${first}`,
         kind: 'trip',
-        title: country ? `Trip to ${country}` : 'Trip',
+        title: cityTrip ? `Trip to ${cityTrip}` : country ? `Trip to ${country}` : 'Trip',
+        places: towns,
         subtitle:
           first === last
             ? fmtDay(first, { day: 'numeric', month: 'long', year: 'numeric' })

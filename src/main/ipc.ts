@@ -17,6 +17,7 @@ import { dismissNearDuplicates, hideAllNearDuplicateExtras, nearDuplicates } fro
 import { similarPhotos } from '@core/repo/similar'
 import { mapClusters } from '@core/repo/geo'
 import { memories } from '@core/repo/memories'
+import { fillPlaces } from '@core/geo/fillPlaces'
 import { allTags, assetFaces, createSmartAlbum, deleteFace, deleteSmartAlbum, setDescription, setLocation, setTags, smartAlbums, updateSmartAlbum } from '@core/repo/annotate'
 import { getPerson, listPeople, markDifferentPeople, mergePeople, moveFaces, personFaces, personMerges, undoMerge, peopleSuggestions, removeFromPerson, renamePerson, setPersonHidden } from '@core/repo/people'
 import { rotateAssets } from '@core/library/rotate'
@@ -239,6 +240,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('asset:setLocation', (_e, ids: unknown, loc: unknown) => {
     const l = loc as { lat?: unknown; lon?: unknown } | null
     setLocation(lib(), idList(ids), l && typeof l.lat === 'number' && typeof l.lon === 'number' ? { lat: l.lat, lon: l.lon } : null)
+    fillPlaces(lib())
     changed('albums')
   })
   ipcMain.handle('smart:list', () => smartAlbums(lib()))

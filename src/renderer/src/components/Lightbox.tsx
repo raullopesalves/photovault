@@ -943,6 +943,7 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
       <Section title="Location" icon={<MapPin className="size-3.5" />}>
         {d.latitude !== null && d.longitude !== null ? (
           <>
+            {d.place && <Row label="Place">Near {d.place}</Row>}
             <Row label="Coordinates">
               {d.latitude.toFixed(5)}, {d.longitude.toFixed(5)}
               {d.locationSource === 'manual' && <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[10.5px] text-stone-300">set by you</span>}

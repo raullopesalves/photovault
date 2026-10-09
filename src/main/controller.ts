@@ -8,6 +8,7 @@ import { VerifyService } from '@core/library/verify'
 import { WatchService } from '@core/library/watch'
 import { restoreSnapshotFile } from '@core/library/dbSnapshots'
 import { buildSearchIndexInBackground } from '@core/repo/search'
+import { fillPlaces, fillPlacesInBackground } from '@core/geo/fillPlaces'
 import { nearDuplicatesCached, primeNearDuplicateGroups } from '@core/repo/nearDuplicates'
 import { HeavyWork } from './heavyWork'
 import { SmartSearchService } from './smartSearch'
@@ -178,7 +179,7 @@ export class LibraryController {
       onProgress: (p) => {
         this.events.importProgress(p)
         if (p.phase === 'completed') {
-          void buildSearchIndexInBackground(opened, () => this.library === opened)
+          void fillPlacesInBackground(opened, () => this.library === opened).then(() => buildSearchIndexInBackground(opened, () => this.library === opened))
           this.classify?.kick()
           this.scheduleDating()
           void this.afterImport()
@@ -228,7 +229,7 @@ export class LibraryController {
     this.classify.kick()
     this.hashes.kick()
     this.scheduleDating()
-    void buildSearchIndexInBackground(opened, () => this.library === opened)
+    void fillPlacesInBackground(opened, () => this.library === opened).then(() => buildSearchIndexInBackground(opened, () => this.library === opened))
     // Protection on open: a daily catalogue snapshot, then bring connected backups up to date.
     setTimeout(() => {
       if (this.library !== opened) return

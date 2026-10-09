@@ -206,6 +206,8 @@ export interface AssetDetail extends AssetSummary {
   tags: string[]
   /** 'manual' when the user placed it on the map. */
   locationSource: string | null
+  /** Nearest town and country ("Lisbon, Portugal"), when located. */
+  place: string | null
   /** People recognised on this photo. */
   people: Array<{ id: number; name: string | null }>
   sha256: string
@@ -465,6 +467,8 @@ export interface Memory {
   ids: number[]
   /** First day (YYYY-MM-DD). */
   start: string
+  /** Main towns visited (trips). */
+  places?: string[]
 }
 
 export interface ShareOptions {
@@ -539,6 +543,8 @@ export interface MapCluster {
   lat: number
   lon: number
   count: number
+  /** Nearest town and country of the cluster's centre. */
+  place: string | null
   /** [south, west, north, east] of the items in this cluster. */
   bounds: [number, number, number, number]
   coverId: number

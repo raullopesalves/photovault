@@ -98,6 +98,7 @@ function MemoryCard(props: { memory: Memory; onOpen: () => void }) {
         <div className="truncate text-xs text-stone-500 dark:text-stone-400">
           {m.subtitle} · {n(m.count)} photos
         </div>
+        {m.places && m.places.length > 1 && <div className="truncate text-xs text-stone-400 dark:text-stone-500">{m.places.join(' · ')}</div>}
       </div>
     </button>
   )

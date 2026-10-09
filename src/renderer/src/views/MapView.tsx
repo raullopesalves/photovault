@@ -64,6 +64,7 @@ export function MapView(props: { version: number }) {
   const [view, setView] = useState<Box | null>(null)
   const [zoom, setZoom] = useState(2)
   const [selected, setSelected] = useState<Box | null>(null)
+  const [selectedPlace, setSelectedPlace] = useState<string | null>(null)
   const [detailed, setDetailed] = useState(() => load(DETAIL_KEY) === '1')
   const [located, setLocated] = useState<number | null>(null)
   const base: AssetQuery = { hidden: 'exclude' }
@@ -77,6 +78,7 @@ export function MapView(props: { version: number }) {
     if (!el.current) return
     const map = L.map(el.current, { worldCopyJump: true, minZoom: 2, maxZoom: 18, zoomSnap: 1, preferCanvas: true, attributionControl: true })
     mapRef.current = map
+    map.attributionControl.addAttribution('Place names: <a href="https://www.geonames.org">GeoNames</a> (CC BY 4.0)')
     let saved: { lat: number; lng: number; zoom: number } | null = null
     try {
       saved = JSON.parse(load(VIEW_KEY) ?? 'null')
@@ -137,11 +139,12 @@ export function MapView(props: { version: number }) {
       const map = mapRef.current
       pins.current.clearLayers()
       for (const c of clusters) {
-        const m = L.marker([c.lat, c.lon], { icon: pinIcon(c), title: `${c.count} item${c.count === 1 ? '' : 's'}` })
+        const m = L.marker([c.lat, c.lon], { icon: pinIcon(c), title: `${c.place ? `${c.place} · ` : ''}${c.count} item${c.count === 1 ? '' : 's'}` })
         m.on('click', () => {
           const [s, w, nn, e] = c.bounds
           const pad = 0.0005
           setSelected([s - pad, w - pad, nn + pad, e + pad])
+          setSelectedPlace(c.place)
           if (c.count > 1 && map.getZoom() < 16 && (nn - s > 0.001 || e - w > 0.001)) map.fitBounds([[s, w], [nn, e]], { padding: [60, 60], maxZoom: 16 })
         })
         pins.current.addLayer(m)
@@ -189,7 +192,7 @@ export function MapView(props: { version: number }) {
             key={JSON.stringify(panelBox)}
             version={props.version}
             query={{ ...base, bbox: panelBox }}
-            title={selected ? 'This place' : 'In view'}
+            title={selected ? (selectedPlace?.split(',')[0] ?? 'This place') : 'In view'}
             subtitle={located !== null ? `${n(located)} items have a location` : undefined}
             toolbar={
               selected ? (

@@ -619,6 +619,21 @@ export const migrations: Migration[] = [
       -- A name for each backup location (e.g. "Drive at home", "Drive at work") for rotating drives.
       ALTER TABLE backup_targets ADD COLUMN label TEXT;
     `
+  },
+  {
+    version: 19,
+    name: 'places',
+    sql: `
+      -- Nearest town/city and country for located items ("Lisbon, Portugal"; '' = none nearby), filled in the
+      -- background from the offline GeoNames table (core/geo/places.ts). NULL = not looked up yet.
+      ALTER TABLE assets ADD COLUMN place TEXT;
+      CREATE INDEX idx_assets_place_todo ON assets (id) WHERE place IS NULL AND latitude IS NOT NULL;
+      -- A new location means a new place name.
+      CREATE TRIGGER trg_place_reset AFTER UPDATE OF latitude, longitude ON assets
+        BEGIN UPDATE assets SET place = NULL WHERE id = new.id; END;
+      CREATE TRIGGER trg_search_place AFTER UPDATE OF place ON assets
+        BEGIN INSERT INTO search_dirty SELECT new.id WHERE NOT EXISTS (SELECT 1 FROM search_dirty WHERE asset_id = new.id); END;
+    `
   }
 ]
 

@@ -76,3 +76,6 @@ Video thumbnails and playable copies of HEVC/old videos use a bundled ffmpeg (a 
 `ffmpeg-static`, run as a process). The smart-search model (~150 MB) and the face models (~39 MB), downloaded only if you turn those features on, live in the app's data folder
 (`%APPDATA%/Photo Vault/models`), not in the library.
 ```
+
+Place names (map, trips, search) come from [GeoNames](https://www.geonames.org) "cities5000" (CC BY 4.0), bundled
+in `src/core/geo/places.json` and rebuilt with `node scripts/make-places.mjs`.
