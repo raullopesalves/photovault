@@ -22,4 +22,12 @@ execFileSync('git', ['push', 'origin', tag], { stdio: 'inherit' })
 run('node', ['scripts/electron-vite.mjs', 'build'])
 // The local electron-builder, not npx (which needs a working global npm).
 run('node', [join('node_modules', 'electron-builder', 'cli.js'), '--win', 'nsis', '--publish', 'always'])
+// electron-builder has reported success with an upload missing: check, and upload what is not there.
+const wanted = [`PhotoVault-Setup-${version}.exe`, `PhotoVault-Setup-${version}.exe.blockmap`, 'latest.yml']
+const have = execFileSync(gh, ['release', 'view', tag, '--json', 'assets', '--jq', '.assets[].name'], { encoding: 'utf8' }).split(/\r?\n/)
+const missing = wanted.filter((f) => !have.includes(f))
+if (missing.length) {
+  console.log(`Uploading ${missing.join(', ')}…`)
+  execFileSync(gh, ['release', 'upload', tag, ...missing.map((f) => join('dist', f)), '--clobber'], { stdio: 'inherit' })
+}
 console.log(`Published v${version}. Installed copies pick it up within 6 hours (or Settings → Updates → Check now).`)
