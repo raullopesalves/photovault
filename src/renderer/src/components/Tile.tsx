@@ -1,0 +1,117 @@
+import { memo, useEffect, useState, type MouseEvent } from 'react'
+import { Check, EyeOff, Heart, ImageOff, Play, Repeat } from 'lucide-react'
+import type { AssetSummary } from '@shared/types'
+import { api, duration, mediaUrl, mimeLabel } from '../lib/format'
+
+export const Tile = memo(function Tile(props: {
+  asset: AssetSummary | undefined
+  size: number
+  selected: boolean
+  /** True while any tile is selected: a click then toggles selection instead of opening. */
+  selecting: boolean
+  onOpen: () => void
+  onToggle: (shift: boolean) => void
+}) {
+  const { asset, size, selected } = props
+  const [loaded, setLoaded] = useState(false)
+  const [broken, setBroken] = useState(false)
+  // Optimistic favourite state so the heart reacts instantly; the grid refreshes from the library afterwards.
+  const [favOverride, setFavOverride] = useState<boolean | null>(null)
+  useEffect(() => setFavOverride(null), [asset?.favorite])
+
+  if (!asset) return <div className="skeleton shrink-0 rounded-[3px]" style={{ width: size, height: size }} />
+
+  const showImg = asset.thumb === 'ready' && !broken
+  const favorite = favOverride ?? asset.favorite
+  const onClick = (e: MouseEvent): void => {
+    if (props.selecting || e.shiftKey || e.ctrlKey || e.metaKey) props.onToggle(e.shiftKey)
+    else props.onOpen()
+  }
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') props.onOpen()
+        if (e.key === ' ') {
+          e.preventDefault()
+          props.onToggle(e.shiftKey)
+        }
+      }}
+      className={`group relative shrink-0 cursor-default overflow-hidden rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-accent-500 ${
+        selected ? 'bg-accent-100 dark:bg-accent-500/20' : 'bg-stone-200 dark:bg-stone-800'
+      }`}
+      style={{ width: size, height: size }}
+    >
+      <div className={`size-full transition-transform duration-200 ease-[var(--ease-out-soft)] ${selected ? 'scale-[0.86] overflow-hidden rounded-[3px]' : ''}`}>
+        {showImg ? (
+          <img
+            src={mediaUrl('thumb', asset.id, asset.rev)}
+            alt=""
+            draggable={false}
+            decoding="async"
+            loading="lazy"
+            onLoad={() => setLoaded(true)}
+            onError={() => setBroken(true)}
+            className={`img-fade size-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] ${selected ? '' : 'group-hover:scale-[1.03]'} ${loaded ? 'loaded' : ''}`}
+          />
+        ) : asset.thumb === 'pending' ? (
+          <div className="skeleton size-full" />
+        ) : (
+          <div className="flex size-full flex-col items-center justify-center gap-1.5 text-stone-400 dark:text-stone-500">
+            <ImageOff className="size-5" strokeWidth={1.5} />
+            <span className="text-[10px] font-medium uppercase tracking-wider">{mimeLabel(asset.mimeType)}</span>
+          </div>
+        )}
+      </div>
+      {!selected && <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 to-transparent to-40% opacity-0 transition-opacity group-hover:opacity-100" />}
+      <button
+        aria-label={selected ? 'Deselect' : 'Select'}
+        onClick={(e) => {
+          e.stopPropagation()
+          props.onToggle(e.shiftKey)
+        }}
+        className={`absolute left-1.5 top-1.5 grid size-[22px] place-items-center rounded-full transition ${
+          selected
+            ? 'bg-accent-500 text-white opacity-100 ring-2 ring-white dark:ring-stone-900'
+            : `border-2 border-white/90 bg-black/10 text-transparent hover:bg-white/30 ${props.selecting ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`
+        }`}
+      >
+        <Check className="size-3.5" strokeWidth={3} />
+      </button>
+      {(asset.mediaType === 'video' || asset.kind === 'animated') && (
+        <div className="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/45 px-1.5 py-0.5 text-[10.5px] font-medium text-white backdrop-blur-sm">
+          {asset.kind === 'loop' || asset.kind === 'animated' ? <Repeat className="size-2.5" /> : <Play className="size-2.5 fill-white" />}
+          {asset.kind === 'animated' ? 'GIF' : duration(asset.durationMs)}
+        </div>
+      )}
+      {asset.liveVideoId !== null && (
+        <div className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/45 px-1.5 py-0.5 text-[9.5px] font-bold tracking-wider text-white backdrop-blur-sm">
+          LIVE
+        </div>
+      )}
+      {asset.hidden && (
+        <div className="pointer-events-none absolute bottom-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-black/45 text-white backdrop-blur-sm" title="Hidden from Photos">
+          <EyeOff className="size-3" />
+        </div>
+      )}
+      <button
+        aria-label={favorite ? 'Remove from favourites' : 'Add to favourites'}
+        title={favorite ? 'Remove from favourites' : 'Add to favourites'}
+        onClick={(e) => {
+          e.stopPropagation()
+          const next = !favorite
+          setFavOverride(next)
+          void api.setFavorite(asset.id, next).catch(() => setFavOverride(null))
+        }}
+        className={`absolute bottom-1 left-1 grid size-7 place-items-center rounded-full transition hover:scale-110 ${
+          favorite ? 'opacity-100' : props.selecting ? 'hidden' : 'opacity-0 hover:bg-black/20 group-hover:opacity-100'
+        }`}
+      >
+        <Heart className={`size-[15px] drop-shadow ${favorite ? 'fill-white text-white' : 'text-white'}`} strokeWidth={2.25} />
+      </button>
+    </div>
+  )
+})

@@ -1,0 +1,53 @@
+# Packaging: `npm run dist` -> dist/Photo Vault Setup <version>.exe (installer) and a portable .exe
+appId: app.photovault.desktop
+productName: Photo Vault
+copyright: Copyright © 2026 Photo Vault
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  # On-device AI: only the Windows x64 onnxruntime binaries are needed; onnxruntime-web is bundled inside
+  # transformers.js already.
+  - '!**/node_modules/onnxruntime-web/**'
+  - '!**/node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**'
+  - '!**/node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**'
+# Native code (sharp/libvips) cannot be loaded from inside the asar archive.
+asarUnpack:
+  - '**/node_modules/sharp/**/*'
+  - '**/node_modules/@img/**/*'
+  - '**/node_modules/onnxruntime-node/**/*'
+  # Bundled ffmpeg (GPL, run as a separate program) for HEVC thumbnails and playable copies.
+  - '**/node_modules/ffmpeg-static/**/*'
+npmRebuild: false
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: build/icon.ico
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Photo Vault
+  # Uninstalling the app never touches photo libraries; only the app's own settings may be removed.
+  deleteAppDataOnUninstall: false
+  artifactName: Photo Vault Setup ${version}.${ext}
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+portable:
+  artifactName: Photo Vault ${version} Portable.${ext}
+mac:
+  target: dmg
+  category: public.app-category.photography
+  icon: build/icon.png
+linux:
+  target: AppImage
+  category: Graphics
+  icon: build/icon.png
