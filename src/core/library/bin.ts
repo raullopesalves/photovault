@@ -21,11 +21,14 @@ export interface DeleteResult {
   errors: string[]
 }
 
-/** A Live Photo's motion clip always shares its still's fate. */
+/** A Live Photo's motion clip, and the original behind an edited version, always share the item's fate. */
 function withLiveClips(library: Library, assetIds: number[]): number[] {
   if (assetIds.length === 0) return assetIds
   const clips = library.db
-    .all<{ id: number }>('SELECT id FROM assets WHERE live_photo_of IN (SELECT value FROM json_each(?))', [JSON.stringify(assetIds)])
+    .all<{ id: number }>('SELECT id FROM assets WHERE live_photo_of IN (SELECT value FROM json_each(?)) OR version_of IN (SELECT value FROM json_each(?))', [
+      JSON.stringify(assetIds),
+      JSON.stringify(assetIds)
+    ])
     .map((r) => r.id)
   return [...new Set([...assetIds, ...clips])]
 }

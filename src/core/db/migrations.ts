@@ -634,6 +634,16 @@ export const migrations: Migration[] = [
       CREATE TRIGGER trg_search_place AFTER UPDATE OF place ON assets
         BEGIN INSERT INTO search_dirty SELECT new.id WHERE NOT EXISTS (SELECT 1 FROM search_dirty WHERE asset_id = new.id); END;
     `
+  },
+  {
+    version: 20,
+    name: 'edited_versions',
+    sql: `
+      -- An original that has an edited version beside it (IMG_1234 + IMG_E1234, name + name-edited) points at
+      -- the edited one and is not shown separately; see core/library/editedVersions.ts.
+      ALTER TABLE assets ADD COLUMN version_of INTEGER REFERENCES assets(id) ON DELETE SET NULL;
+      CREATE INDEX idx_assets_version_of ON assets (version_of) WHERE version_of IS NOT NULL;
+    `
   }
 ]
 

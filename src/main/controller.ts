@@ -19,6 +19,7 @@ import { ClassifyQueue } from '@core/library/classifyQueue'
 import { HashQueue } from '@core/library/hashQueue'
 import { runDating } from '@core/dating/dating'
 import { linkLivePhotos } from '@core/library/livePhotos'
+import { linkEditedVersions } from '@core/library/editedVersions'
 import { BackupService } from '@core/library/backup'
 import { maybeDailySnapshot, snapshotDatabase } from '@core/library/dbSnapshots'
 import { createLogger, type Logger } from '@core/log'
@@ -86,6 +87,7 @@ export class LibraryController {
         if (this.library !== library) return
         try {
           linkLivePhotos(library)
+          linkEditedVersions(library)
           const r = runDating(library)
           if (r.borrowed + r.estimated > 0) this.notifyChanged('import')
         } catch (err) {

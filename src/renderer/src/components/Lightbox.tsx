@@ -34,6 +34,7 @@ export function Lightbox(props: {
   const [dating, setDating] = useState(false)
   const [editing, setEditing] = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [showOriginal, setShowOriginal] = useState(false)
   const [showFaces, setShowFaces] = useState(() => {
     try {
       return localStorage.getItem('pv.faces') === '1'
@@ -75,6 +76,7 @@ export function Lightbox(props: {
 
   // New photo: start fresh.
   useEffect(() => {
+    setShowOriginal(false)
     setFullLoaded(false)
     setDetail(null)
     if (assetId === null) return
@@ -179,7 +181,9 @@ export function Lightbox(props: {
   }
 
   const full = detail
-    ? detail.fullView === 'video'
+    ? showOriginal && detail.originalVersionId
+      ? mediaUrl('preview', detail.originalVersionId)
+      : detail.fullView === 'video'
       ? null
       : mediaUrl(detail.fullView === 'original' ? 'original' : detail.fullView === 'preview' ? 'preview' : 'thumb', detail.id, detail.rev)
     : null
@@ -217,6 +221,15 @@ export function Lightbox(props: {
                   <Plus className="size-4" />
                 </button>
               </div>
+            )}
+            {detail?.originalVersionId != null && (
+              <button
+                onClick={() => setShowOriginal((o) => !o)}
+                className={`mr-1 inline-flex h-8 items-center rounded-full px-3 text-[12.5px] font-medium transition ${showOriginal ? 'bg-white text-stone-900' : 'bg-white/10 hover:bg-white/20'}`}
+                title="This photo was edited on the phone; the unedited original is kept too"
+              >
+                {showOriginal ? 'Showing the original' : 'Original'}
+              </button>
             )}
             {detail?.mediaType === 'photo' && showFaces && (
               <button

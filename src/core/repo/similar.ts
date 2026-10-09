@@ -63,7 +63,7 @@ export function findSimilarGroups(library: Library): number[][] {
     .all<Omit<Row, 't'> & { capture_time_source: string }>(
       `SELECT a.id, h.phash, h.dhash, h.color, h.sharpness, a.width, a.height, a.size_bytes, a.capture_time, a.capture_time_source
          FROM assets a JOIN asset_hashes h ON h.asset_id = a.id
-        WHERE a.media_type = 'photo' AND a.trashed_at IS NULL AND a.live_photo_of IS NULL AND h.flat = 0
+        WHERE a.media_type = 'photo' AND a.trashed_at IS NULL AND a.live_photo_of IS NULL AND a.version_of IS NULL AND h.flat = 0
           AND h.phash IS NOT NULL AND a.capture_time IS NOT NULL`
     )
     .filter((r) => RECORDED.has(r.capture_time_source))

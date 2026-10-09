@@ -208,6 +208,8 @@ export interface AssetDetail extends AssetSummary {
   locationSource: string | null
   /** Nearest town and country ("Lisbon, Portugal"), when located. */
   place: string | null
+  /** The unedited original behind this edited version (iPhone IMG_E…, Takeout …-edited), if any. */
+  originalVersionId: number | null
   /** People recognised on this photo. */
   people: Array<{ id: number; name: string | null }>
   sha256: string

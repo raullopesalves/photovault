@@ -110,12 +110,12 @@ export function libraryInfo(library: Library): LibraryInfo {
     bin: number | null
     binBytes: number | null
   }>(
-    `SELECT SUM(trashed_at IS NULL AND live_photo_of IS NULL) AS n,
-            SUM(media_type = 'photo' AND trashed_at IS NULL AND live_photo_of IS NULL) AS photos,
-            SUM(media_type = 'video' AND trashed_at IS NULL AND live_photo_of IS NULL) AS videos,
+    `SELECT SUM(trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL) AS n,
+            SUM(media_type = 'photo' AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL) AS photos,
+            SUM(media_type = 'video' AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL) AS videos,
             SUM(size_bytes) AS bytes,
             SUM(thumb_status = 'pending') AS pending,
-            SUM(hidden = 1 AND trashed_at IS NULL AND live_photo_of IS NULL) AS hidden,
+            SUM(hidden = 1 AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL) AS hidden,
             SUM(trashed_at IS NOT NULL) AS bin,
             SUM(CASE WHEN trashed_at IS NOT NULL THEN size_bytes ELSE 0 END) AS binBytes
        FROM assets`
@@ -311,6 +311,7 @@ export function assetDetail(library: Library, id: number): AssetDetail | null {
     edits: r.edits ? (JSON.parse(r.edits) as PhotoEdits) : null,
     people: peopleOfAsset(library, id),
     tags: tagsOf(library, id),
+    originalVersionId: db.get<{ id: number }>('SELECT id FROM assets WHERE version_of = ? LIMIT 1', [id])?.id ?? null,
     locationSource: (r as { location_source?: string | null }).location_source ?? null,
     place:
       (r as { place?: string | null }).place ||

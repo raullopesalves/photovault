@@ -78,7 +78,7 @@ function ownPhotos(library: Library): Row[] {
   return library.db.all<Row>(
     `SELECT a.id, a.sort_time AS t, a.sort_day AS day, a.latitude AS lat, a.longitude AS lon, a.favorite
        FROM assets a
-      WHERE a.trashed_at IS NULL AND a.hidden = 0 AND a.live_photo_of IS NULL AND a.undated = 0
+      WHERE a.trashed_at IS NULL AND a.hidden = 0 AND a.live_photo_of IS NULL AND a.version_of IS NULL AND a.undated = 0
         AND a.capture_time IS NOT NULL AND a.capture_time_source NOT IN ('estimated', 'duplicate')
         AND (a.origin IS NULL OR a.origin = 'camera')
       ORDER BY a.sort_time`

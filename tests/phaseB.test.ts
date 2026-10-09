@@ -121,3 +121,29 @@ describe('Live Photos', () => {
   })
 })
 
+
+describe('edited versions', () => {
+  it('shows the phone-edited version and keeps the original behind it', async () => {
+    const { linkEditedVersions } = await import('@core/library/editedVersions')
+    const { moveToBin } = await import('@core/library/bin')
+    const dir = join(sb.source, 'iCloud')
+    mkdirSync(dir, { recursive: true })
+    await makeJpeg(join(dir, 'IMG_2001.JPG'), { color: '#334455' })
+    await makeJpeg(join(dir, 'IMG_E2001.JPG'), { color: '#445566' })
+    await makeJpeg(join(dir, 'Beach.jpg'), { color: '#556677' })
+    await makeJpeg(join(dir, 'Beach-edited.jpg'), { color: '#667788' })
+    await makeJpeg(join(dir, 'IMG_2002.JPG'), { color: '#778899' })
+    await runImport(lib, sb.source)
+    expect(linkEditedVersions(lib)).toBe(2)
+    expect(linkEditedVersions(lib)).toBe(0) // idempotent
+
+    const shown = assetsPage(lib, 0, 10).map((a) => a.id)
+    const names = shown.map((id) => assetDetail(lib, id)!.originalFilename).sort()
+    expect(names).toEqual(['Beach-edited.jpg', 'IMG_2002.JPG', 'IMG_E2001.JPG'])
+    const edited = byName('IMG_E2001.JPG')
+    expect(edited.originalVersionId).toBe(byName('IMG_2001.JPG').id)
+
+    moveToBin(lib, [edited.id])
+    expect(lib.db.get<{ n: number }>('SELECT COUNT(*) AS n FROM assets WHERE trashed_at IS NOT NULL')!.n).toBe(2) // both versions
+  })
+})
