@@ -29,8 +29,11 @@ npm run test:perf  # opt-in: build a 100k-item synthetic catalogue and time ever
 
 `npm run dist` produces:
 
-- `dist/Photo Vault Setup <version>.exe`: per-user installer (no admin rights needed), with Start-menu and desktop shortcuts.
-- `dist/Photo Vault <version> Portable.exe`: runs without installing.
+- `dist/PhotoVault-Setup-<version>.exe`: per-user installer (no admin rights needed), with Start-menu and desktop shortcuts. Installed copies update themselves.
+- `dist/PhotoVault-<version>-Portable.exe`: runs without installing (no automatic updates).
+
+To publish an update: bump `version` in package.json, commit, then `npm run release` (uploads to the private
+repository's Releases with the GitHub CLI login). The app needs a read-only token in Settings → Updates to see them.
 
 The builds are not code-signed yet, so Windows SmartScreen shows "Windows protected your PC" on first launch; choose **More info → Run anyway**. Uninstalling never touches your photo library folder.
 

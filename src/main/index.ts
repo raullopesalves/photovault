@@ -3,6 +3,7 @@ import { join, sep } from 'node:path'
 import { setFfmpegPath } from '@core/media/ffmpeg'
 import { LibraryController } from './controller'
 import { registerIpc } from './ipc'
+import { startUpdater } from './updater'
 import { handleMediaProtocol, registerMediaScheme } from './protocol'
 import { loadSettings, type StoredSettings } from './settings'
 
@@ -110,6 +111,7 @@ if (!gotLock) {
     handleMediaProtocol(controller)
     registerIpc(controller, () => mainWindow, applyTheme)
     createWindow()
+    void startUpdater((st) => mainWindow?.webContents.send('update:status', st))
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })

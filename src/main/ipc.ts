@@ -25,6 +25,7 @@ import { exportOriginals } from '@core/library/export'
 import { playableVideo } from './videos'
 import { editPreview, editState, renderEdited, saveEdits } from './editing'
 import { prepareShare } from './share'
+import { checkForUpdates, installUpdateNow, setUpdateToken, updateStatus } from './updater'
 import type { LibraryController } from './controller'
 import { loadSettings, saveSettings, type StoredSettings } from './settings'
 
@@ -219,6 +220,10 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     await controller.ensureNearDuplicateGroups()
     return nearDuplicates(lib(), int(offset, 'offset'), int(limit, 'limit', 1))
   })
+  ipcMain.handle('update:status', () => updateStatus())
+  ipcMain.handle('update:check', () => checkForUpdates())
+  ipcMain.handle('update:setToken', (_e, token: unknown) => setUpdateToken(typeof token === 'string' && token.trim() ? token.trim().slice(0, 300) : null))
+  ipcMain.handle('update:install', () => installUpdateNow())
   ipcMain.handle('memories:list', () => memories(lib()))
   ipcMain.handle('share:prepare', async (_e, ids: unknown, opts: unknown) => {
     const o = (opts ?? {}) as { size?: unknown; includeDate?: unknown }

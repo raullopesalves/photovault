@@ -20,6 +20,13 @@ asarUnpack:
   # Bundled ffmpeg (GPL, run as a separate program) for HEVC thumbnails and playable copies.
   - '**/node_modules/ffmpeg-static/**/*'
 npmRebuild: false
+# Auto-update: releases are published to the private repository; the app reads them with a token from Settings.
+publish:
+  provider: github
+  owner: raullopesalves
+  repo: photovault
+  private: true
+  releaseType: release
 win:
   files:
     - '!**/node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**'
@@ -39,11 +46,11 @@ nsis:
   shortcutName: Photo Vault
   # Uninstalling the app never touches photo libraries; only the app's own settings may be removed.
   deleteAppDataOnUninstall: false
-  artifactName: Photo Vault Setup ${version}.${ext}
+  artifactName: PhotoVault-Setup-${version}.${ext}
   installerIcon: build/icon.ico
   uninstallerIcon: build/icon.ico
 portable:
-  artifactName: Photo Vault ${version} Portable.${ext}
+  artifactName: PhotoVault-${version}-Portable.${ext}
 # Mac and Linux builds are produced by CI (.github/workflows/ci.yml); they are unsigned and less tested than Windows.
 mac:
   target: dmg

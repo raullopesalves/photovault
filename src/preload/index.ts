@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { BackupProgress, BinDeleteProgress, ExportProgress, ImportProgress, PeopleStatus, SmartSearchStatus, LibraryChangeReason, PhotoVaultApi, VerifyProgress } from '@shared/types'
+import type { BackupProgress, BinDeleteProgress, ExportProgress, ImportProgress, PeopleStatus, SmartSearchStatus, UpdateStatus, LibraryChangeReason, PhotoVaultApi, VerifyProgress } from '@shared/types'
 
 // The only surface the renderer gets: typed calls into the main process. No Node, no fs.
 const api: PhotoVaultApi = {
@@ -64,6 +64,15 @@ const api: PhotoVaultApi = {
   saveCopy: (id) => ipcRenderer.invoke('asset:saveCopy', id),
   setBackupLabel: (id, label) => ipcRenderer.invoke('backup:label', id, label),
   restoreSnapshot: (name) => ipcRenderer.invoke('db:restoreSnapshot', name),
+  updateStatus: () => ipcRenderer.invoke('update:status'),
+  checkForUpdates: () => ipcRenderer.invoke('update:check'),
+  setUpdateToken: (token) => ipcRenderer.invoke('update:setToken', token),
+  installUpdate: () => ipcRenderer.invoke('update:install'),
+  onUpdateStatus: (cb) => {
+    const listener = (_e: unknown, s: UpdateStatus): void => cb(s)
+    ipcRenderer.on('update:status', listener)
+    return () => ipcRenderer.removeListener('update:status', listener)
+  },
   smartSearchStatus: () => ipcRenderer.invoke('smart:status'),
   setSmartSearch: (enabled) => ipcRenderer.invoke('smart:enable', enabled),
   smartSearch: (text) => ipcRenderer.invoke('smart:search', text),

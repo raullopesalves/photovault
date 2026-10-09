@@ -531,6 +531,20 @@ export interface PeopleStatus {
   error: string | null
 }
 
+export interface UpdateStatus {
+  state: 'idle' | 'needs-token' | 'checking' | 'up-to-date' | 'downloading' | 'ready' | 'error'
+  /** Running version. */
+  version: string
+  /** Newer version found / downloaded. */
+  available?: string
+  percent?: number
+  checkedAt?: string
+  error?: string
+  tokenSet: boolean
+  /** False for the portable exe and development runs. */
+  canUpdate: boolean
+}
+
 export interface SmartSearchStatus {
   enabled: boolean
   phase: 'off' | 'loading' | 'downloading' | 'indexing' | 'ready' | 'error'
@@ -710,6 +724,12 @@ export interface PhotoVaultApi {
   setBackupLabel(id: number, label: string | null): Promise<void>
   /** Replaces the catalogue with a snapshot (the current one is kept first) and reopens the library. */
   restoreSnapshot(name: string): Promise<void>
+  updateStatus(): Promise<UpdateStatus>
+  checkForUpdates(): Promise<UpdateStatus>
+  /** Saves the read-only GitHub token used to fetch updates from the private repository (null removes it). */
+  setUpdateToken(token: string | null): Promise<UpdateStatus>
+  installUpdate(): Promise<void>
+  onUpdateStatus(cb: (s: UpdateStatus) => void): () => void
   smartSearchStatus(): Promise<SmartSearchStatus>
   /** Turns smart search on (downloads the model once, then indexes in the background) or off. */
   setSmartSearch(enabled: boolean): Promise<void>

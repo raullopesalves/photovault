@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { LoaderCircle, Monitor, Moon, Sparkles, Sun } from 'lucide-react'
-import type { LibraryInfo, SmartSearchStatus, ThemePreference } from '@shared/types'
+import type { LibraryInfo, SmartSearchStatus, ThemePreference, UpdateStatus } from '@shared/types'
 import { api, bytes, n } from '../lib/format'
 import { PageHeader } from './Placeholder'
 
@@ -40,6 +40,8 @@ export function SettingsView(props: {
         </Group>
 
         <SmartSearchGroup />
+
+        <UpdatesGroup />
 
         <Group title="Library">
           <div className="text-[13px] text-stone-500 dark:text-stone-400">Location</div>
@@ -84,6 +86,91 @@ export function SettingsView(props: {
         </Group>
       </div>
     </div>
+  )
+}
+
+function UpdatesGroup() {
+  const [s, setS] = useState<UpdateStatus | null>(null)
+  const [token, setToken] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  useEffect(() => {
+    void api.updateStatus().then(setS)
+    return api.onUpdateStatus(setS)
+  }, [])
+  if (!s) return null
+  const line =
+    !s.canUpdate
+      ? 'This copy cannot update itself (portable or development build). Use the installer for automatic updates.'
+      : s.state === 'checking'
+        ? 'Checking for updates…'
+        : s.state === 'downloading'
+          ? `Downloading version ${s.available ?? ''}… ${s.percent ?? 0}%`
+          : s.state === 'ready'
+            ? `Version ${s.available} is ready — it installs when you quit, or restart now.`
+            : s.state === 'up-to-date'
+              ? 'You have the latest version.'
+              : s.state === 'error'
+                ? `Could not check: ${s.error}`
+                : !s.tokenSet
+                  ? 'Add a GitHub token below to get updates from your private repository.'
+                  : 'Updates are checked automatically.'
+  return (
+    <Group title="Updates">
+      <div className="text-[13px] text-stone-600 dark:text-stone-400">
+        Photo Vault {s.version}. {line}
+      </div>
+      {s.canUpdate && (
+        <div className="mt-3 flex gap-2">
+          {s.state === 'ready' ? (
+            <button onClick={() => void api.installUpdate()} className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white dark:bg-white dark:text-stone-900">
+              Restart and update
+            </button>
+          ) : (
+            <Btn onClick={() => void api.checkForUpdates().then(setS)}>Check now</Btn>
+          )}
+        </div>
+      )}
+      {s.canUpdate && (
+        <div className="mt-5 border-t border-stone-100 pt-4 dark:border-stone-800">
+          <div className="text-[13px] font-medium">GitHub access {s.tokenSet && <span className="ml-1 text-emerald-600 dark:text-emerald-400">· saved</span>}</div>
+          <p className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+            Your code repository is private, so the app needs a read-only token to see new versions. On github.com: Settings → Developer settings →
+            Personal access tokens → Fine-grained tokens → Generate. Repository access: only <b>photovault</b>; Permissions → Contents: <b>Read-only</b>. The
+            token is stored encrypted on this computer.
+          </p>
+          <div className="mt-2 flex gap-2">
+            <input
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder={s.tokenSet ? 'Paste a new token to replace it' : 'github_pat_…'}
+              className="h-9 min-w-0 flex-1 rounded-lg bg-stone-100 px-3 text-[13px] outline-none ring-accent-500 focus:ring-2 dark:bg-stone-800"
+            />
+            <button
+              disabled={!token.trim() || busy}
+              onClick={async () => {
+                setBusy(true)
+                setError(null)
+                try {
+                  setS(await api.setUpdateToken(token))
+                  setToken('')
+                } catch (err) {
+                  setError(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err))
+                } finally {
+                  setBusy(false)
+                }
+              }}
+              className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white disabled:opacity-40 dark:bg-white dark:text-stone-900"
+            >
+              Save
+            </button>
+            {s.tokenSet && <Btn onClick={() => void api.setUpdateToken(null).then(setS)}>Remove</Btn>}
+          </div>
+          {error && <div className="mt-2 text-xs text-red-600 dark:text-red-400">{error}</div>}
+        </div>
+      )}
+    </Group>
   )
 }
 

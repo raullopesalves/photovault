@@ -1,0 +1,19 @@
+// Publishes a release to the private GitHub repository so installed copies update themselves:
+//   1. bump "version" in package.json and commit;  2. node scripts/release.mjs
+// Uses the GitHub CLI's login for the upload token (gh auth token).
+import { execFileSync, spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+
+const gh = process.platform === 'win32' ? 'C:\Program Files\GitHub CLI\gh.exe' : 'gh'
+const token = execFileSync(gh, ['auth', 'token'], { encoding: 'utf8' }).trim()
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+const env = { ...process.env, GH_TOKEN: token }
+delete env.ELECTRON_RUN_AS_NODE
+const run = (cmd, args) => {
+  const r = spawnSync(cmd, args, { stdio: 'inherit', env, shell: process.platform === 'win32' })
+  if (r.status !== 0) process.exit(r.status ?? 1)
+}
+console.log(`Releasing ${version}…`)
+run('node', ['scripts/electron-vite.mjs', 'build'])
+run('npx', ['electron-builder', '--win', 'nsis', '--publish', 'always'])
+console.log(`Published v${version}. Installed copies pick it up within 6 hours (or Settings → Updates → Check now).`)
