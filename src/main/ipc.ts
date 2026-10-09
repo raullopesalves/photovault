@@ -18,6 +18,7 @@ import { similarPhotos } from '@core/repo/similar'
 import { mapClusters } from '@core/repo/geo'
 import { memories } from '@core/repo/memories'
 import { fillPlaces } from '@core/geo/fillPlaces'
+import { placesInBox } from '@core/geo/places'
 import { allTags, assetFaces, createSmartAlbum, deleteFace, deleteSmartAlbum, setDescription, setLocation, setTags, smartAlbums, updateSmartAlbum } from '@core/repo/annotate'
 import { getPerson, listPeople, markDifferentPeople, mergePeople, moveFaces, personFaces, personMerges, undoMerge, peopleSuggestions, removeFromPerson, renamePerson, setPersonHidden } from '@core/repo/people'
 import { rotateAssets } from '@core/library/rotate'
@@ -403,6 +404,11 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('watch:remove', (_e, id: unknown) => controller.watch?.remove(int(id, 'id', 1)))
   ipcMain.handle('watch:setEnabled', (_e, id: unknown, enabled: unknown) => controller.watch?.setEnabled(int(id, 'id', 1), enabled === true))
   ipcMain.handle('watch:check', () => controller.watch?.checkAll())
+  ipcMain.handle('geo:places', (_e, v: unknown, minPopulation: unknown) => {
+    const b = (v ?? {}) as Record<string, unknown>
+    const num = (x: unknown): number => (typeof x === 'number' && Number.isFinite(x) ? x : 0)
+    return placesInBox(num(b.south), num(b.west), num(b.north), num(b.east), Math.max(1000, num(minPopulation)), 200)
+  })
   ipcMain.handle('library:mapClusters', (_e, v: unknown, q: unknown) => {
     const o = (v ?? {}) as Record<string, unknown>
     const num = (x: unknown, name: string): number => {

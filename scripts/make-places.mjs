@@ -1,6 +1,6 @@
-// Builds src/core/geo/places.json from GeoNames "cities5000" (CC BY 4.0, https://www.geonames.org):
-//   curl -O https://download.geonames.org/export/dump/cities5000.zip && unzip cities5000.zip
-//   node scripts/make-places.mjs cities5000.txt
+// Builds src/core/geo/places.json from GeoNames "cities1000" (CC BY 4.0, https://www.geonames.org):
+//   curl -O https://download.geonames.org/export/dump/cities1000.zip && unzip cities1000.zip
+//   node scripts/make-places.mjs cities1000.txt
 // Keeps towns and cities (not city districts) as [name, countryCode, lat, lon, population].
 import { readFileSync, writeFileSync } from 'node:fs'
 
@@ -14,6 +14,6 @@ for (const line of readFileSync(process.argv[2], 'utf8').split('\n')) {
 rows.sort((a, b) => b[4] - a[4])
 writeFileSync(
   new URL('../src/core/geo/places.json', import.meta.url),
-  JSON.stringify({ source: 'GeoNames cities5000, CC BY 4.0 (https://www.geonames.org)', rows })
+  JSON.stringify({ source: 'GeoNames cities1000, CC BY 4.0 (https://www.geonames.org)', rows })
 )
 console.log(rows.length, 'places')

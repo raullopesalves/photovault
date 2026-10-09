@@ -191,7 +191,7 @@ export function memories(library: Library, today = new Date(), lang: 'en' | 'pt'
       const cities = new Map<string, number>()
       const sample = located.filter((_, i) => i % Math.max(1, Math.floor(located.length / 60)) === 0)
       for (const r of sample) {
-        const p = nearestPlace(r.lat as number, r.lon as number)
+        const p = nearestPlace(r.lat as number, r.lon as number, 30, 5000)
         const c = p ? countryName(p.countryCode, lang) : countryAt(r.lat as number, r.lon as number)
         if (c) countries.set(c, (countries.get(c) ?? 0) + 1)
         if (p) cities.set(p.city, (cities.get(p.city) ?? 0) + 1)

@@ -62,6 +62,7 @@ export function MapView(props: { version: number }) {
   const mapRef = useRef<L.Map | null>(null)
   const pins = useRef<L.LayerGroup | null>(null)
   const tiles = useRef<L.TileLayer | null>(null)
+  const labels = useRef<L.LayerGroup | null>(null)
   const [view, setView] = useState<Box | null>(null)
   const [zoom, setZoom] = useState(2)
   const [selected, setSelected] = useState<Box | null>(null)
@@ -88,6 +89,10 @@ export function MapView(props: { version: number }) {
     }
     map.setView(saved ? [saved.lat, saved.lng] : [30, 0], saved?.zoom ?? 2)
     pins.current = L.layerGroup().addTo(map)
+    // Town names sit above the outlines and below the photo pins, and never catch the mouse.
+    map.createPane('pv-labels').style.zIndex = '450'
+    map.getPane('pv-labels')!.style.pointerEvents = 'none'
+    labels.current = L.layerGroup([], { pane: 'pv-labels' }).addTo(map)
     void import('world-atlas/countries-50m.json').then((mod) => {
       const topo = (mod.default ?? mod) as unknown as Topology<{ countries: GeometryCollection }>
       const dark = document.documentElement.classList.contains('dark')
@@ -130,6 +135,41 @@ export function MapView(props: { version: number }) {
       tiles.current = null
     }
   }, [detailed])
+
+  // Offline town names (bundled list), more of them as you zoom in; hidden over the detailed online map.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!view || !map || !labels.current) return
+    labels.current.clearLayers()
+    if (detailed) return
+    let alive = true
+    const minPopulation = [8e6, 8e6, 3e6, 1.2e6, 5e5, 2e5, 8e4, 3e4, 1.2e4, 5e3, 2e3][zoom] ?? 1000
+    void api.mapPlaces({ south: view[0], west: view[1], north: view[2], east: view[3] }, minPopulation).then((towns) => {
+      if (!alive || !labels.current) return
+      const dark = document.documentElement.classList.contains('dark')
+      const taken: Array<{ x: number; y: number }> = []
+      for (const town of towns) {
+        // Skip a name that would overlap a bigger town's (the list is biggest first).
+        const p = map.latLngToContainerPoint([town.lat, town.lon])
+        if (taken.some((q) => Math.abs(q.x - p.x) < 90 && Math.abs(q.y - p.y) < 22)) continue
+        taken.push({ x: p.x, y: p.y })
+        const big = town.population >= 1e6
+        L.marker([town.lat, town.lon], {
+          pane: 'pv-labels',
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: '',
+            iconSize: [0, 0],
+            html: `<div style="position:absolute;left:-3px;top:-3px;display:flex;align-items:center;gap:4px;white-space:nowrap;font:${big ? 600 : 500} ${big ? 12 : 11}px system-ui,sans-serif;color:${dark ? '#d6d3d1' : '#44403c'};text-shadow:0 0 3px ${dark ? '#1c1917' : '#fafaf9'},0 0 3px ${dark ? '#1c1917' : '#fafaf9'}"><span style="width:5px;height:5px;border-radius:50%;background:${dark ? '#a8a29e' : '#78716c'};flex:none"></span>${town.name.replace(/[<>&]/g, '')}</div>`
+          })
+        }).addTo(labels.current)
+      }
+    })
+    return () => {
+      alive = false
+    }
+  }, [view, zoom, detailed])
 
   // Clusters for the visible area.
   useEffect(() => {

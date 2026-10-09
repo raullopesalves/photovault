@@ -796,6 +796,8 @@ export interface PhotoVaultApi {
   removeWatchFolder(id: number): Promise<void>
   setWatchFolderEnabled(id: number, enabled: boolean): Promise<void>
   checkWatchFolders(): Promise<void>
+  /** Towns to label on the offline map (bundled GeoNames list), biggest first. */
+  mapPlaces(view: { south: number; west: number; north: number; east: number }, minPopulation: number): Promise<Array<{ name: string; lat: number; lon: number; population: number }>>
   mapClusters(view: { south: number; west: number; north: number; east: number; zoom: number }, query?: AssetQuery): Promise<MapCluster[]>
   /** Rotates photos by 90° steps without touching the originals. */
   rotate(ids: number[], degrees: 90 | -90 | 180): Promise<void>

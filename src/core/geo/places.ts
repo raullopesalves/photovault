@@ -1,8 +1,8 @@
 import data from './places.json'
 
 /**
- * Offline place names: the nearest town or city (GeoNames "cities5000", CC BY 4.0 — 64k places with at least
- * 5,000 inhabitants) and its country. Used for trip names, the map, the viewer and search ("lisbon").
+ * Offline place names: the nearest town, city or village (GeoNames "cities1000", CC BY 4.0 — 162k places with
+ * at least 1,000 inhabitants) and its country. Used for trip names, the map, the viewer and search ("lisbon").
  */
 export interface Place {
   city: string
@@ -47,8 +47,11 @@ function km(lat1: number, lon1: number, lat2: number, lon2: number): number {
   return 12742 * Math.asin(Math.sqrt(h))
 }
 
-/** The nearest town or city within `maxKm` (default 30 km), or null (at sea, in the wilderness…). */
-export function nearestPlace(lat: number, lon: number, maxKm = 30): Place | null {
+/**
+ * The nearest town or city within `maxKm` (default 30 km), or null (at sea, in the wilderness…).
+ * `minPopulation` skips smaller places (trip names use real towns rather than the nearest village).
+ */
+export function nearestPlace(lat: number, lon: number, maxKm = 30, minPopulation = 0): Place | null {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null
   const g = index()
   let best: Row | null = null
@@ -57,6 +60,7 @@ export function nearestPlace(lat: number, lon: number, maxKm = 30): Place | null
     for (let dx = -1; dx <= 1; dx++) {
       for (const i of g.get(key(lat + dy, lon + dx)) ?? []) {
         const r = rows[i] as Row
+        if (r[4] < minPopulation) continue
         const d = km(lat, lon, r[2], r[3])
         if (d < bestKm) {
           bestKm = d
@@ -72,6 +76,21 @@ export function nearestPlace(lat: number, lon: number, maxKm = 30): Place | null
 export function placeLabel(lat: number, lon: number): string | null {
   const p = nearestPlace(lat, lon)
   return p ? `${p.city}, ${p.country}` : null
+}
+
+/** Bumped when the bundled list changes, so stored place names are looked up again. */
+export const PLACES_VERSION = 'cities1000'
+
+/** Towns to label on the offline map: those inside the box with at least `minPopulation`, biggest first. */
+export function placesInBox(south: number, west: number, north: number, east: number, minPopulation: number, limit: number): Array<{ name: string; lat: number; lon: number; population: number }> {
+  const out: Array<{ name: string; lat: number; lon: number; population: number }> = []
+  // Rows are sorted by population (largest first), so the scan stops early.
+  for (const r of rows) {
+    if (r[4] < minPopulation || out.length >= limit) break
+    const inLon = west <= east ? r[3] >= west && r[3] <= east : r[3] >= west || r[3] <= east
+    if (r[2] >= south && r[2] <= north && inLon) out.push({ name: r[0], lat: r[2], lon: r[3], population: r[4] })
+  }
+  return out
 }
 
 export const PLACES_ATTRIBUTION = 'Place names: GeoNames (CC BY 4.0)'

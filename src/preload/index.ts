@@ -102,6 +102,7 @@ const api: PhotoVaultApi = {
   removeWatchFolder: (id) => ipcRenderer.invoke('watch:remove', id),
   setWatchFolderEnabled: (id, enabled) => ipcRenderer.invoke('watch:setEnabled', id, enabled),
   checkWatchFolders: () => ipcRenderer.invoke('watch:check'),
+  mapPlaces: (view, minPopulation) => ipcRenderer.invoke('geo:places', view, minPopulation),
   mapClusters: (view, query) => ipcRenderer.invoke('library:mapClusters', view, query),
   rotate: (ids, degrees) => ipcRenderer.invoke('library:rotate', ids, degrees),
   exportOriginals: (ids) => ipcRenderer.invoke('library:export', ids),

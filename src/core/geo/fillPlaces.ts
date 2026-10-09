@@ -1,9 +1,16 @@
 import type { Library } from '../library/library'
-import { placeLabel } from './places'
+import { PLACES_VERSION, placeLabel } from './places'
 
 /** Looks up place names for located items that do not have one yet (a few thousand per call). Returns how many. */
 export function fillPlaces(library: Library, limit = 3000): number {
   const db = library.db
+  // A newer bundled list: look every place name up again (once).
+  if (db.get<{ value: string }>("SELECT value FROM library_settings WHERE key = 'places_version'")?.value !== PLACES_VERSION) {
+    db.tx(() => {
+      db.run('UPDATE assets SET place = NULL WHERE place IS NOT NULL')
+      db.run("INSERT INTO library_settings (key, value) VALUES ('places_version', ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value", [PLACES_VERSION])
+    })
+  }
   const rows = db.all<{ id: number; latitude: number; longitude: number }>(
     'SELECT id, latitude, longitude FROM assets WHERE place IS NULL AND latitude IS NOT NULL AND longitude IS NOT NULL LIMIT ?',
     [limit]
