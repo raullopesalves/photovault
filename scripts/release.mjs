@@ -3,8 +3,9 @@
 // Uses the GitHub CLI's login for the upload token (gh auth token).
 import { execFileSync, spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
-const gh = process.platform === 'win32' ? 'C:\Program Files\GitHub CLI\gh.exe' : 'gh'
+const gh = process.platform === 'win32' ? join(process.env.ProgramFiles ?? 'C:\\Program Files', 'GitHub CLI', 'gh.exe') : 'gh'
 const token = execFileSync(gh, ['auth', 'token'], { encoding: 'utf8' }).trim()
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 const env = { ...process.env, GH_TOKEN: token }
@@ -15,5 +16,6 @@ const run = (cmd, args) => {
 }
 console.log(`Releasing ${version}…`)
 run('node', ['scripts/electron-vite.mjs', 'build'])
-run('npx', ['electron-builder', '--win', 'nsis', '--publish', 'always'])
+// The local electron-builder, not npx (which needs a working global npm).
+run('node', [join('node_modules', 'electron-builder', 'cli.js'), '--win', 'nsis', '--publish', 'always'])
 console.log(`Published v${version}. Installed copies pick it up within 6 hours (or Settings → Updates → Check now).`)
