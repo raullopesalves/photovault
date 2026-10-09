@@ -799,6 +799,8 @@ export interface PhotoVaultApi {
   /** Asks for a folder and copies the originals there (never overwriting). Null if cancelled. */
   exportOriginals(ids: number[]): Promise<ExportResult | null>
   onExportProgress(cb: (p: ExportProgress) => void): () => void
+  /** Saves these items as a web page (index.html + photos) in a folder the user picks; null if cancelled. */
+  exportWebGallery(ids: number[], title: string, description: string | null): Promise<ExportResult | null>
   /** Hide or show everything matching a filter (e.g. all WhatsApp loops). Returns how many changed. */
   setHiddenByQuery(query: AssetQuery, hidden: boolean): Promise<number>
 

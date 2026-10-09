@@ -89,6 +89,41 @@ try {
     console.log('captions:', JSON.stringify(sample, null, 1))
   }
 
+  if (process.argv.includes('--web-gallery')) {
+    // A throwaway album in the snapshot copy, shared as a web page into the work folder.
+    const out = join(work, 'web')
+    rmSync(out, { recursive: true, force: true })
+    mkdirSync(out, { recursive: true })
+    await app.evaluate(({ dialog }, dir) => {
+      dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [dir] })
+    }, out)
+    await page.evaluate(async () => {
+      const ids = (await window.photoVault.assetsPage(0, 40, { mediaType: 'photo' })).map((a) => a.id)
+      await window.photoVault.createAlbum('Web gallery test', ids)
+    })
+    await page.locator('nav button').nth(3).click()
+    await page.waitForTimeout(1500)
+    await page.locator('main button:has-text("Web gallery test")').first().click()
+    await page.waitForTimeout(2000)
+    await page.locator('[aria-label="Share as a web page"]').click()
+    await page.waitForSelector('text=/Web page ready/', { timeout: 120_000 })
+    await page.screenshot({ path: join(shots, 'web-album.png') })
+    const index = join(out, 'Web gallery test (web)', 'index.html')
+    const winPromise = app.waitForEvent('window')
+    await app.evaluate(({ BrowserWindow }, file) => {
+      const w = new BrowserWindow({ width: 1280, height: 860, show: true })
+      void w.loadFile(file)
+    }, index)
+    const web = await winPromise
+    await web.waitForLoadState()
+    await web.waitForTimeout(2000)
+    await web.screenshot({ path: join(shots, 'web-page.png') })
+    await web.locator('main button').nth(2).click()
+    await web.waitForTimeout(1500)
+    await web.screenshot({ path: join(shots, 'web-viewer.png') })
+    await web.close()
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()

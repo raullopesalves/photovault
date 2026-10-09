@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Album, ArrowLeft, FolderOutput, Pencil, Plus, Trash2, Wand2 } from 'lucide-react'
+import { Album, ArrowLeft, FolderOutput, Globe, Pencil, Plus, Trash2, Wand2 } from 'lucide-react'
 import type { AlbumSummary, AssetQuery, SmartAlbum } from '@shared/types'
-import { api, mediaUrl, plural } from '../lib/format'
+import { api, mediaUrl, n, plural } from '../lib/format'
 import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog, PromptDialog } from '../components/Dialog'
 import { FilterBar } from '../components/FilterBar'
@@ -205,6 +205,7 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
   const [renaming, setRenaming] = useState(false)
   const [describing, setDescribing] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [webStatus, setWebStatus] = useState<string | null>(null)
 
   useEffect(() => {
     void api.album(props.id).then((a) => (a ? setAlbum(a) : props.onBack()))
@@ -252,6 +253,29 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
                 <FolderOutput className="size-4" />
               </button>
             )}
+            {album.count > 0 && (
+              <button
+                disabled={webStatus !== null}
+                onClick={async () => {
+                  const ids = await api.assetIdsInRange({ albumId: props.id }, 0, 200_000)
+                  const off = api.onExportProgress((p) => setWebStatus(t('Making the web page… {done} of {total}', { done: n(p.done), total: n(p.total) })))
+                  try {
+                    const r = await api.exportWebGallery(ids, album.name, album.description)
+                    setWebStatus(r ? (r.failed ? t('Web page ready — {failed} could not be included', { failed: n(r.failed) }) : t('Web page ready: open index.html, or zip the folder to send it')) : null)
+                  } catch (err) {
+                    setWebStatus(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err))
+                  } finally {
+                    off()
+                    window.setTimeout(() => setWebStatus(null), 6000)
+                  }
+                }}
+                className={iconBtn}
+                aria-label={t('Share as a web page')}
+                title={t('Share as a web page: a folder with index.html that opens in any browser — zip it and send it, or upload it to share a link')}
+              >
+                <Globe className="size-4" />
+              </button>
+            )}
             <button onClick={() => setRenaming(true)} className={iconBtn} aria-label={t('Rename album')} title={t('Rename')}>
               <Pencil className="size-4" />
             </button>
@@ -269,6 +293,9 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
           )
         }
       />
+      {webStatus && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-stone-900 px-4 py-2 text-[13px] text-white shadow-lg dark:bg-white dark:text-stone-900">{webStatus}</div>
+      )}
       {renaming && (
         <PromptDialog
           title={t('Rename album')}

@@ -25,6 +25,7 @@ import { exportOriginals } from '@core/library/export'
 import { playableVideo } from './videos'
 import { editPreview, editState, renderEdited, saveEdits } from './editing'
 import { prepareShare } from './share'
+import { exportWebGallery } from './webGallery'
 import { cancelPhoneCopy, copyPhone } from './phoneImport'
 import { listPhones } from '@core/sources/phone'
 import { checkForUpdates, installUpdateNow, setUpdateToken, updateStatus } from './updater'
@@ -205,6 +206,29 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     try {
       const result = await exportOriginals(lib(), list, r.filePaths[0], { onProgress: (p) => getWindow()?.webContents.send('export:progress', p) })
       if (result.exported > 0) void shell.openPath(result.folder)
+      return result
+    } finally {
+      exporting = false
+    }
+  })
+  ipcMain.handle('library:exportWeb', async (_e, ids: unknown, title: unknown, description: unknown) => {
+    if (exporting) throw new Error('An export is already running.')
+    const list = idList(ids)
+    const win = getWindow()
+    const opts: Electron.OpenDialogOptions = {
+      title: tr('Choose where to save the web page', 'Escolha onde guardar a página web'),
+      properties: ['openDirectory', 'createDirectory']
+    }
+    const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
+    if (r.canceled || !r.filePaths[0]) return null
+    exporting = true
+    try {
+      const result = await exportWebGallery(lib(), list, r.filePaths[0], {
+        title: str(title, 'title').slice(0, 200),
+        description: typeof description === 'string' ? description.slice(0, 5000) : null,
+        onProgress: (p) => getWindow()?.webContents.send('export:progress', p)
+      })
+      if (result.exported > 0) shell.showItemInFolder(joinPath(result.folder, 'index.html'))
       return result
     } finally {
       exporting = false

@@ -1,5 +1,10 @@
 /** European Portuguese (pt-PT). Keys are the English interface text; see i18n.ts. Missing keys show in English. */
 export const PT: Record<string, string> = {
+  "Making the web page… {done} of {total}": "A criar a página web… {done} de {total}",
+  "Web page ready — {failed} could not be included": "Página web pronta — {failed} não puderam ser incluídos",
+  "Web page ready: open index.html, or zip the folder to send it": "Página web pronta: abra o index.html ou comprima a pasta para a enviar",
+  "Share as a web page": "Partilhar como página web",
+  "Share as a web page: a folder with index.html that opens in any browser — zip it and send it, or upload it to share a link": "Partilhar como página web: uma pasta com index.html que abre em qualquer navegador — comprima-a e envie-a, ou carregue-a para partilhar uma ligação",
   "Automatic descriptions": "Descrições automáticas",
   "Paused — {described} of {total} described": "Em pausa — {described} de {total} descritos",
   "Downloading the model… {loaded} of {total}": "A transferir o modelo… {loaded} de {total}",
