@@ -6,6 +6,7 @@ import { DatabaseSync } from 'node:sqlite'
 import { Database } from '@core/db/database'
 import { computeNearDuplicateGroups, nearDuplicateStamp } from '@core/repo/nearDuplicates'
 import { CLIP_DIM, Clip, selectMatches, zeroShot } from '@core/ai/clip'
+import { Captioner } from '@core/ai/caption'
 import { FaceEngine } from '@core/ai/faces'
 import { clusterFaces } from '@core/ai/people'
 import { loadClusterContext, loadClusterFaces } from '@core/repo/people'
@@ -15,6 +16,8 @@ export type WorkerTask =
   | { task: 'clipLoad'; cacheDir: string; allowDownload: boolean }
   | { task: 'clipEmbed'; cacheDir: string; paths: string[] }
   | { task: 'clipSearch'; cacheDir: string; dbFile: string; text: string; limit: number }
+  | { task: 'captionLoad'; cacheDir: string; allowDownload: boolean }
+  | { task: 'caption'; cacheDir: string; paths: string[] }
   | { task: 'clipClassify'; cacheDir: string; dbFile: string; labels: string[]; targets: number[]; minP: number }
   | { task: 'faceScan'; modelsDir: string; items: Array<{ path: string; rotation: number }> }
   | { task: 'faceCluster'; dbFile: string }
@@ -26,6 +29,7 @@ export type WorkerMessage =
   | { id: number; kind: 'progress'; progress: unknown }
 
 let clip: Clip | null = null
+let captioner: Captioner | null = null
 let faceEngine: FaceEngine | null = null
 const clipFor = (cacheDir: string): Clip => (clip ??= new Clip(cacheDir))
 
@@ -103,6 +107,14 @@ async function run(id: number, t: WorkerTask): Promise<unknown> {
         onProgress: (progress) => parentPort?.postMessage({ id, kind: 'progress', progress } satisfies WorkerMessage)
       })
       return true
+    case 'captionLoad':
+      await (captioner ??= new Captioner(t.cacheDir)).load({
+        allowDownload: t.allowDownload,
+        onProgress: (progress) => parentPort?.postMessage({ id, kind: 'progress', progress } satisfies WorkerMessage)
+      })
+      return true
+    case 'caption':
+      return (captioner ??= new Captioner(t.cacheDir)).caption(t.paths)
     case 'clipEmbed': {
       const vecs = await clipFor(t.cacheDir).embedImages(t.paths)
       return vecs.map((v) => (v ? Buffer.from(v.buffer, v.byteOffset, v.byteLength) : null))

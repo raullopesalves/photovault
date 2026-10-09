@@ -1,7 +1,7 @@
 import { app, nativeImage } from 'electron'
 import { createWriteStream, type WriteStream } from 'node:fs'
 import { join } from 'node:path'
-import type { AppState, BackupProgress, ImportProgress, LibraryChangeReason, PeopleStatus, SmartSearchStatus, VerifyProgress } from '@shared/types'
+import type { AppState, BackupProgress, CaptionStatus, ImportProgress, LibraryChangeReason, PeopleStatus, SmartSearchStatus, VerifyProgress } from '@shared/types'
 import { ImportService } from '@core/import/service'
 import { Library } from '@core/library/library'
 import { VerifyService } from '@core/library/verify'
@@ -12,6 +12,7 @@ import { fillPlaces, fillPlacesInBackground } from '@core/geo/fillPlaces'
 import { nearDuplicatesCached, primeNearDuplicateGroups } from '@core/repo/nearDuplicates'
 import { HeavyWork } from './heavyWork'
 import { SmartSearchService } from './smartSearch'
+import { CaptionService } from './captions'
 import { PeopleService } from './people'
 import { videoFramesToTemp } from './videos'
 import { isSharpDecodable } from '@core/media/formats'
@@ -43,6 +44,7 @@ export interface ControllerEvents {
   backupProgress: (p: BackupProgress) => void
   smartSearchStatus: (s: SmartSearchStatus) => void
   peopleStatus: (s: PeopleStatus) => void
+  captionStatus: (s: CaptionStatus) => void
 }
 
 /** Owns the open library and its long-lived services (imports, thumbnail worker, logging). */
@@ -53,6 +55,9 @@ export class LibraryController {
   private heavy = new HeavyWork()
   smart: SmartSearchService | null = null
   people: PeopleService | null = null
+  /** Captions run on a second worker thread: they are slow and would otherwise queue other work behind them. */
+  private captionWorker = new HeavyWork()
+  captions: CaptionService | null = null
   private nearJob: Promise<void> | null = null
   thumbnails: ThumbnailQueue | null = null
   verify: VerifyService | null = null
@@ -175,6 +180,7 @@ export class LibraryController {
         this.hashes?.kick()
         this.smart?.kick()
         this.people?.kick()
+        this.captions?.kick()
       }
     })
     this.imports = new ImportService(opened, {
@@ -194,6 +200,8 @@ export class LibraryController {
     })
     this.smart = new SmartSearchService(opened, this.heavy, join(app.getPath('userData'), 'models'), (s) => this.events.smartSearchStatus(s))
     this.smart.start()
+    this.captions = new CaptionService(opened, this.captionWorker, join(app.getPath('userData'), 'models'), (s) => this.events.captionStatus(s))
+    this.captions.start()
     this.people = new PeopleService(
       opened,
       this.heavy,
@@ -323,6 +331,8 @@ export class LibraryController {
     this.protectTimer = null
     this.smart?.stop()
     this.smart = null
+    this.captions?.stop()
+    this.captions = null
     this.people?.stop()
     this.people = null
     this.watch?.stop()

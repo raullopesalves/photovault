@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { BackupProgress, BinDeleteProgress, ExportProgress, ImportProgress, PeopleStatus, SmartSearchStatus, UpdateStatus, PhoneCopyProgress, LibraryChangeReason, PhotoVaultApi, VerifyProgress } from '@shared/types'
+import type { BackupProgress, BinDeleteProgress, ExportProgress, ImportProgress, PeopleStatus, SmartSearchStatus, UpdateStatus, PhoneCopyProgress, CaptionStatus, LibraryChangeReason, PhotoVaultApi, VerifyProgress } from '@shared/types'
 
 // The only surface the renderer gets: typed calls into the main process. No Node, no fs.
 const api: PhotoVaultApi = {
@@ -82,6 +82,13 @@ const api: PhotoVaultApi = {
     return () => ipcRenderer.removeListener('update:status', listener)
   },
   pets: () => ipcRenderer.invoke('smart:pets'),
+  captionStatus: () => ipcRenderer.invoke('captions:status'),
+  setCaptionsEnabled: (on) => ipcRenderer.invoke('captions:enable', on),
+  onCaptionStatus: (cb) => {
+    const listener = (_e: unknown, s: CaptionStatus): void => cb(s)
+    ipcRenderer.on('captions:status', listener)
+    return () => ipcRenderer.removeListener('captions:status', listener)
+  },
   smartSearchStatus: () => ipcRenderer.invoke('smart:status'),
   setSmartSearch: (enabled) => ipcRenderer.invoke('smart:enable', enabled),
   smartSearch: (text) => ipcRenderer.invoke('smart:search', text),

@@ -1,5 +1,14 @@
 /** European Portuguese (pt-PT). Keys are the English interface text; see i18n.ts. Missing keys show in English. */
 export const PT: Record<string, string> = {
+  "Automatic descriptions": "Descrições automáticas",
+  "Paused — {described} of {total} described": "Em pausa — {described} de {total} descritos",
+  "Downloading the model… {loaded} of {total}": "A transferir o modelo… {loaded} de {total}",
+  "Describing your photos… {described} of {total} ({pct}%), newest first": "A descrever as suas fotografias… {described} de {total} ({pct}%), as mais recentes primeiro",
+  "Ready — {described} items described": "Pronto — {described} itens descritos",
+  "Writes a short description of each photo — “A dog sitting in a field with trees in the background.” — shown in the photo’s details and found by the search box. Runs on this computer only. Turning it on downloads the model (Florence-2, about 265 MB, once); describing takes about 2 seconds per photo in the background, newest first, so a large library takes many hours. Descriptions are in English.": "Escreve uma pequena descrição de cada fotografia — “A dog sitting in a field with trees in the background.” — mostrada nos detalhes da fotografia e encontrada pela caixa de pesquisa. Funciona só neste computador. Ao ativar, transfere o modelo (Florence-2, cerca de 265 MB, uma vez); descrever demora cerca de 2 segundos por fotografia em segundo plano, das mais recentes para as mais antigas, por isso uma biblioteca grande demora muitas horas. As descrições são em inglês (pesquise em inglês para as encontrar).",
+  "Continue describing": "Continuar a descrever",
+  "Turn on automatic descriptions": "Ativar descrições automáticas",
+  "Automatic description, made on this computer": "Descrição automática, feita neste computador",
   "Pets": "Animais",
   "Dogs": "Cães",
   "Cats": "Gatos",

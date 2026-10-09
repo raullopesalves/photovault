@@ -64,6 +64,14 @@ export class HeavyWork {
     return this.call({ task: 'clipSearch', cacheDir, dbFile, text, limit })
   }
 
+  captionLoad(cacheDir: string, allowDownload: boolean, onProgress?: (p: DownloadProgress) => void): Promise<void> {
+    return this.call({ task: 'captionLoad', cacheDir, allowDownload }, onProgress as (p: unknown) => void)
+  }
+
+  caption(cacheDir: string, paths: string[]): Promise<Array<string | null>> {
+    return this.call({ task: 'caption', cacheDir, paths })
+  }
+
   /** Ids classified as each target label (zero-shot over `labels`), most certain first. */
   clipClassify(cacheDir: string, dbFile: string, labels: string[], targets: number[], minP: number): Promise<number[][]> {
     return this.call({ task: 'clipClassify', cacheDir, dbFile, labels, targets, minP })

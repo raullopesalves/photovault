@@ -210,6 +210,8 @@ export interface AssetDetail extends AssetSummary {
   place: string | null
   /** The unedited original behind this edited version (iPhone IMG_E…, Takeout …-edited), if any. */
   originalVersionId: number | null
+  /** Automatic description (Settings → Automatic descriptions), if made. */
+  autoCaption: string | null
   /** People recognised on this photo. */
   people: Array<{ id: number; name: string | null }>
   sha256: string
@@ -565,6 +567,15 @@ export interface UpdateStatus {
   canUpdate: boolean
 }
 
+export interface CaptionStatus {
+  enabled: boolean
+  phase: 'off' | 'loading' | 'downloading' | 'describing' | 'ready' | 'error'
+  described: number
+  total: number
+  download: { loaded: number; total: number } | null
+  error: string | null
+}
+
 export interface PetGroup {
   kind: 'dog' | 'cat'
   /** Most certain first. */
@@ -764,6 +775,10 @@ export interface PhotoVaultApi {
   setUpdateToken(token: string | null): Promise<UpdateStatus>
   installUpdate(): Promise<void>
   onUpdateStatus(cb: (s: UpdateStatus) => void): () => void
+  captionStatus(): Promise<CaptionStatus>
+  /** Turns automatic descriptions on (downloads the model once) or pauses them. Descriptions made are kept. */
+  setCaptionsEnabled(on: boolean): Promise<void>
+  onCaptionStatus(cb: (s: CaptionStatus) => void): () => void
   /** Photos of dogs and cats, found by smart search (empty while it is off). */
   pets(): Promise<PetGroup[]>
   smartSearchStatus(): Promise<SmartSearchStatus>

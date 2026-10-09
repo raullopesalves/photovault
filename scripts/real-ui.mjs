@@ -57,6 +57,38 @@ try {
   await page.waitForSelector('nav button', { timeout: 60_000 })
   await page.waitForTimeout(2500)
 
+  if (process.argv.includes('--captions')) {
+    // Automatic descriptions: describe a few dozen of the newest photos, then show them.
+    await page.evaluate(() => window.photoVault.setCaptionsEnabled(true))
+    const t0 = Date.now()
+    for (;;) {
+      await page.waitForTimeout(10_000)
+      const st = await page.evaluate(() => window.photoVault.captionStatus())
+      console.log(`captions ${st.phase} ${st.described}/${st.total} (${Math.round((Date.now() - t0) / 1000)} s)`, st.error ?? '')
+      if (st.phase === 'error' || st.phase === 'ready' || st.described >= Number(process.env.CAPTIONS_MIN ?? 40) || Date.now() - t0 > 10 * 60_000) break
+    }
+    await page.locator('nav button').last().click()
+    await page.waitForTimeout(1500)
+    await page.locator('text=/Automatic descriptions|Descrições automáticas/').first().scrollIntoViewIfNeeded()
+    await page.screenshot({ path: join(shots, 'captions-settings.png') })
+    await page.locator('nav button').first().click()
+    await page.waitForTimeout(1500)
+    await page.locator('main img').first().click()
+    await page.waitForTimeout(2000)
+    await page.mouse.move(720, 300)
+    await page.mouse.click(1262, 28)
+    await page.waitForTimeout(1500)
+    await page.screenshot({ path: join(shots, 'captions-viewer.png') })
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(800)
+    const sample = await page.evaluate(async () => {
+      const ids = (await window.photoVault.assetsPage(0, 12, {})).map((a) => a.id)
+      return Promise.all(ids.map(async (id) => (await window.photoVault.asset(id))?.autoCaption))
+    })
+    console.log('captions:', JSON.stringify(sample, null, 1))
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()

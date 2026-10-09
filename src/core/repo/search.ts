@@ -14,7 +14,8 @@ const TEXT_SQL = `
               FROM provenance p WHERE p.asset_id = a.id), '') || ' ' ||
   COALESCE((SELECT group_concat(al.name, ' ') FROM album_assets x JOIN albums al ON al.id = x.album_id WHERE x.asset_id = a.id), '') || ' ' ||
   COALESCE((SELECT group_concat(DISTINCT pe.name) FROM faces fa JOIN persons pe ON pe.id = fa.person_id WHERE fa.asset_id = a.id AND pe.name IS NOT NULL), '') || ' ' ||
-  COALESCE((SELECT group_concat(tg.tag, ' ') FROM asset_tags tg WHERE tg.asset_id = a.id), '')`
+  COALESCE((SELECT group_concat(tg.tag, ' ') FROM asset_tags tg WHERE tg.asset_id = a.id), '') || ' ' ||
+  COALESCE((SELECT c.caption FROM asset_captions c WHERE c.asset_id = a.id), '')`
 
 /** Re-indexes up to `limit` changed assets (all when omitted). Returns how many were indexed. */
 export function refreshSearchIndex(library: Library, limit?: number): number {

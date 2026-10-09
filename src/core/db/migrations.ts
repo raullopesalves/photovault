@@ -644,6 +644,23 @@ export const migrations: Migration[] = [
       ALTER TABLE assets ADD COLUMN version_of INTEGER REFERENCES assets(id) ON DELETE SET NULL;
       CREATE INDEX idx_assets_version_of ON assets (version_of) WHERE version_of IS NOT NULL;
     `
+  },
+  {
+    version: 21,
+    name: 'captions',
+    sql: `
+      -- Automatic one-sentence descriptions (on-device model, opt-in); searchable. See main/captions.ts.
+      CREATE TABLE asset_captions (
+        asset_id   INTEGER PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,
+        caption    TEXT,
+        model      TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+      CREATE TRIGGER trg_search_caption_ins AFTER INSERT ON asset_captions
+        BEGIN INSERT INTO search_dirty SELECT new.asset_id WHERE NOT EXISTS (SELECT 1 FROM search_dirty WHERE asset_id = new.asset_id); END;
+      CREATE TRIGGER trg_search_caption_upd AFTER UPDATE ON asset_captions
+        BEGIN INSERT INTO search_dirty SELECT new.asset_id WHERE NOT EXISTS (SELECT 1 FROM search_dirty WHERE asset_id = new.asset_id); END;
+    `
   }
 ]
 

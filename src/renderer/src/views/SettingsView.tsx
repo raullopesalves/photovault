@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { LoaderCircle, Monitor, Moon, Sparkles, Sun } from 'lucide-react'
-import type { Language, LibraryInfo, SmartSearchStatus, ThemePreference, UpdateStatus } from '@shared/types'
+import { LoaderCircle, MessageSquareText, Monitor, Moon, Sparkles, Sun } from 'lucide-react'
+import type { CaptionStatus, Language, LibraryInfo, SmartSearchStatus, ThemePreference, UpdateStatus } from '@shared/types'
 import { api, bytes, n } from '../lib/format'
 import { PageHeader } from './Placeholder'
 import { language, t } from '../lib/i18n'
@@ -71,6 +71,8 @@ export function SettingsView(props: {
         </Group>
 
         <SmartSearchGroup />
+
+        <CaptionsGroup />
 
         <UpdatesGroup />
 
@@ -238,6 +240,71 @@ function SmartSearchGroup() {
                 className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900"
               >
                 <Sparkles className="size-4" />{' '}{t('Turn on smart search')}</button>
+            )}
+          </div>
+        </div>
+      </div>
+    </Group>
+  )
+}
+
+function CaptionsGroup() {
+  const [s, setS] = useState<CaptionStatus | null>(null)
+  useEffect(() => {
+    void api.captionStatus().then(setS)
+    return api.onCaptionStatus(setS)
+  }, [])
+  if (!s) return null
+  const pct = s.total ? Math.floor((s.described / s.total) * 100) : 0
+  const busy = s.enabled && (s.phase === 'downloading' || s.phase === 'describing' || s.phase === 'loading')
+  const status = !s.enabled
+    ? s.described > 0
+      ? t('Paused — {described} of {total} described', { described: n(s.described), total: n(s.total) })
+      : null
+    : s.phase === 'downloading' && s.download
+      ? t('Downloading the model… {loaded} of {total}', { loaded: bytes(s.download.loaded), total: bytes(s.download.total) })
+      : s.phase === 'loading'
+        ? t('Starting…')
+        : s.phase === 'describing'
+          ? t('Describing your photos… {described} of {total} ({pct}%), newest first', { described: n(s.described), total: n(s.total), pct })
+          : s.phase === 'error'
+            ? t('Something went wrong: {error}', { error: s.error })
+            : t('Ready — {described} items described', { described: n(s.described) })
+  return (
+    <Group title={t('Automatic descriptions')}>
+      <div className="flex items-start gap-4">
+        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">
+          <MessageSquareText className="size-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">
+            {t('Writes a short description of each photo — “A dog sitting in a field with trees in the background.” — shown in the photo’s details and found by the search box. Runs on this computer only. Turning it on downloads the model (Florence-2, about 265 MB, once); describing takes about 2 seconds per photo in the background, newest first, so a large library takes many hours. Descriptions are in English.')}
+          </p>
+          {status && (
+            <div className={`mt-3 flex items-center gap-2 text-[13px] ${s.phase === 'error' ? 'text-red-600 dark:text-red-400' : 'text-stone-700 dark:text-stone-300'}`}>
+              {busy && <LoaderCircle className="size-3.5 animate-spin" />}
+              {status}
+            </div>
+          )}
+          {s.enabled && s.phase === 'describing' && (
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
+              <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${pct}%` }} />
+            </div>
+          )}
+          <div className="mt-4 flex gap-2">
+            {s.enabled ? (
+              <>
+                <Btn onClick={() => void api.setCaptionsEnabled(false)}>{t('Pause')}</Btn>
+                {s.phase === 'error' && <Btn onClick={() => void api.setCaptionsEnabled(true)}>{t('Try again')}</Btn>}
+              </>
+            ) : (
+              <button
+                onClick={() => void api.setCaptionsEnabled(true)}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900"
+              >
+                <MessageSquareText className="size-4" />
+                {s.described > 0 ? t('Continue describing') : t('Turn on automatic descriptions')}
+              </button>
             )}
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { Album, Users, Calendar, Camera, Eye, EyeOff, RotateCcw, RotateCw, Smartphone, Trash2, Check, ChevronLeft, ChevronRight, Copy, Download, ExternalLink, SlidersHorizontal, UserPlus, Tag, Share2, Files, FolderOpen, Heart, Info, Link2, MapPin, Fingerprint, HardDrive, History, Minus, Plus, X } from 'lucide-react'
+import { Album, Sparkles, Users, Calendar, Camera, Eye, EyeOff, RotateCcw, RotateCw, Smartphone, Trash2, Check, ChevronLeft, ChevronRight, Copy, Download, ExternalLink, SlidersHorizontal, UserPlus, Tag, Share2, Files, FolderOpen, Heart, Info, Link2, MapPin, Fingerprint, HardDrive, History, Minus, Plus, X } from 'lucide-react'
 import type { AlbumSummary, AssetDetail, AssetSummary } from '@shared/types'
 import { kindLabel, originLabel } from '../lib/labels'
 import { DateDialog, ShareDialog } from './Dialog'
@@ -770,13 +770,21 @@ function Caption(props: { d: AssetDetail; onChanged: () => void }) {
   }
   if (!editing) {
     return (
-      <button onClick={() => setEditing(true)} className="mt-3 block w-full text-left" title={t('Add or edit a caption')}>
-        {props.d.description ? (
-          <p className="select-text whitespace-pre-wrap text-[13.5px] leading-relaxed text-stone-200 hover:text-white">{props.d.description}</p>
-        ) : (
-          <span className="text-[13px] text-stone-500 hover:text-stone-300">{t('Add a caption…')}</span>
+      <>
+        <button onClick={() => setEditing(true)} className="mt-3 block w-full text-left" title={t('Add or edit a caption')}>
+          {props.d.description ? (
+            <p className="select-text whitespace-pre-wrap text-[13.5px] leading-relaxed text-stone-200 hover:text-white">{props.d.description}</p>
+          ) : (
+            <span className="text-[13px] text-stone-500 hover:text-stone-300">{t('Add a caption…')}</span>
+          )}
+        </button>
+        {props.d.autoCaption && (
+          <p className="mt-2 flex select-text gap-1.5 text-[12.5px] leading-snug text-stone-400" title={t('Automatic description, made on this computer')}>
+            <Sparkles className="mt-0.5 size-3 shrink-0" />
+            {props.d.autoCaption}
+          </p>
         )}
-      </button>
+      </>
     )
   }
   return (

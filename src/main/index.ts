@@ -28,7 +28,8 @@ const controller = new LibraryController({
   verifyProgress: (p) => mainWindow?.webContents.send('verify:progress', p),
   backupProgress: (p) => mainWindow?.webContents.send('backup:progress', p),
   smartSearchStatus: (s) => mainWindow?.webContents.send('smart:status', s),
-  peopleStatus: (s) => mainWindow?.webContents.send('people:status', s)
+  peopleStatus: (s) => mainWindow?.webContents.send('people:status', s),
+  captionStatus: (s) => mainWindow?.webContents.send('captions:status', s)
 })
 
 function isDark(): boolean {

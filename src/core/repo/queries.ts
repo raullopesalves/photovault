@@ -312,6 +312,7 @@ export function assetDetail(library: Library, id: number): AssetDetail | null {
     people: peopleOfAsset(library, id),
     tags: tagsOf(library, id),
     originalVersionId: db.get<{ id: number }>('SELECT id FROM assets WHERE version_of = ? LIMIT 1', [id])?.id ?? null,
+    autoCaption: db.get<{ caption: string | null }>('SELECT caption FROM asset_captions WHERE asset_id = ?', [id])?.caption ?? null,
     locationSource: (r as { location_source?: string | null }).location_source ?? null,
     place:
       (r as { place?: string | null }).place ||

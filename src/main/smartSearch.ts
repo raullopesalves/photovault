@@ -163,7 +163,7 @@ export class SmartSearchService {
              LEFT JOIN asset_embeddings e ON e.asset_id = a.id
             WHERE e.asset_id IS NULL AND a.trashed_at IS NULL AND a.live_photo_of IS NULL
               AND a.id NOT IN (SELECT value FROM json_each(?))
-            ORDER BY a.sort_time DESC LIMIT ?`,
+            ORDER BY a.undated, a.sort_time DESC LIMIT ?`,
           [JSON.stringify([...this.failed]), BATCH]
         )
         if (batch.length === 0) break

@@ -190,3 +190,12 @@ describe('pets (zero-shot)', () => {
     expect(found.get(1)?.map((r) => r.id)).toEqual([11])
   })
 })
+
+describe('automatic descriptions', () => {
+  it('tidies the model output into a sentence', async () => {
+    const { cleanCaption } = await import('@core/ai/caption')
+    expect(cleanCaption('<s>a dog sitting in a field .</s>')).toBe('A dog sitting in a field.')
+    expect(cleanCaption('A beach scene')).toBe('A beach scene.')
+    expect(cleanCaption('  ')).toBeNull()
+  })
+})

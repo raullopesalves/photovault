@@ -103,6 +103,8 @@ describe('favourites and filters', () => {
     expect(names({ text: 'holidays' })).toEqual(['mountain.jpg']) // album name
     expect(names({ text: '2021 iphone' })).toEqual(['IMG_9999.jpg', 'mountain.jpg'])
     expect(names({ text: '100%_' })).toEqual([]) // LIKE wildcards are escaped
+    lib.db.run("INSERT INTO asset_captions (asset_id, caption, model, created_at) VALUES (?, 'A snowy peak under a blue sky.', 'test', '2026-01-01')", [byName('mountain.jpg')])
+    expect(names({ text: 'snowy peak' })).toEqual(['mountain.jpg']) // automatic description
     expect(names({ mediaType: 'video' })).toEqual([])
     expect(names({ year: 2021, favorite: true })).toEqual(['IMG_9999.jpg'])
 

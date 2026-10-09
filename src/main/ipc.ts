@@ -329,6 +329,8 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     changed('albums')
     return n
   })
+  ipcMain.handle('captions:status', () => controller.captions?.get() ?? null)
+  ipcMain.handle('captions:enable', (_e, on: unknown) => controller.captions?.enable(on === true))
   ipcMain.handle('smart:pets', () => controller.smart?.pets() ?? [])
   ipcMain.handle('smart:status', () => controller.smart?.get() ?? null)
   ipcMain.handle('smart:enable', (_e, on: unknown) => controller.smart?.enable(on === true))
