@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { Album, CalendarClock, Check, Eye, EyeOff, Heart, HeartOff, ImageMinus, ImageUp, Minus, MapPin, MoreHorizontal, Play, Plus, RotateCcw, RotateCw, FolderOutput, Share2, Tag, Trash2, UserX, X } from 'lucide-react'
+import { Album, CalendarClock, Check, Eye, EyeOff, Heart, HeartOff, ImageMinus, ImageUp, Minus, MapPin, MoreHorizontal, Play, Plus, RotateCcw, RotateCw, FolderOutput, Printer, Share2, Tag, Trash2, UserX, X } from 'lucide-react'
 import type { AlbumSummary, AssetQuery, AssetSummary, TimelineGroup } from '@shared/types'
 import { api, monthLabel, n, plural } from '../lib/format'
 import { Tile } from './Tile'
 import { Lightbox } from './Lightbox'
 import { Slideshow } from './Slideshow'
-import { DateDialog, PromptDialog, ShareDialog } from './Dialog'
+import { DateDialog, PrintDialog, PromptDialog, ShareDialog } from './Dialog'
 import { LocationPicker } from './LocationPicker'
 import { BinDeleteDialog } from './BinDelete'
 import { t } from '../lib/i18n'
@@ -468,6 +468,7 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
     }
   }, [more])
   const [sharing, setSharing] = useState(false)
+  const [printing, setPrinting] = useState(false)
   const [tagging, setTagging] = useState(false)
   const [placing, setPlacing] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -571,6 +572,7 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                           flash(t('{count} rotated', { count: plural(count, 'item') }))
                         }
                       },
+                      { label: t('Print or photo book…'), icon: <Printer className="size-4" />, run: () => setPrinting(true) },
                       {
                         label: t('Export originals…'),
                         icon: <FolderOutput className="size-4" />,
@@ -664,6 +666,26 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
             setDating(false)
             await api.setDates(props.ids, wall)
             flash(t('Date set for {count}', { count: plural(count, 'item') }))
+          }}
+        />
+      )}
+      {printing && (
+        <PrintDialog
+          count={count}
+          title={t('Photos')}
+          onClose={() => setPrinting(false)}
+          onMake={async (layout, title) => {
+            setPrinting(false)
+            const off = api.onExportProgress((p) => setToast(t('Preparing the PDF… {done} of {total}', { done: n(p.done), total: n(p.total) })))
+            try {
+              const r = await api.photoBook(props.ids, title, layout)
+              if (r) flash(t('PDF ready: {pages} pages', { pages: n(r.pages) }))
+              else setToast(null)
+            } catch (err) {
+              flash(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : t('Export failed'))
+            } finally {
+              off()
+            }
           }}
         />
       )}

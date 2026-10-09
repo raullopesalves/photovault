@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { ShareOptions } from '@shared/types'
+import type { PhotoBookLayout, ShareOptions } from '@shared/types'
+import { plural } from '../lib/format'
 import { t } from '../lib/i18n'
 
 function Shell(props: { children: ReactNode; onClose: () => void }) {
@@ -148,6 +149,51 @@ export function ShareDialog(props: { count: number; onShare: (opts: ShareOptions
       <div className="mt-6 flex justify-end gap-2">
         <button onClick={props.onClose} className={secondary}>{t('Cancel')}</button>
         <button onClick={() => props.onShare({ size, includeDate })} className={primary}>{t('Prepare copies')}</button>
+      </div>
+    </Shell>
+  )
+}
+
+/** "Print or photo book": choose a layout and a title; a PDF is made where the user chooses. */
+export function PrintDialog(props: { count: number; title: string; onMake: (layout: PhotoBookLayout, title: string) => void; onClose: () => void }) {
+  const [layout, setLayout] = useState<PhotoBookLayout>('book')
+  const [title, setTitle] = useState(props.title)
+  const layouts: Array<{ id: PhotoBookLayout; label: string; hint: string }> = [
+    { id: 'book', label: t('Photo book'), hint: t('Cover, then one or two photos per page with dates and captions') },
+    { id: 'single', label: t('One per page'), hint: t('Each photo on its own page, to print') },
+    { id: 'grid', label: t('Contact sheet'), hint: t('20 small photos per page') }
+  ]
+  return (
+    <Shell onClose={props.onClose}>
+      <h2 className="text-[17px] font-semibold">{t('Print or make a photo book')}</h2>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">
+        {t('Makes an A4 PDF of {count} — print it at home or send it to a print shop. Edits are applied; videos are left out.', { count: plural(props.count, 'item') })}
+      </p>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        maxLength={120}
+        placeholder={t('Title')}
+        className="mt-4 h-10 w-full select-text rounded-lg bg-stone-100 px-3 text-[14px] outline-none ring-accent-500 focus:ring-2 dark:bg-stone-800"
+      />
+      <div className="mt-3 space-y-1.5">
+        {layouts.map((l) => (
+          <label key={l.id} className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 ${layout === l.id ? 'bg-stone-100 dark:bg-stone-800' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50'}`}>
+            <input type="radio" checked={layout === l.id} onChange={() => setLayout(l.id)} className="mt-1 accent-accent-500" />
+            <span>
+              <span className="block text-[13.5px] font-medium">{l.label}</span>
+              <span className="block text-xs text-stone-500 dark:text-stone-400">{l.hint}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+      <div className="mt-6 flex justify-end gap-2">
+        <button onClick={props.onClose} className={secondary}>
+          {t('Cancel')}
+        </button>
+        <button onClick={() => props.onMake(layout, title.trim() || t('Photos'))} className={primary}>
+          {t('Make PDF')}
+        </button>
       </div>
     </Shell>
   )

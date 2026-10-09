@@ -105,6 +105,7 @@ const api: PhotoVaultApi = {
   mapClusters: (view, query) => ipcRenderer.invoke('library:mapClusters', view, query),
   rotate: (ids, degrees) => ipcRenderer.invoke('library:rotate', ids, degrees),
   exportOriginals: (ids) => ipcRenderer.invoke('library:export', ids),
+  photoBook: (ids, title, layout) => ipcRenderer.invoke('library:photoBook', ids, title, layout),
   exportWebGallery: (ids, title, description) => ipcRenderer.invoke('library:exportWeb', ids, title, description),
   onExportProgress: (cb) => {
     const listener = (_e: unknown, p: ExportProgress): void => cb(p)

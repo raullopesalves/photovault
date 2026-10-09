@@ -567,6 +567,9 @@ export interface UpdateStatus {
   canUpdate: boolean
 }
 
+/** book: cover + one or two photos per page (landscape); grid: contact sheet; single: one photo per page. */
+export type PhotoBookLayout = 'book' | 'grid' | 'single'
+
 export interface CaptionStatus {
   enabled: boolean
   phase: 'off' | 'loading' | 'downloading' | 'describing' | 'ready' | 'error'
@@ -799,6 +802,8 @@ export interface PhotoVaultApi {
   /** Asks for a folder and copies the originals there (never overwriting). Null if cancelled. */
   exportOriginals(ids: number[]): Promise<ExportResult | null>
   onExportProgress(cb: (p: ExportProgress) => void): () => void
+  /** Makes a print-ready A4 PDF of these photos where the user chooses; null if cancelled. */
+  photoBook(ids: number[], title: string, layout: PhotoBookLayout): Promise<{ pages: number; photos: number; skipped: number; file: string } | null>
   /** Saves these items as a web page (index.html + photos) in a folder the user picks; null if cancelled. */
   exportWebGallery(ids: number[], title: string, description: string | null): Promise<ExportResult | null>
   /** Hide or show everything matching a filter (e.g. all WhatsApp loops). Returns how many changed. */

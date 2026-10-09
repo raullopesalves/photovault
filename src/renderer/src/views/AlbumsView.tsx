@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Album, ArrowLeft, FolderOutput, Globe, Pencil, Plus, Trash2, Wand2 } from 'lucide-react'
+import { Album, ArrowLeft, FolderOutput, Globe, Pencil, Plus, Printer, Trash2, Wand2 } from 'lucide-react'
 import type { AlbumSummary, AssetQuery, SmartAlbum } from '@shared/types'
 import { api, mediaUrl, n, plural } from '../lib/format'
 import { AssetGrid } from '../components/AssetGrid'
-import { ConfirmDialog, PromptDialog } from '../components/Dialog'
+import { ConfirmDialog, PrintDialog, PromptDialog } from '../components/Dialog'
 import { FilterBar } from '../components/FilterBar'
 import { NoMatches } from './PhotosView'
 import { t } from '../lib/i18n'
@@ -206,6 +206,7 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
   const [describing, setDescribing] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [webStatus, setWebStatus] = useState<string | null>(null)
+  const [printing, setPrinting] = useState(false)
 
   useEffect(() => {
     void api.album(props.id).then((a) => (a ? setAlbum(a) : props.onBack()))
@@ -276,6 +277,11 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
                 <Globe className="size-4" />
               </button>
             )}
+            {album.count > 0 && (
+              <button onClick={() => setPrinting(true)} className={iconBtn} aria-label={t('Print or photo book…')} title={t('Print or make a photo book (PDF)')}>
+                <Printer className="size-4" />
+              </button>
+            )}
             <button onClick={() => setRenaming(true)} className={iconBtn} aria-label={t('Rename album')} title={t('Rename')}>
               <Pencil className="size-4" />
             </button>
@@ -293,6 +299,27 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
           )
         }
       />
+      {printing && (
+        <PrintDialog
+          count={album.count}
+          title={album.name}
+          onClose={() => setPrinting(false)}
+          onMake={async (layout, title) => {
+            setPrinting(false)
+            const ids = await api.assetIdsInRange({ albumId: props.id }, 0, 200_000)
+            const off = api.onExportProgress((p) => setWebStatus(t('Preparing the PDF… {done} of {total}', { done: n(p.done), total: n(p.total) })))
+            try {
+              const r = await api.photoBook(ids, title, layout)
+              setWebStatus(r ? t('PDF ready: {pages} pages', { pages: n(r.pages) }) : null)
+            } catch (err) {
+              setWebStatus(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err))
+            } finally {
+              off()
+              window.setTimeout(() => setWebStatus(null), 6000)
+            }
+          }}
+        />
+      )}
       {webStatus && (
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-stone-900 px-4 py-2 text-[13px] text-white shadow-lg dark:bg-white dark:text-stone-900">{webStatus}</div>
       )}

@@ -26,6 +26,7 @@ import { playableVideo } from './videos'
 import { editPreview, editState, renderEdited, saveEdits } from './editing'
 import { prepareShare } from './share'
 import { exportWebGallery } from './webGallery'
+import { makePhotoBook } from './photoBook'
 import { cancelPhoneCopy, copyPhone } from './phoneImport'
 import { listPhones } from '@core/sources/phone'
 import { checkForUpdates, installUpdateNow, setUpdateToken, updateStatus } from './updater'
@@ -206,6 +207,33 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     try {
       const result = await exportOriginals(lib(), list, r.filePaths[0], { onProgress: (p) => getWindow()?.webContents.send('export:progress', p) })
       if (result.exported > 0) void shell.openPath(result.folder)
+      return result
+    } finally {
+      exporting = false
+    }
+  })
+  ipcMain.handle('library:photoBook', async (_e, ids: unknown, title: unknown, layout: unknown) => {
+    if (exporting) throw new Error('An export is already running.')
+    const list = idList(ids)
+    const kind = layout === 'grid' || layout === 'single' ? layout : 'book'
+    const name = str(title, 'title').slice(0, 200)
+    const win = getWindow()
+    const opts: Electron.SaveDialogOptions = {
+      title: tr('Save the PDF', 'Guardar o PDF'),
+      defaultPath: `${name.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_') || 'Photos'}.pdf`,
+      filters: [{ name: 'PDF', extensions: ['pdf'] }]
+    }
+    const r = win ? await dialog.showSaveDialog(win, opts) : await dialog.showSaveDialog(opts)
+    if (r.canceled || !r.filePath) return null
+    exporting = true
+    try {
+      const result = await makePhotoBook(lib(), list, r.filePath, {
+        title: name,
+        layout: kind,
+        lang: languageOf(settings),
+        onProgress: (p) => getWindow()?.webContents.send('export:progress', p)
+      })
+      void shell.openPath(result.file)
       return result
     } finally {
       exporting = false

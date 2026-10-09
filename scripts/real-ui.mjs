@@ -124,6 +124,36 @@ try {
     await web.close()
   }
 
+  if (process.argv.includes('--photo-book')) {
+    // A throwaway album in the snapshot copy, printed as a photo book and as a contact sheet.
+    const out = join(work, 'book')
+    rmSync(out, { recursive: true, force: true })
+    mkdirSync(out, { recursive: true })
+    await app.evaluate(({ dialog, shell }, dir) => {
+      let n = 0
+      dialog.showSaveDialog = async () => ({ canceled: false, filePath: `${dir}/book-${++n}.pdf` })
+      shell.openPath = async () => ''
+    }, out)
+    await page.evaluate(async () => {
+      const ids = (await window.photoVault.assetsPage(0, 300, { mediaType: 'photo', origins: ['camera'] })).map((a) => a.id).filter((_, i) => i % 10 === 0)
+      await window.photoVault.createAlbum('Summer book', ids)
+    })
+    await page.locator('nav button').nth(3).click()
+    await page.waitForTimeout(1500)
+    await page.locator('main button:has-text("Summer book")').first().click()
+    await page.waitForTimeout(2000)
+    for (const layout of ['Photo book', 'Contact sheet']) {
+      await page.locator('[aria-label="Print or photo book…"]').click()
+      await page.waitForTimeout(500)
+      if (layout !== 'Photo book') await page.locator(`label:has-text("${layout}")`).click()
+      await page.screenshot({ path: join(shots, `book-dialog-${layout.replace(' ', '-')}.png`) })
+      await page.locator('button:has-text("Make PDF")').click()
+      await page.waitForSelector('text=/PDF ready/', { timeout: 180_000 })
+      console.log('pdf:', layout, await page.locator('text=/PDF ready/').first().textContent())
+      await page.waitForTimeout(6500)
+    }
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()
