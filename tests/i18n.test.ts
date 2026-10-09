@@ -2,7 +2,6 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
-import { PT } from '../src/renderer/src/lib/i18n-pt'
 
 // Names that read the same in Portuguese.
 const SAME = new Set(['Facebook', 'Instagram', 'Messenger', 'MP', 'photovault', 'SHA-256', 'Signal', 'Snapchat', 'Telegram', 'TikTok', 'WhatsApp', 'X / Twitter'])
@@ -35,6 +34,21 @@ function interfaceKeys(): Set<string> {
   }
   return keys
 }
+
+/** The Portuguese dictionary, read from its source (renderer code is outside this test project). */
+function dictionary(): Record<string, string> {
+  const file = join(__dirname, '../src/renderer/src/lib/i18n-pt.ts')
+  const sf = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true)
+  const out: Record<string, string> = {}
+  const visit = (n: ts.Node): void => {
+    if (ts.isPropertyAssignment(n) && ts.isStringLiteral(n.name) && ts.isStringLiteral(n.initializer)) out[n.name.text] = n.initializer.text
+    ts.forEachChild(n, visit)
+  }
+  visit(sf)
+  return out
+}
+
+const PT = dictionary()
 
 describe('Portuguese interface', () => {
   const keys = interfaceKeys()

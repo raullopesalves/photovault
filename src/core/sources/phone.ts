@@ -44,6 +44,25 @@ function Size($item) {
   try { return [int64]$item.Size } catch { return [int64]0 }
 }
 
+# Copied before: the same name (or a "name (2)" kept beside a different file) with the same size.
+function Already([string]$dir, [string]$name, [int64]$size) {
+  if ($size -le 0) { return $false }
+  $stem = [System.IO.Path]::GetFileNameWithoutExtension($name)
+  $ext = [System.IO.Path]::GetExtension($name)
+  for ($k = 1; ; $k++) {
+    $f = Join-Path $dir ($(if ($k -eq 1) { $name } else { $stem + ' (' + $k + ')' + $ext }))
+    if (-not (Test-Path -LiteralPath $f -PathType Leaf)) { return $false }
+    if ((Get-Item -LiteralPath $f).Length -eq $size) { return $true }
+  }
+}
+
+# New files can be held open for a moment (antivirus scan): retry.
+function Retry([scriptblock]$block) {
+  for ($i = 0; ; $i++) {
+    try { & $block; return } catch { if ($i -ge 40) { throw }; Start-Sleep -Milliseconds 250 }
+  }
+}
+
 function FileName($item) {
   try { $n = $item.ExtendedProperty('System.FileName'); if ($n) { return [string]$n } } catch { }
   return [string]$item.Name
@@ -91,8 +110,7 @@ foreach ($f in $files) {
   $dir = Join-Path $Dest $f.Rel
   $p.current = $name
   try {
-    $target = Join-Path $dir $name
-    if ($size -gt 0 -and (Test-Path -LiteralPath $target -PathType Leaf) -and (Get-Item -LiteralPath $target).Length -eq $size) {
+    if (Already $dir $name $size) {
       $p.skipped++
     } else {
       $inNs.CopyHere($f.Item, 4 + 16 + 512 + 1024)
@@ -115,12 +133,14 @@ foreach ($f in $files) {
         if (-not (Test-Path -LiteralPath $final)) { break }
         if ((Get-Item -LiteralPath $final).Length -eq $got.Length) {
           if (-not $hash) { $hash = (Get-FileHash -LiteralPath $got.FullName -Algorithm SHA256).Hash }
-          if ((Get-FileHash -LiteralPath $final -Algorithm SHA256).Hash -eq $hash) { Remove-Item -LiteralPath $got.FullName -Force; $final = $null; $p.skipped++; break }
+          if ((Get-FileHash -LiteralPath $final -Algorithm SHA256).Hash -eq $hash) { $gone = $got.FullName; Retry { Remove-Item -LiteralPath $gone -Force }; $final = $null; $p.skipped++; break }
         }
         $k++
       }
       if ($final) {
-        Move-Item -LiteralPath $got.FullName -Destination $final
+        $from = $got.FullName
+        $to = $final
+        Retry { Move-Item -LiteralPath $from -Destination $to }
         $p.copied++
         $p.bytes += $got.Length
       }

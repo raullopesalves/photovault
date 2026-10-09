@@ -8,6 +8,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  # onnxruntime-node's install script otherwise downloads optional GPU (CUDA) files on Linux, which
+  # often times out; the CPU build the app uses is already in the package.
+  ONNXRUNTIME_NODE_INSTALL: skip
+
 jobs:
   test:
     runs-on: windows-latest
