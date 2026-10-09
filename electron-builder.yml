@@ -9,11 +9,9 @@ files:
   - out/**
   - package.json
   - '!**/*.map'
-  # On-device AI: only the Windows x64 onnxruntime binaries are needed; onnxruntime-web is bundled inside
-  # transformers.js already.
+  # On-device AI: onnxruntime-web is bundled inside transformers.js already. Each platform below keeps only
+  # its own onnxruntime-node binaries.
   - '!**/node_modules/onnxruntime-web/**'
-  - '!**/node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**'
-  - '!**/node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**'
 # Native code (sharp/libvips) cannot be loaded from inside the asar archive.
 asarUnpack:
   - '**/node_modules/sharp/**/*'
@@ -23,6 +21,9 @@ asarUnpack:
   - '**/node_modules/ffmpeg-static/**/*'
 npmRebuild: false
 win:
+  files:
+    - '!**/node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**'
+    - '!**/node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**'
   target:
     - target: nsis
       arch: [x64]
@@ -43,11 +44,17 @@ nsis:
   uninstallerIcon: build/icon.ico
 portable:
   artifactName: Photo Vault ${version} Portable.${ext}
+# Mac and Linux builds are produced by CI (.github/workflows/ci.yml); they are unsigned and less tested than Windows.
 mac:
   target: dmg
   category: public.app-category.photography
   icon: build/icon.png
+  identity: null
+  files:
+    - '!**/node_modules/onnxruntime-node/bin/napi-v6/{win32,linux}/**'
 linux:
+  files:
+    - '!**/node_modules/onnxruntime-node/bin/napi-v6/{win32,darwin}/**'
   target: AppImage
   category: Graphics
   icon: build/icon.png
