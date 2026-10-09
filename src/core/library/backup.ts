@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, realpathSync } from 'node:fs'
 import { copyFile, mkdir, rename, stat, unlink, utimes } from 'node:fs/promises'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { backup as sqliteBackup } from 'node:sqlite'
@@ -76,8 +76,8 @@ export class BackupService {
   }
 
   addTarget(path: string): BackupTargetInfo {
-    const target = resolve(path)
-    if (!accessible(target)) throw new Error('That folder does not exist or is not reachable.')
+    if (!accessible(resolve(path))) throw new Error('That folder does not exist or is not reachable.')
+    const target = realpathSync.native(resolve(path)) // canonical form, so "inside the library" checks are reliable
     if (isInside(target, this.library.root) || isInside(this.library.root, target)) {
       throw new Error('A backup must be outside the library folder (ideally on another drive).')
     }

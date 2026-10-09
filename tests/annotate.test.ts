@@ -104,7 +104,7 @@ describe('memories', () => {
 
     const m = memories(lib, new Date('2026-10-09T12:00:00'))
     expect(m.find((x) => x.kind === 'on_this_day')).toMatchObject({ title: '4 years ago', count: 6 })
-    expect(m.find((x) => x.kind === 'trip')).toMatchObject({ title: 'Trip to Spain', count: 12 })
+    expect(m.find((x) => x.kind === 'trip')).toMatchObject({ title: 'Trip to Madrid', count: 12 })
     expect(countryAt(38.72, -9.14)).toBe('Portugal')
     expect(countryAt(0, -30)).toBeNull() // at sea
   })

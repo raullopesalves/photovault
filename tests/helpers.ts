@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, realpathSync } from 'node:fs'
 import { copyFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -15,7 +15,8 @@ export interface Sandbox {
 }
 
 export function sandbox(): Sandbox {
-  const dir = mkdtempSync(join(tmpdir(), 'photovault-test-'))
+  // Canonical path: CI temp folders can be 8.3 short names (RUNNER~1).
+  const dir = realpathSync.native(mkdtempSync(join(tmpdir(), 'photovault-test-')))
   const source = join(dir, 'source')
   mkdirSync(source, { recursive: true })
   return { dir, source, libraryRoot: join(dir, 'library'), cleanup: () => rmSync(dir, { recursive: true, force: true }) }

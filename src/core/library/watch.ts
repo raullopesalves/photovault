@@ -1,4 +1,4 @@
-import { existsSync, statSync, watch, type FSWatcher } from 'node:fs'
+import { existsSync, realpathSync, statSync, watch, type FSWatcher } from 'node:fs'
 import { readdir, stat } from 'node:fs/promises'
 import { join, resolve, sep } from 'node:path'
 import type { WatchFolder } from '@shared/types'
@@ -55,7 +55,12 @@ export class WatchService {
   }
 
   add(path: string): WatchFolder {
-    const abs = resolve(path)
+    let abs = resolve(path)
+    try {
+      abs = realpathSync.native(abs)
+    } catch {
+      /* checked just below */
+    }
     if (!existsSync(abs) || !statSync(abs).isDirectory()) throw new Error('That folder does not exist.')
     const lib = resolve(this.library.root)
     const inside = (a: string, b: string): boolean => a === b || a.startsWith(b.endsWith(sep) ? b : b + sep)

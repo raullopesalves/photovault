@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { Database } from '../db/database'
 import { silentLogger, type Logger } from '../log'
@@ -24,8 +24,18 @@ export interface LibraryPaths {
   logs: string
 }
 
+/** The real, canonical form of a path (long names, real casing on Windows), so paths compare reliably. */
+function canonical(p: string): string {
+  const abs = resolve(p)
+  try {
+    return realpathSync.native(abs)
+  } catch {
+    return abs // does not exist (yet)
+  }
+}
+
 export function libraryPaths(root: string): LibraryPaths {
-  const r = resolve(root)
+  const r = canonical(root)
   return {
     root: r,
     originals: join(r, 'originals'),
