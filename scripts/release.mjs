@@ -15,6 +15,10 @@ const run = (cmd, args) => {
   if (r.status !== 0) process.exit(r.status ?? 1)
 }
 console.log(`Releasing ${version}…`)
+// GitHub only publishes a release for an existing tag: tag the current commit (once) and push it.
+const tag = `v${version}`
+if (!execFileSync('git', ['tag', '--list', tag], { encoding: 'utf8' }).trim()) execFileSync('git', ['tag', tag])
+execFileSync('git', ['push', 'origin', tag], { stdio: 'inherit' })
 run('node', ['scripts/electron-vite.mjs', 'build'])
 // The local electron-builder, not npx (which needs a working global npm).
 run('node', [join('node_modules', 'electron-builder', 'cli.js'), '--win', 'nsis', '--publish', 'always'])
