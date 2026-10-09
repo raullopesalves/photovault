@@ -398,3 +398,44 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 - **Smart albums:** "Save as smart album" next to the filter badges stores the query (`smart_albums`; paging, smart-search ids and sort are not saved). The album shows whatever matches now, and appears on the Albums page.
 - **Share:** prepares JPEG copies in a new folder that opens in Explorer: small 1280 / large 2048 / full size, edits applied. Location and camera details are always removed; the date taken is kept unless unticked. Videos are copied as they are.
 - **Selection bar:** Favourite, Add to album, Share, Hide, Bin, and **More** (Set date, Set location, Add tags, Rotate, Export originals).
+
+## Protection, updates and platforms (0.10)
+
+**D74. Rotating backup drives and automatic checks.** The owner chose rotating drives over a cloud copy (no subscription, nothing leaves the house).
+- **Naming:** each backup location can be named ("Drive at home", "Drive at Mum's"). Storage shows per drive whether it is up to date or how many items are not on it yet.
+- **Brought up to date on plug-in:** every minute the app checks connected automatic drives; one that is missing items gets them copied straight away.
+- **Monthly checks:** once a day the app looks at when the library and each connected drive were last fully verified; anything older than 30 days is verified again in the background.
+- **One-click catalogue restore:** Storage lists the catalogue snapshots. Restore first saves the current catalogue as a "before restore" snapshot, so a restore can itself be undone; photo files are never touched.
+
+**D75. CI on GitHub.** Every push runs typecheck and the full test suite on Windows, and builds unsigned macOS and Linux packages (artifacts on the run).
+- **Canonical paths:** Windows runners use 8.3 short temp paths (`RUNNER~1`); the library, backup targets, watched folders and the test sandbox now compare `realpathSync.native` forms.
+- **onnxruntime-node:** `ONNXRUNTIME_NODE_INSTALL=skip` stops its install script downloading optional CUDA files on Linux (it timed out); the CPU build is in the package.
+- Mac and Linux builds package fine but have not been run on those systems. Phone import and the Recycle Bin are Windows-only.
+
+**D76. Auto-update from the private repository** (`src/main/updater.ts`). electron-updater against GitHub Releases of `raullopesalves/photovault`.
+- **Token:** a private repository needs a token to read releases. The user pastes a fine-grained, read-only token (this repository, Contents: read) in Settings → Updates; it is checked against the API and stored encrypted with Electron `safeStorage` (DPAPI). Nothing is bundled in the app.
+- **Behaviour:** checks 30 s after start and every 6 h, downloads in the background, installs on quit or "Restart and update". Only the installed (NSIS) build updates; the portable exe and dev runs say so.
+- **Publishing:** `npm run release` builds and uploads with the GitHub CLI's login. Code signing was skipped by the owner (SmartScreen warns on first run).
+
+## Library (0.10)
+
+**D77. Place names offline** (`src/core/geo/places.ts`, migration 19). GeoNames cities5000 (64k places, CC BY 4.0, 2.6 MB JSON) on a 1° grid; nearest town within 30 km becomes `assets.place` ("Lisbon, Portugal"), filled in the background and reset by a trigger when the location changes. Used by search, the map, the viewer and trip names (the dominant town when ≥ 60 % of the trip, else the country).
+
+**D78. RAW photos** (`src/core/media/raw.ts`). Camera RAW files are kept as originals; thumbnails, previews, edits and shares use the largest JPEG the camera embedded (walked by JPEG markers), oriented by its own or the RAW's EXIF. No RAW development is attempted.
+
+**D79. Edited versions from phones** (`src/core/library/editedVersions.ts`, migration 20). `IMG_E1234` next to `IMG_1234` (iPhone, with its `.AAE`) and `name-edited` next to `name` (Google Takeout) in the same source folder are paired: the original gets `version_of` = the edited one and leaves the grid; the viewer's "Original" toggle shows it; Bin and delete take both. Both stay ordinary files.
+
+**D80. Import straight from a phone** (`src/core/sources/phone.ts`). Phones and cameras over USB are MTP devices, invisible to Node. Windows' Shell (PowerShell `Shell.Application`) lists them and copies their `DCIM` and `Pictures` folders into `PhotoVault phone copies\<device>` next to the library (outside it, since imports never read the library), which is then imported as a folder.
+- **Never overwrites:** each file lands in an empty `.incoming` folder and is moved into place; a different file with the same name gets "name (2)".
+- **Only new files:** a file already copied (same name, or a "(n)" variant, with the same size) is skipped before copying; the SHA-256 import still decides identity.
+- The phone is only read. Moves and deletes of our own temporary copies retry briefly (antivirus scans lock new files).
+
+**D81. Portuguese interface** (`src/renderer/src/lib/i18n.ts`, `i18n-pt.ts`). English text is the key (`t('Photos')`), `{name}` placeholders; a missing entry shows English. European Portuguese. The language is chosen in Settings (first run follows Windows) and applied before the renderer's modules load (changing it reloads the window). Memory titles, dates, country names and file dialogs follow it. A test fails if any interface text lacks a translation, a translation changes the placeholders, or a translation is unused. The strings were wrapped by a TypeScript-AST codemod, then reviewed.
+
+**D82. Pets** (`src/main/smartSearch.ts`). Dogs and Cats appear in People once smart search has looked at the photos. Zero-shot classification over 20 CLIP labels (dog, cat, person, selfie, food, screenshot, meme, cartoon, toy…): a photo counts only when "dog" or "cat" wins with p ≥ 0.6 (softmax at CLIP's logit scale 100), which is far more precise than a single-text threshold. On the owner's first 2,400 indexed photos: 21 dogs and 18 cats. Telling individual pets apart is not attempted (no reliable on-device model).
+
+**D83. Automatic descriptions** (`src/core/ai/caption.ts`, `src/main/captions.ts`, migration 21). Florence-2-base (MIT, ~265 MB quantised, `<CAPTION>` task) describes each photo in one sentence ("A dog sitting in a field with trees in the background."), from its thumbnail. Opt-in; ~2 s per photo, so it runs on a second worker thread to avoid queueing smart search and faces behind it, newest first, and can be paused. Captions are English, shown in the viewer's details and indexed for search. ViT-GPT2 was considered and rejected for quality.
+
+**D84. Sharing as a web page** (`src/main/webGallery.ts`). A shared family library would need a server or a cloud account, so it was not built. Instead an album can be saved as a folder with `index.html`, `photos/` (2048 px JPEGs, edits applied, location and camera data removed) and `thumbs/`; the page has a grid, a full-screen viewer with keys and swipe, and works offline from `file://` (data embedded, captions escaped). Zip it and send it, or upload it anywhere to share a link.
+
+**D85. Print and photo books** (`src/main/photoBook.ts`). A4 PDF from an album or a selection, rendered by Chromium (`printToPDF`) in a hidden window from a temporary HTML page: a photo book (cover, then one landscape or two portrait photos per page with date and caption), one photo per page, or a 20-up contact sheet. Images are prepared at about 200 dpi with edits applied; videos are left out.

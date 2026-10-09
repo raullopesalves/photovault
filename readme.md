@@ -8,7 +8,7 @@ A local-first desktop photo archive. Photo Vault imports folders, ZIP archives a
 ## Requirements
 
 - Node.js 24+
-- Windows, macOS or Linux (developed and tested on Windows 11)
+- Windows, macOS or Linux (developed and tested on Windows 11; CI packages macOS and Linux builds, untested there)
 
 ## Commands
 
@@ -74,11 +74,15 @@ scripts/         e2e smoke test, electron-vite launcher
   database/backups/         automatic catalogue snapshots
   temp/                     in-flight copies (never published until verified)
   logs/                     JSON-lines logs
+```
 
 Video thumbnails and playable copies of HEVC/old videos use a bundled ffmpeg (a separate GPL program from
 `ffmpeg-static`, run as a process). The smart-search model (~150 MB) and the face models (~39 MB), downloaded only if you turn those features on, live in the app's data folder
-(`%APPDATA%/Photo Vault/models`), not in the library.
-```
+(`%APPDATA%/Photo Vault/models`), not in the library. The same goes for the automatic-descriptions model
+(Florence-2-base, ~265 MB, MIT).
+
+Importing from a phone copies its camera folders into `PhotoVault phone copies\<device>` next to the library
+first (Windows only); that folder can be deleted once the import is done.
 
 Place names (map, trips, search) come from [GeoNames](https://www.geonames.org) "cities5000" (CC BY 4.0), bundled
 in `src/core/geo/places.json` and rebuilt with `node scripts/make-places.mjs`.

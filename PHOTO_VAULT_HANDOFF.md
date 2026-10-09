@@ -1076,21 +1076,21 @@ It is trust.
 The user must be able to give Photo Vault irreplaceable personal photographs and understand exactly what the application has done with them.
 ---
 
-# 29. Implementation Status (updated 2026-10-09, version 0.9.0)
+# 29. Implementation Status (updated 2026-10-09, version 0.10.0)
 
 Milestones 0–5 are implemented, and most of Milestone 6:
 - **Import and safety:** resumable imports, library verification, catalogue snapshots and mirror backups.
 - **Library:** similar photos, a map, smart search on the device, watched folders, export and rotation.
-- **Platform:** a Windows installer.
+- **Platform:** a Windows installer that updates itself from the private GitHub repository; CI builds for macOS and Linux.
 
-See `DECISIONS.md` (D1–D73) for reasoning and `readme.md` for commands.
+See `DECISIONS.md` (D1–D85) for reasoning and `readme.md` for commands.
 
 ## Architecture as built
 
 - **Desktop:** Electron 44 + React 19 + TypeScript + Vite (electron-vite) + Tailwind 4.
-- **Database:** SQLite through Node's built-in `node:sqlite`. Append-only migrations live in `src/core/db/migrations.ts` (v1 initial schema, v2 archives/Takeout/verification, v3 albums, v4 origin/kind/hidden, v5 origin confidence, v6–7 visual fingerprints, v8 dating, v9 bin, v10 backups, v11 Live Photos, v12: sharpness, rotation, watched folders, FTS5 search, smart-search vectors, map index).
-- **Worker thread:** `src/main/worker.ts` runs whole-library computations (probable-duplicate grouping) and on-device AI on its own read-only connection, so the main process stays responsive.
-- **Distribution:** electron-builder: NSIS installer + portable exe for Windows (unsigned for now).
+- **Database:** SQLite through Node's built-in `node:sqlite`. Append-only migrations live in `src/core/db/migrations.ts` (v1 initial schema, v2 archives/Takeout/verification, v3 albums, v4 origin/kind/hidden, v5 origin confidence, v6–7 visual fingerprints, v8 dating, v9 bin, v10 backups, v11 Live Photos, v12: sharpness, rotation, watched folders, FTS5 search, smart-search vectors, map index; v13–15 people; v16 edits; v17 tags, smart albums, manual locations; v18 backup drive names; v19 place names; v20 edited versions; v21 automatic descriptions).
+- **Worker threads:** `src/main/worker.ts` runs whole-library computations (probable-duplicate grouping) and on-device AI (smart search, faces) on its own read-only connection, so the main process stays responsive. Automatic descriptions use a second instance of the same worker.
+- **Distribution:** electron-builder: NSIS installer (self-updating via electron-updater, D76) + portable exe for Windows, unsigned. CI (`.github/workflows/ci.yml`) tests on Windows and packages macOS/Linux.
 - **Core:** `src/core` has no Electron dependency and contains all archive logic. The main process handles IPC, the protocol and the window. The renderer is sandboxed and uses a typed preload API.
 - **Media in the UI:** served through `pv-media://{thumb|preview|original}/<assetId>`. The renderer never handles filesystem paths.
 - **ZIP reading:** yauzl, entries streamed and never extracted to disk paths.
@@ -1139,6 +1139,18 @@ See `DECISIONS.md` (D1–D73) for reasoning and `readme.md` for commands.
 - **Search:** full-text search via FTS5 trigrams (accent-insensitive, includes folders and albums); **smart search** with CLIP on the device, opt-in, model downloaded once, results best match first.
 - **Scale:** a 100k-item performance test (`npm run test:perf`).
 
+### Added in 0.10
+
+- **Protection:** name backup drives and rotate them (each is brought up to date when plugged in); monthly automatic checks of the library and connected drives; one-click catalogue restore (undoable).
+- **Updates:** installed copies update themselves from the private repository's Releases (read-only token in Settings).
+- **Import:** straight from a phone or camera over USB (Windows), only new files; RAW photos via their embedded preview; iPhone/Takeout edited versions shown as one item with the original behind it.
+- **Places:** offline town names (GeoNames) in search, the map, the viewer and trip names.
+- **Interface in Portuguese** (Settings → Language).
+- **Pets:** Dogs and Cats groups in People (needs smart search).
+- **Automatic descriptions:** an on-device model describes each photo; searchable (opt-in, English).
+- **Sharing:** an album as a self-contained web page (zip it or upload it to share a link).
+- **Print:** A4 PDF photo books, one-per-page prints and contact sheets.
+
 ### Added in 0.9
 
 - **Viewer:** stays on the photo you opened (no flicker during background work); right-click menu (copy picture, copy file, open a copy in another app, save a copy, share, edit…).
@@ -1163,6 +1175,8 @@ See `DECISIONS.md` (D1–D73) for reasoning and `readme.md` for commands.
 
 ## Not yet
 
-- **Code signing and auto-update:** need a certificate and an update host (cost/credentials).
-- **Ideas not built:** pets/objects as groups, a shared family library, AI captions.
-- **Other:** RAW decoding without the OS codec; AAE edit sidecars (counted only); a "keep another physical copy" option for duplicates.
+- **Code signing:** skipped by the owner for now (needs a paid certificate); SmartScreen warns on first run.
+- **Cloud backup:** the owner chose rotating drives instead (D74).
+- **Shared family library:** needs a server or a cloud account; sharing is one-way (web page, D84).
+- **Individual pets** (which dog is which) and **people recognition beyond the free OpenCV models** (owner's choice to keep the free model).
+- **Other:** real RAW development (only the embedded preview is used); AAE edits are not re-applied (the phone's own edited JPEG is used); Mac/Linux builds are packaged by CI but untested on those systems; a "keep another physical copy" option for duplicates.

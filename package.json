@@ -1,6 +1,6 @@
 {
   "name": "photo-vault",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "Local-first personal photo archive",
   "main": "out/main/index.js",

@@ -4,7 +4,7 @@
 // Usage: node scripts/e2e-smoke.mjs [screenshotDir] [--packaged]
 import { _electron as electron } from 'playwright-core'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, mkdirSync, copyFileSync, cpSync, readdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, copyFileSync, cpSync, readdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createRequire } from 'node:module'
@@ -531,6 +531,21 @@ if (process.env.PV_MODELS) {
   }
   smartIds = await page.evaluate(() => window.photoVault.smartSearch('mountains at sunset'))
 }
+// Automatic descriptions, when the models folder also has Florence-2 (no download in the test).
+let captions = null
+if (process.env.PV_MODELS && existsSync(join(process.env.PV_MODELS, 'onnx-community', 'Florence-2-base-ft'))) {
+  await page.evaluate(() => window.photoVault.setCaptionsEnabled(true))
+  for (let i = 0; i < 180; i++) {
+    const st = await page.evaluate(() => window.photoVault.captionStatus())
+    if (st.phase === 'error' || st.described >= 2) {
+      console.log('captions:', st)
+      captions = st.phase === 'error' ? -1 : st.described
+      break
+    }
+    await page.waitForTimeout(1000)
+  }
+  await page.evaluate(() => window.photoVault.setCaptionsEnabled(false))
+}
 let faces = null
 if (process.env.PV_FACE) {
   await page.click('nav >> text=People')
@@ -600,7 +615,7 @@ if (process.env.PV_HEIC) {
     })
   }
 }
-console.log('0.7:', { rotation, exported, pins, smart: smartIds?.length ?? 'skipped', heic: heicThumb ?? 'skipped', faces: faces ?? 'skipped' })
+console.log('0.7:', { rotation, exported, pins, smart: smartIds?.length ?? 'skipped', heic: heicThumb ?? 'skipped', faces: faces ?? 'skipped', captions: captions ?? 'skipped' })
 
 const state = await page.evaluate(() => window.photoVault.getState())
 console.log('library:', state.library)
@@ -621,6 +636,7 @@ const ok =
   exported === 2 &&
   pins > 0 &&
   (smartIds === null || smartIds.length > 0) &&
+  (captions === null || captions > 0) &&
   (!process.env.PV_HEIC || heicThumb === 'ready') &&
   (!process.env.PV_FACE || faces >= 1) &&
   backup.protectedAssets === backup.totalAssets &&
