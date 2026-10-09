@@ -1076,14 +1076,14 @@ It is trust.
 The user must be able to give Photo Vault irreplaceable personal photographs and understand exactly what the application has done with them.
 ---
 
-# 29. Implementation Status (updated 2026-10-09, version 0.10.0)
+# 29. Implementation Status (updated 2026-10-10, version 0.11.0)
 
 Milestones 0–5 are implemented, and most of Milestone 6:
 - **Import and safety:** resumable imports, library verification, catalogue snapshots and mirror backups.
 - **Library:** similar photos, a map, smart search on the device, watched folders, export and rotation.
 - **Platform:** a Windows installer that updates itself from the private GitHub repository; CI builds for macOS and Linux.
 
-See `DECISIONS.md` (D1–D85) for reasoning and `readme.md` for commands.
+See `DECISIONS.md` (D1–D88) for reasoning and `readme.md` for commands.
 
 ## Architecture as built
 
@@ -1138,6 +1138,11 @@ See `DECISIONS.md` (D1–D85) for reasoning and `readme.md` for commands.
   - Map: offline country outlines, optional OpenStreetMap, clustering, photos by place.
 - **Search:** full-text search via FTS5 trigrams (accent-insensitive, includes folders and albums); **smart search** with CLIP on the device, opt-in, model downloaded once, results best match first.
 - **Scale:** a 100k-item performance test (`npm run test:perf`).
+
+### Added in 0.11
+
+- **Offline mode:** one switch that blocks every internet connection (D87). Models can be loaded from / saved to a folder (D88).
+- **Villages** in place names (162k places) and **town names on the offline map** (D86).
 
 ### Added in 0.10
 

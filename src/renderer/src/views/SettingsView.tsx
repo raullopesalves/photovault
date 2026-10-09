@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { LoaderCircle, MessageSquareText, Monitor, Moon, Sparkles, Sun } from 'lucide-react'
-import type { CaptionStatus, Language, LibraryInfo, SmartSearchStatus, ThemePreference, UpdateStatus } from '@shared/types'
+import { LoaderCircle, MessageSquareText, Monitor, Moon, Sparkles, Sun, Wifi, WifiOff } from 'lucide-react'
+import type { CaptionStatus, Language, LibraryInfo, ModelInfo, SmartSearchStatus, ThemePreference, UpdateStatus } from '@shared/types'
 import { api, bytes, n } from '../lib/format'
 import { PageHeader } from './Placeholder'
 import { language, t } from '../lib/i18n'
@@ -51,6 +51,10 @@ export function SettingsView(props: {
             ))}
           </div>
         </Group>
+
+        <OfflineGroup />
+
+        <ModelsGroup />
 
         <Group title={t('Language')}>
           <div className="flex gap-2">
@@ -114,6 +118,103 @@ export function SettingsView(props: {
   )
 }
 
+function OfflineGroup() {
+  const [offline, setOffline] = useState<boolean | null>(null)
+  useEffect(() => {
+    void api.getSettings().then((s) => setOffline(s.offline))
+  }, [])
+  if (offline === null) return null
+  const toggle = async (): Promise<void> => setOffline((await api.setSettings({ offline: !offline })).offline)
+  return (
+    <Group title={t('Offline mode')}>
+      <div className="flex items-start gap-4">
+        <div className={`grid size-10 shrink-0 place-items-center rounded-xl ${offline ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-stone-100 text-stone-500 dark:bg-stone-800'}`}>
+          {offline ? <WifiOff className="size-5" /> : <Wifi className="size-5" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">
+            {t('Photo Vault works without the internet. Its only connections are ones you start: downloading an AI model, the detailed map, and update checks. Offline mode blocks all of them at once, as a guarantee. Models you already have keep working.')}
+          </p>
+          <div className="mt-2 text-[13px] font-medium">{offline ? t('On — nothing connects to the internet.') : t('Off')}</div>
+          <button
+            onClick={() => void toggle()}
+            className={`mt-3 h-9 rounded-lg px-4 text-[13px] font-medium ${offline ? 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700' : 'bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900'}`}
+          >
+            {offline ? t('Turn off offline mode') : t('Turn on offline mode')}
+          </button>
+        </div>
+      </div>
+    </Group>
+  )
+}
+
+const MODEL_NAMES: Record<ModelInfo['id'], string> = {
+  smart: t('Smart search and pets (CLIP)'),
+  captions: t('Automatic descriptions (Florence-2)'),
+  faces: t('People (YuNet + SFace)')
+}
+
+function ModelsGroup() {
+  const [models, setModels] = useState<ModelInfo[] | null>(null)
+  const [note, setNote] = useState<string | null>(null)
+  useEffect(() => {
+    void api.models().then(setModels)
+  }, [])
+  if (!models) return null
+  const run = async (fn: () => Promise<void>): Promise<void> => {
+    setNote(null)
+    try {
+      await fn()
+    } catch (err) {
+      setNote(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err))
+    }
+  }
+  return (
+    <Group title={t('AI models')}>
+      <p className="text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">
+        {t('The on-device models are downloaded once when you turn a feature on. To set up a computer that is never online, or to avoid downloading again after a reinstall, save a copy to a USB stick here and load it on the other computer.')}
+      </p>
+      <ul className="mt-3 space-y-1.5">
+        {models.map((m) => (
+          <li key={m.id} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2 text-[13px] dark:bg-stone-800/60">
+            <span>{MODEL_NAMES[m.id]}</span>
+            <span className={m.installed ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400'}>
+              {m.installed ? t('Installed · {size}', { size: bytes(m.bytes) }) : t('Not installed')}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {note && <p className="mt-3 text-[13px] text-stone-700 dark:text-stone-300">{note}</p>}
+      <div className="mt-4 flex gap-2">
+        <Btn
+          onClick={() =>
+            void run(async () => {
+              const r = await api.importModels()
+              if (!r) return
+              setModels(r.models)
+              setNote(r.installed.length ? t('Installed: {list}', { list: r.installed.map((id) => MODEL_NAMES[id]).join(', ') }) : t('Those models were already installed.'))
+            })
+          }
+        >
+          {t('Load from a folder…')}
+        </Btn>
+        {models.some((m) => m.installed) && (
+          <Btn
+            onClick={() =>
+              void run(async () => {
+                const out = await api.exportModels()
+                if (out) setNote(t('Saved to {folder}', { folder: out }))
+              })
+            }
+          >
+            {t('Save a copy to a folder…')}
+          </Btn>
+        )}
+      </div>
+    </Group>
+  )
+}
+
 function UpdatesGroup() {
   const [s, setS] = useState<UpdateStatus | null>(null)
   const [token, setToken] = useState('')
@@ -133,7 +234,9 @@ function UpdatesGroup() {
           ? t('Downloading version {v0}… {v1}%', { v0: s.available ?? '', v1: s.percent ?? 0 })
           : s.state === 'ready'
             ? t('Version {available} is ready — it installs when you quit, or restart now.', { available: s.available })
-            : s.state === 'up-to-date'
+            : s.state === 'offline'
+              ? t('Offline mode is on: updates are not checked.')
+              : s.state === 'up-to-date'
               ? t('You have the latest version.')
               : s.state === 'error'
                 ? t('Could not check: {error}', { error: s.error })

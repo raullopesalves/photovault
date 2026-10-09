@@ -27,7 +27,9 @@ export class Captioner {
     this.loading = (async () => {
       const t = await import('@huggingface/transformers')
       t.env.cacheDir = this.cacheDir
-      t.env.allowRemoteModels = opts.allowDownload
+      // Cache first: files already on disk load without any request. Missing files are fetched, unless
+      // offline mode blocks fetch (main/network.ts, worker.ts).
+      t.env.allowRemoteModels = true
       t.env.allowLocalModels = false
       const progress_callback = (p: { status: string; file?: string; loaded?: number; total?: number }): void => {
         if (p.status === 'progress' && p.file) opts.onProgress?.({ file: p.file, loaded: p.loaded ?? 0, total: p.total ?? 0 })

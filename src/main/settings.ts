@@ -4,10 +4,12 @@ import { dirname, join } from 'node:path'
 import type { Language, Settings, ThemePreference } from '@shared/types'
 
 /** App-level settings (not library data) stored in the OS user-data folder. */
-export interface StoredSettings extends Omit<Settings, 'language'> {
+export interface StoredSettings extends Omit<Settings, 'language' | 'offline'> {
   libraryPath: string | null
   /** Unset until chosen: follows the system language. */
   language?: Language
+  /** Offline mode (main/network.ts). */
+  offline?: boolean
 }
 
 const DEFAULTS: StoredSettings = { theme: 'system', libraryPath: null }
@@ -27,7 +29,7 @@ export function loadSettings(): StoredSettings {
     const parsed = JSON.parse(readFileSync(file(), 'utf8')) as Partial<StoredSettings>
     const theme: ThemePreference = parsed.theme === 'light' || parsed.theme === 'dark' ? parsed.theme : 'system'
     const language = parsed.language === 'en' || parsed.language === 'pt' ? parsed.language : undefined
-    return { theme, libraryPath: typeof parsed.libraryPath === 'string' ? parsed.libraryPath : null, language }
+    return { theme, libraryPath: typeof parsed.libraryPath === 'string' ? parsed.libraryPath : null, language, offline: parsed.offline === true }
   } catch {
     return { ...DEFAULTS }
   }

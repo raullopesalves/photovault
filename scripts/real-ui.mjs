@@ -41,6 +41,8 @@ for (const d of ['originals', 'thumbnails']) execFileSync('cmd', ['/c', 'mklink'
 
 const userData = join(work, 'userdata')
 mkdirSync(userData, { recursive: true })
+// --offline starts without models, to see that nothing can be downloaded.
+if (process.argv.includes('--offline')) rmSync(join(userData, 'models'), { recursive: true, force: true })
 if (modelsArg) cpSync(modelsArg, join(userData, 'models'), { recursive: true })
 writeFileSync(join(userData, 'settings.json'), JSON.stringify({ theme: process.env.THEME ?? 'light', libraryPath: lib, language: process.env.PV_LANG ?? 'en' }))
 const env = { ...process.env, PHOTOVAULT_USER_DATA: userData }
@@ -152,6 +154,71 @@ try {
       console.log('pdf:', layout, await page.locator('text=/PDF ready/').first().textContent())
       await page.waitForTimeout(6500)
     }
+  }
+
+  if (process.argv.includes('--offline')) {
+    // Offline mode: downloads and map tiles must fail; models loaded from a folder must still work.
+    await page.evaluate(() => window.photoVault.setSettings({ offline: true }))
+    const tile = await page.evaluate(() => fetch('https://tile.openstreetmap.org/0/0/0.png').then((r) => `loaded ${r.status}`, (e) => `blocked: ${e.message}`))
+    console.log('offline tile request:', tile)
+    await page.evaluate(() => window.photoVault.setCaptionsEnabled(true))
+    for (let i = 0; i < 30; i++) {
+      await page.waitForTimeout(1000)
+      const st = await page.evaluate(() => window.photoVault.captionStatus())
+      if (st.phase === 'error') {
+        console.log('offline captions without models:', st.error)
+        break
+      }
+    }
+    const from = process.env.PV_MODELS_FOLDER
+    if (from) {
+      await app.evaluate(({ dialog }, dir) => {
+        dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [dir] })
+      }, from)
+      const r = await page.evaluate(() => window.photoVault.importModels())
+      console.log('models loaded from folder:', JSON.stringify(r?.installed), JSON.stringify(r?.models))
+      await page.evaluate(() => window.photoVault.setCaptionsEnabled(true))
+      for (let i = 0; i < 120; i++) {
+        await page.waitForTimeout(1000)
+        const st = await page.evaluate(() => window.photoVault.captionStatus())
+        if (st.phase === 'error' || st.described >= 2) {
+          console.log('offline captions with models from folder:', st.phase, st.described, st.error ?? '')
+          break
+        }
+      }
+      await page.evaluate(() => window.photoVault.setCaptionsEnabled(false))
+    }
+    await page.locator('nav button').last().click()
+    await page.waitForTimeout(1500)
+    await page.locator('text=Offline mode').first().scrollIntoViewIfNeeded()
+    await page.screenshot({ path: join(shots, 'offline-settings.png') })
+    await page.locator('nav button').nth(5).click()
+    await page.waitForTimeout(2500)
+    await page.screenshot({ path: join(shots, 'offline-map.png') })
+    await page.locator('nav button').first().click()
+    await page.waitForTimeout(1000)
+  }
+
+  if (process.argv.includes('--map-labels')) {
+    // Town names on the offline map at a few zoom levels.
+    await page.locator('nav button').nth(5).click()
+    await page.waitForTimeout(2000)
+    for (let i = 0; i < 14; i++) {
+      await page.locator('.leaflet-control-zoom-out').click({ force: true })
+      await page.waitForTimeout(250)
+    }
+    await page.waitForTimeout(2000)
+    await page.screenshot({ path: join(shots, 'labels-world.png') })
+    for (const z of [3, 5]) {
+      for (let i = 0; i < (z === 3 ? 1 : 2); i++) {
+        await page.locator('.leaflet-control-zoom-in').click({ force: true })
+        await page.waitForTimeout(400)
+      }
+      await page.waitForTimeout(2000)
+      await page.screenshot({ path: join(shots, `labels-z${z}.png`) })
+    }
+    await page.locator('nav button').first().click()
+    await page.waitForTimeout(1000)
   }
 
   if (process.argv.includes('--all-views')) {

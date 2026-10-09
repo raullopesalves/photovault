@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import type { DownloadProgress } from '@core/ai/clip'
 import type { ClusterResult } from '@core/ai/people'
 import type { WorkerMessage, WorkerTask } from './worker'
+import { onOfflineChange } from './network'
 
 interface Pending {
   resolve: (v: unknown) => void
@@ -15,10 +16,18 @@ export class HeavyWork {
   private worker: Worker | null = null
   private nextId = 1
   private pending = new Map<number, Pending>()
+  private offline = false
+
+  constructor() {
+    onOfflineChange((on) => {
+      this.offline = on
+      if (this.worker) void this.call({ task: 'setOffline', offline: on })
+    })
+  }
 
   private get(): Worker {
     if (this.worker) return this.worker
-    const w = new Worker(join(__dirname, 'worker.js'))
+    const w = new Worker(join(__dirname, 'worker.js'), { workerData: { offline: this.offline } })
     w.on('message', (m: WorkerMessage) => {
       const p = this.pending.get(m.id)
       if (!p) return

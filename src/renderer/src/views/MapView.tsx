@@ -68,6 +68,12 @@ export function MapView(props: { version: number }) {
   const [selected, setSelected] = useState<Box | null>(null)
   const [selectedPlace, setSelectedPlace] = useState<string | null>(null)
   const [detailed, setDetailed] = useState(() => load(DETAIL_KEY) === '1')
+  // Offline mode (Settings) keeps the online map off, whatever was chosen before.
+  const [offline, setOffline] = useState(false)
+  useEffect(() => {
+    void api.getSettings().then((s) => setOffline(s.offline))
+  }, [])
+  const online = detailed && !offline
   const [located, setLocated] = useState<number | null>(null)
   const base: AssetQuery = { hidden: 'exclude' }
 
@@ -125,23 +131,23 @@ export function MapView(props: { version: number }) {
     const map = mapRef.current
     if (!map) return
     save(DETAIL_KEY, detailed ? '1' : '0')
-    if (detailed && !tiles.current) {
+    if (online && !tiles.current) {
       tiles.current = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map)
-    } else if (!detailed && tiles.current) {
+    } else if (!online && tiles.current) {
       tiles.current.remove()
       tiles.current = null
     }
-  }, [detailed])
+  }, [online, detailed])
 
   // Offline town names (bundled list), more of them as you zoom in; hidden over the detailed online map.
   useEffect(() => {
     const map = mapRef.current
     if (!view || !map || !labels.current) return
     labels.current.clearLayers()
-    if (detailed) return
+    if (online) return
     let alive = true
     const minPopulation = [8e6, 8e6, 3e6, 1.2e6, 5e5, 2e5, 8e4, 3e4, 1.2e4, 5e3, 2e3][zoom] ?? 1000
     void api.mapPlaces({ south: view[0], west: view[1], north: view[2], east: view[3] }, minPopulation).then((towns) => {
@@ -169,7 +175,7 @@ export function MapView(props: { version: number }) {
     return () => {
       alive = false
     }
-  }, [view, zoom, detailed])
+  }, [view, zoom, online])
 
   // Clusters for the visible area.
   useEffect(() => {
@@ -204,17 +210,20 @@ export function MapView(props: { version: number }) {
         <div className="no-drag absolute left-14 top-3 z-[500] flex items-center gap-2">
           <button
             onClick={() => setDetailed((d) => !d)}
+            disabled={offline}
             title={
-              detailed
+              offline
+                ? t('Offline mode is on — the detailed map needs the internet.')
+                : online
                 ? t('Showing OpenStreetMap. Click to use the offline map (nothing is sent anywhere).')
                 : t('Offline map. Click to show streets and places from OpenStreetMap (the visible area is requested from tile.openstreetmap.org).')
             }
             className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium shadow-md transition ${
-              detailed ? 'bg-accent-500 text-white' : 'bg-white text-stone-700 hover:bg-stone-50 dark:bg-stone-800 dark:text-stone-200'
+              online ? 'bg-accent-500 text-white' : 'bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-60 dark:bg-stone-800 dark:text-stone-200'
             }`}
           >
             <Layers className="size-3.5" />
-            {detailed ? t('Detailed map') : t('Offline map')}
+            {online ? t('Detailed map') : t('Offline map')}
           </button>
         </div>
         {located === 0 && (

@@ -4,6 +4,7 @@ import { setFfmpegPath } from '@core/media/ffmpeg'
 import { LibraryController } from './controller'
 import { registerIpc } from './ipc'
 import { startUpdater } from './updater'
+import { installNetworkGuards, setOffline } from './network'
 import { handleMediaProtocol, registerMediaScheme } from './protocol'
 import { loadSettings, type StoredSettings } from './settings'
 
@@ -108,6 +109,8 @@ if (!gotLock) {
   void app.whenReady().then(() => {
     app.setAppUserModelId('app.photovault.desktop')
     const settings = loadSettings()
+    installNetworkGuards()
+    setOffline(settings.offline === true)
     if (settings.libraryPath) controller.tryOpen(settings.libraryPath)
     handleMediaProtocol(controller)
     registerIpc(controller, () => mainWindow, applyTheme)

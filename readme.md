@@ -81,8 +81,12 @@ Video thumbnails and playable copies of HEVC/old videos use a bundled ffmpeg (a 
 (`%APPDATA%/Photo Vault/models`), not in the library. The same goes for the automatic-descriptions model
 (Florence-2-base, ~265 MB, MIT).
 
+Photo Vault never needs the internet. The only connections are ones you start (downloading an AI model, the
+detailed OpenStreetMap view, update checks), and **Settings → Offline mode** blocks all of them. Models can be
+loaded from a folder (Settings → AI models) on a computer that is never online.
+
 Importing from a phone copies its camera folders into `PhotoVault phone copies\<device>` next to the library
 first (Windows only); that folder can be deleted once the import is done.
 
-Place names (map, trips, search) come from [GeoNames](https://www.geonames.org) "cities5000" (CC BY 4.0), bundled
+Place names (map labels, trips, search) come from [GeoNames](https://www.geonames.org) "cities1000" (CC BY 4.0), bundled
 in `src/core/geo/places.json` and rebuilt with `node scripts/make-places.mjs`.

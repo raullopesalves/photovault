@@ -554,7 +554,7 @@ export interface PhoneCopyProgress {
 }
 
 export interface UpdateStatus {
-  state: 'idle' | 'needs-token' | 'checking' | 'up-to-date' | 'downloading' | 'ready' | 'error'
+  state: 'idle' | 'offline' | 'needs-token' | 'checking' | 'up-to-date' | 'downloading' | 'ready' | 'error'
   /** Running version. */
   version: string
   /** Newer version found / downloaded. */
@@ -569,6 +569,12 @@ export interface UpdateStatus {
 
 /** book: cover + one or two photos per page (landscape); grid: contact sheet; single: one photo per page. */
 export type PhotoBookLayout = 'book' | 'grid' | 'single'
+
+export interface ModelInfo {
+  id: 'smart' | 'captions' | 'faces'
+  installed: boolean
+  bytes: number
+}
 
 export interface CaptionStatus {
   enabled: boolean
@@ -696,6 +702,8 @@ export type Language = 'en' | 'pt'
 export interface Settings {
   theme: ThemePreference
   language: Language
+  /** Blocks every internet connection (model downloads, map tiles, updates). */
+  offline: boolean
 }
 
 export type LibraryChangeReason = 'import' | 'thumbnails' | 'favorite' | 'opened' | 'albums'
@@ -778,6 +786,12 @@ export interface PhotoVaultApi {
   setUpdateToken(token: string | null): Promise<UpdateStatus>
   installUpdate(): Promise<void>
   onUpdateStatus(cb: (s: UpdateStatus) => void): () => void
+  /** The on-device AI models and whether they are installed. */
+  models(): Promise<ModelInfo[]>
+  /** Installs models from a folder the user picks (null if cancelled). */
+  importModels(): Promise<{ installed: Array<ModelInfo['id']>; models: ModelInfo[] } | null>
+  /** Saves a copy of the installed models to a folder the user picks; returns that folder (null if cancelled). */
+  exportModels(): Promise<string | null>
   captionStatus(): Promise<CaptionStatus>
   /** Turns automatic descriptions on (downloads the model once) or pauses them. Descriptions made are kept. */
   setCaptionsEnabled(on: boolean): Promise<void>

@@ -2,6 +2,7 @@ import { app, safeStorage } from 'electron'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { UpdateStatus } from '@shared/types'
+import { isOffline } from './network'
 
 /**
  * Auto-update from the private GitHub repository's Releases (electron-updater). The app needs a read-only
@@ -49,6 +50,10 @@ export function updateStatus(): UpdateStatus {
 export async function checkForUpdates(): Promise<UpdateStatus> {
   const token = readToken()
   if (!canSelfUpdate()) return updateStatus()
+  if (isOffline()) {
+    set({ state: 'offline' })
+    return updateStatus()
+  }
   if (!token) {
     set({ state: 'needs-token' })
     return updateStatus()

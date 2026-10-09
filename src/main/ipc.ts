@@ -29,6 +29,8 @@ import { prepareShare } from './share'
 import { exportWebGallery } from './webGallery'
 import { makePhotoBook } from './photoBook'
 import { cancelPhoneCopy, copyPhone } from './phoneImport'
+import { setOffline } from './network'
+import { exportModels, importModels, listModels } from './models'
 import { listPhones } from '@core/sources/phone'
 import { checkForUpdates, installUpdateNow, setUpdateToken, updateStatus } from './updater'
 import type { LibraryController } from './controller'
@@ -382,6 +384,32 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     changed('albums')
     return n
   })
+  ipcMain.handle('models:list', () => listModels())
+  ipcMain.handle('models:import', async () => {
+    const win = getWindow()
+    const opts: Electron.OpenDialogOptions = { title: tr('Choose the folder with the models', 'Escolha a pasta com os modelos'), properties: ['openDirectory'] }
+    const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
+    if (r.canceled || !r.filePaths[0]) return null
+    const result = await importModels(r.filePaths[0])
+    // Anything that stopped for want of a model can carry on now.
+    if (result.installed.length) {
+      controller.smart?.kick()
+      controller.captions?.kick()
+    }
+    return result
+  })
+  ipcMain.handle('models:export', async () => {
+    const win = getWindow()
+    const opts: Electron.OpenDialogOptions = {
+      title: tr('Choose where to save a copy of the models', 'Escolha onde guardar uma cópia dos modelos'),
+      properties: ['openDirectory', 'createDirectory']
+    }
+    const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
+    if (r.canceled || !r.filePaths[0]) return null
+    const out = await exportModels(r.filePaths[0])
+    void shell.openPath(out)
+    return out
+  })
   ipcMain.handle('captions:status', () => controller.captions?.get() ?? null)
   ipcMain.handle('captions:enable', (_e, on: unknown) => controller.captions?.enable(on === true))
   ipcMain.handle('smart:pets', () => controller.smart?.pets() ?? [])
@@ -634,14 +662,20 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   })
   ipcMain.handle('db:openSnapshots', () => shell.openPath(snapshotDir(lib())))
 
-  ipcMain.handle('settings:get', (): Settings => ({ theme: settings.theme, language: languageOf(settings) }))
+  const settingsOut = (): Settings => ({ theme: settings.theme, language: languageOf(settings), offline: settings.offline === true })
+  ipcMain.handle('settings:get', (): Settings => settingsOut())
   ipcMain.handle('settings:set', (_e, patch: unknown): Settings => {
     const p = (patch ?? {}) as Partial<Settings>
     if (p.theme === 'system' || p.theme === 'light' || p.theme === 'dark') settings = { ...settings, theme: p.theme }
     if (p.language === 'en' || p.language === 'pt') settings = { ...settings, language: p.language }
+    if (typeof p.offline === 'boolean') {
+      settings = { ...settings, offline: p.offline }
+      setOffline(p.offline)
+      if (!p.offline) void checkForUpdates()
+    }
     saveSettings(settings)
     applyTheme(settings)
-    return { theme: settings.theme, language: languageOf(settings) }
+    return settingsOut()
   })
 
   nativeTheme.on('updated', () => applyTheme(settings))

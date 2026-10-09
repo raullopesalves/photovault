@@ -82,6 +82,9 @@ const api: PhotoVaultApi = {
     return () => ipcRenderer.removeListener('update:status', listener)
   },
   pets: () => ipcRenderer.invoke('smart:pets'),
+  models: () => ipcRenderer.invoke('models:list'),
+  importModels: () => ipcRenderer.invoke('models:import'),
+  exportModels: () => ipcRenderer.invoke('models:export'),
   captionStatus: () => ipcRenderer.invoke('captions:status'),
   setCaptionsEnabled: (on) => ipcRenderer.invoke('captions:enable', on),
   onCaptionStatus: (cb) => {

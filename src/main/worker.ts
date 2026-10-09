@@ -1,7 +1,7 @@
 // Worker thread for work that would otherwise stall the main process (and with it every IPC answer to the
 // window): whole-library computations and on-device AI. It opens its own READ-ONLY connections to the
 // catalogue and only computes; the main process writes any result.
-import { parentPort } from 'node:worker_threads'
+import { parentPort, workerData } from 'node:worker_threads'
 import { DatabaseSync } from 'node:sqlite'
 import { Database } from '@core/db/database'
 import { computeNearDuplicateGroups, nearDuplicateStamp } from '@core/repo/nearDuplicates'
@@ -12,6 +12,7 @@ import { clusterFaces } from '@core/ai/people'
 import { loadClusterContext, loadClusterFaces } from '@core/repo/people'
 
 export type WorkerTask =
+  | { task: 'setOffline'; offline: boolean }
   | { task: 'nearDuplicateGroups'; dbFile: string }
   | { task: 'clipLoad'; cacheDir: string; allowDownload: boolean }
   | { task: 'clipEmbed'; cacheDir: string; paths: string[] }
@@ -22,6 +23,15 @@ export type WorkerTask =
   | { task: 'faceScan'; modelsDir: string; items: Array<{ path: string; rotation: number }> }
   | { task: 'faceCluster'; dbFile: string }
   | { task: 'faceRegion'; modelsDir: string; path: string; rotation: number; box: { x: number; y: number; w: number; h: number } }
+
+// Offline mode (see main/network.ts): model downloads go through fetch, which fails while it is on.
+// Models already on disk load without any request.
+let offline = (workerData as { offline?: boolean } | null)?.offline === true
+const realFetch = globalThis.fetch
+globalThis.fetch = ((...args: Parameters<typeof fetch>) =>
+  offline
+    ? Promise.reject(new Error('Offline mode is on, so nothing is downloaded. Turn it off in Settings, or load the models from a folder (Settings → AI models).'))
+    : realFetch(...args)) as typeof fetch
 
 export type WorkerMessage =
   | { id: number; kind: 'done'; result: unknown }
@@ -101,6 +111,9 @@ async function run(id: number, t: WorkerTask): Promise<unknown> {
         raw.close()
       }
     }
+    case 'setOffline':
+      offline = t.offline
+      return true
     case 'clipLoad':
       await clipFor(t.cacheDir).load({
         allowDownload: t.allowDownload,
