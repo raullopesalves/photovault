@@ -42,7 +42,7 @@ for (const d of ['originals', 'thumbnails']) execFileSync('cmd', ['/c', 'mklink'
 const userData = join(work, 'userdata')
 mkdirSync(userData, { recursive: true })
 if (modelsArg) cpSync(modelsArg, join(userData, 'models'), { recursive: true })
-writeFileSync(join(userData, 'settings.json'), JSON.stringify({ theme: process.env.THEME ?? 'light', libraryPath: lib }))
+writeFileSync(join(userData, 'settings.json'), JSON.stringify({ theme: process.env.THEME ?? 'light', libraryPath: lib, language: process.env.PV_LANG ?? 'en' }))
 const env = { ...process.env, PHOTOVAULT_USER_DATA: userData }
 delete env.ELECTRON_RUN_AS_NODE
 delete env.ELECTRON_RENDERER_URL
@@ -54,8 +54,29 @@ try {
   page.on('pageerror', (e) => errors.push(String(e)))
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
   await page.setViewportSize({ width: 1440, height: 900 }).catch(() => {})
-  await page.waitForSelector('nav >> text=Photos', { timeout: 60_000 })
+  await page.waitForSelector('nav button', { timeout: 60_000 })
   await page.waitForTimeout(2500)
+
+  if (process.argv.includes('--all-views')) {
+    // Every sidebar view in turn (works in any interface language).
+    const count = await page.locator('nav button').count()
+    for (let i = 0; i < count; i++) {
+      await page.locator('nav button').nth(i).click()
+      await page.waitForTimeout(2500)
+      await page.screenshot({ path: join(shots, `view-${String(i).padStart(2, '0')}.png`) })
+    }
+    await page.locator('nav button').first().click()
+    await page.waitForTimeout(1000)
+    await page.locator('main img').nth(3).click()
+    await page.waitForTimeout(2500)
+    await page.screenshot({ path: join(shots, 'view-viewer.png') })
+    await page.mouse.click(720, 450, { button: 'right' })
+    await page.waitForTimeout(600)
+    await page.screenshot({ path: join(shots, 'view-viewer-menu.png') })
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(800)
+  }
 
   if (process.argv.includes('--tour')) {
     const shot = (name) => page.screenshot({ path: join(shots, `tour-${name}.png`) })

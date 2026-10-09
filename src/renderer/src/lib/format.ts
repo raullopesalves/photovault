@@ -1,15 +1,18 @@
 import type { CaptureTimeSource, SortTimeSource } from '@shared/types'
+import { locale, t } from './i18n'
 
 export const api = window.photoVault
 
-const nf = new Intl.NumberFormat()
+let nf: Intl.NumberFormat | null = null
 
 export function n(value: number): string {
+  nf ??= new Intl.NumberFormat(locale())
   return nf.format(value)
 }
 
+/** "1 photo", "3 photos" — the noun is translated (see i18n). */
 export function plural(count: number, one: string, many = `${one}s`): string {
-  return `${n(count)} ${count === 1 ? one : many}`
+  return `${n(count)} ${t(count === 1 ? one : many)}`
 }
 
 export function bytes(value: number): string {
@@ -26,25 +29,25 @@ export function bytes(value: number): string {
 
 /** Timeline dates are wall-clock dates encoded as UTC; always format them in UTC. */
 export function monthLabel(month: string): string {
-  if (month === 'undated') return 'No date'
-  if (month === 'matches') return 'Best matches'
+  if (month === 'undated') return t('No date')
+  if (month === 'matches') return t('Best matches')
   // A day key (Recently added groups by import day).
-  if (month.length === 10) return new Date(`${month}T00:00:00Z`).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
-  return new Date(`${month}-01T00:00:00Z`).toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' })
+  if (month.length === 10) return new Date(`${month}T00:00:00Z`).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+  return new Date(`${month}-01T00:00:00Z`).toLocaleDateString(locale(), { month: 'long', year: 'numeric', timeZone: 'UTC' })
 }
 
 export function wallClock(wall: string): string {
   const d = new Date(`${wall.slice(0, 19)}Z`)
-  return d.toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' })
+  return d.toLocaleString(locale(), { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' })
 }
 
 export function sortTimeLabel(ms: number): string {
-  return new Date(ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' })
+  return new Date(ms).toLocaleString(locale(), { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' })
 }
 
 export function isoLocal(iso: string | null): string {
   if (!iso) return '—'
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+  return new Date(iso).toLocaleString(locale(), { dateStyle: 'medium', timeStyle: 'short' })
 }
 
 export function offsetLabel(minutes: number | null): string {
@@ -56,21 +59,21 @@ export function offsetLabel(minutes: number | null): string {
 
 /** "About 3 min left", "A few seconds left", or "Estimating time…" while there is no honest estimate. */
 export function etaLabel(seconds: number | null | undefined): string {
-  if (seconds === null || seconds === undefined) return 'Estimating time…'
-  if (seconds < 10) return 'A few seconds left'
-  if (seconds < 60) return `About ${Math.max(10, Math.round(seconds / 5) * 5)} seconds left`
+  if (seconds === null || seconds === undefined) return t('Estimating time…')
+  if (seconds < 10) return t('A few seconds left')
+  if (seconds < 60) return t('About {v0} seconds left', { v0: Math.max(10, Math.round(seconds / 5) * 5) })
   if (seconds < 3600) {
     const m = Math.round(seconds / 60)
-    return `About ${m} min left`
+    return t('About {m} min left', { m })
   }
   const h = Math.floor(seconds / 3600)
   const m = Math.round((seconds % 3600) / 60)
-  return m > 0 ? `About ${h} h ${m} min left` : `About ${h} h left`
+  return m > 0 ? t('About {h} h {m} min left', { h, m }) : t('About {h} h left', { h })
 }
 
 export function rateLabel(rate: number | null | undefined, unit: 'files' | 'bytes' | null | undefined): string {
   if (!rate || !unit) return ''
-  return unit === 'bytes' ? `${bytes(rate)}/s` : `${rate < 10 ? rate.toFixed(1) : Math.round(rate)} files/s`
+  return unit === 'bytes' ? `${bytes(rate)}/s` : t('{v0} files/s', { v0: rate < 10 ? rate.toFixed(1) : Math.round(rate) })
 }
 
 export function clockLabel(seconds: number): string {
@@ -91,22 +94,22 @@ export function duration(ms: number | null): string {
 }
 
 const SOURCE_LABELS: Record<SortTimeSource, string> = {
-  exif_original: 'Camera metadata (EXIF date taken)',
-  exif_digitized: 'Camera metadata (EXIF date digitised)',
-  xmp: 'XMP metadata',
-  takeout: 'Google Photos metadata (Takeout)',
-  icloud: 'iCloud export details',
-  quicktime: 'Video container metadata',
-  filename: 'Estimated from the file name',
-  exif_modified: 'EXIF modification date (may reflect editing)',
-  estimated: 'Estimated from neighbouring files',
-  duplicate: 'From a matching copy of this picture',
-  manual: 'Set by you',
-  file_modified: 'No capture date found — placed by file modified date'
+  exif_original: t('Camera metadata (EXIF date taken)'),
+  exif_digitized: t('Camera metadata (EXIF date digitised)'),
+  xmp: t('XMP metadata'),
+  takeout: t('Google Photos metadata (Takeout)'),
+  icloud: t('iCloud export details'),
+  quicktime: t('Video container metadata'),
+  filename: t('Estimated from the file name'),
+  exif_modified: t('EXIF modification date (may reflect editing)'),
+  estimated: t('Estimated from neighbouring files'),
+  duplicate: t('From a matching copy of this picture'),
+  manual: t('Set by you'),
+  file_modified: t('No capture date found — placed by file modified date')
 }
 
 export function timeSourceLabel(source: CaptureTimeSource | SortTimeSource | null): string {
-  return source ? SOURCE_LABELS[source] : 'Unknown'
+  return source ? SOURCE_LABELS[source] : t('Unknown')
 }
 
 export function basename(path: string): string {
@@ -118,19 +121,19 @@ export function basename(path: string): string {
 export function sourcesLabel(sources: string[]): string {
   if (sources.length === 0) return ''
   const first = basename(sources[0] as string)
-  return sources.length === 1 ? first : `${first} and ${sources.length - 1} more`
+  return sources.length === 1 ? first : t('{first} and {v1} more', { first, v1: sources.length - 1 })
 }
 
 export function sourceTypeLabel(type: string): string {
   switch (type) {
     case 'GOOGLE_TAKEOUT':
-      return 'Google Photos Takeout'
+      return t('Google Photos Takeout')
     case 'ZIP':
-      return 'ZIP archive'
+      return t('ZIP archive')
     case 'ICLOUD_EXPORT':
-      return 'iCloud export'
+      return t('iCloud export')
     default:
-      return 'Folder'
+      return t('Folder')
   }
 }
 

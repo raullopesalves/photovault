@@ -4,11 +4,12 @@ import type { Memory } from '@shared/types'
 import { AssetGrid } from '../components/AssetGrid'
 import { api, mediaUrl, n } from '../lib/format'
 import { PageHeader } from './Placeholder'
+import { t } from '../lib/i18n'
 
 const SECTIONS: Array<{ kind: Memory['kind']; title: string; icon: React.ReactNode; empty?: string }> = [
-  { kind: 'on_this_day', title: 'On this day', icon: <CalendarHeart className="size-4" />, empty: 'No photos from this day in earlier years.' },
-  { kind: 'trip', title: 'Trips', icon: <Plane className="size-4" /> },
-  { kind: 'event', title: 'Big days', icon: <PartyPopper className="size-4" /> }
+  { kind: 'on_this_day', title: t('On this day'), icon: <CalendarHeart className="size-4" />, empty: t('No photos from this day in earlier years.') },
+  { kind: 'trip', title: t('Trips'), icon: <Plane className="size-4" /> },
+  { kind: 'event', title: t('Big days'), icon: <PartyPopper className="size-4" /> }
 ]
 
 export function MemoriesView(props: { version: number }) {
@@ -29,7 +30,7 @@ export function MemoriesView(props: { version: number }) {
             <button
               onClick={() => setOpen(null)}
               className="no-drag grid size-8 place-items-center rounded-lg text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-              aria-label="All memories"
+              aria-label={t('All memories')}
             >
               <ArrowLeft className="size-4" />
             </button>
@@ -37,21 +38,19 @@ export function MemoriesView(props: { version: number }) {
           </span>
         }
         subtitle={open.subtitle}
-        empty={<div className="mt-16 text-center text-stone-500">These photos are no longer in the library.</div>}
+        empty={<div className="mt-16 text-center text-stone-500">{t('These photos are no longer in the library.')}</div>}
       />
     )
   }
 
   return (
     <div className="scroll-thin h-full overflow-y-auto">
-      <PageHeader title="Memories" subtitle="Found in your own photos: the same day in earlier years, trips away from home, and days you took a lot of pictures." />
+      <PageHeader title={t('Memories')} subtitle={t('Found in your own photos: the same day in earlier years, trips away from home, and days you took a lot of pictures.')} />
       <div className="mx-auto max-w-5xl space-y-10 px-8 pb-12">
         {list === null && <div className="skeleton h-48 rounded-2xl" />}
         {list?.length === 0 && (
           <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">
-            <Sparkles className="mx-auto mb-2 size-6" />
-            Memories appear once the library has photos with dates (and, for trips, locations).
-          </div>
+            <Sparkles className="mx-auto mb-2 size-6" />{t('Memories appear once the library has photos with dates (and, for trips, locations).')}</div>
         )}
         {list &&
           list.length > 0 &&
@@ -96,8 +95,7 @@ function MemoryCard(props: { memory: Memory; onOpen: () => void }) {
       <div className="px-4 py-3">
         <div className="truncate text-[14px] font-semibold">{m.title}</div>
         <div className="truncate text-xs text-stone-500 dark:text-stone-400">
-          {m.subtitle} · {n(m.count)} photos
-        </div>
+          {m.subtitle} · {n(m.count)}{' '}{t('photos')}</div>
         {m.places && m.places.length > 1 && <div className="truncate text-xs text-stone-400 dark:text-stone-500">{m.places.join(' · ')}</div>}
       </div>
     </button>

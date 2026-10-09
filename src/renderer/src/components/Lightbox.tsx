@@ -7,6 +7,7 @@ import { Editor } from './Editor'
 import { FaceOverlay } from './FaceOverlay'
 import { LocationPicker } from './LocationPicker'
 import { api, basename, bytes, isoLocal, mediaUrl, mimeLabel, offsetLabel, plural, sortTimeLabel, sourceTypeLabel, splitArchivePath, timeSourceLabel, wallClock } from '../lib/format'
+import { t } from '../lib/i18n'
 
 export function Lightbox(props: {
   index: number
@@ -108,7 +109,7 @@ export function Lightbox(props: {
       await action()
       if (done) flash(done)
     } catch (err) {
-      flash(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : 'That did not work')
+      flash(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : t('That did not work'))
     }
   }
 
@@ -131,7 +132,7 @@ export function Lightbox(props: {
       if (e.key === 'Escape' && menu) return setMenu(null)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && detail) {
         e.preventDefault()
-        return void run(() => api.copyImage(detail.id), 'Picture copied')
+        return void run(() => api.copyImage(detail.id), t('Picture copied'))
       }
       if (e.key === 'Escape') {
         if (zoom.scale > 1) zoom.reset()
@@ -196,7 +197,7 @@ export function Lightbox(props: {
     <div className="no-drag fixed inset-0 z-40 flex bg-stone-950 text-stone-100 animate-fade-in">
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="drag absolute inset-x-0 top-0 z-10 flex h-14 items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-4 pr-40">
-          <button onClick={props.onClose} className="no-drag grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label="Close">
+          <button onClick={props.onClose} className="no-drag grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label={t('Close')}>
             <X className="size-5" />
           </button>
           <div className="no-drag flex items-center gap-1">
@@ -204,20 +205,18 @@ export function Lightbox(props: {
               <button
                 onClick={() => setPlayingLive((p) => !p)}
                 className={`mr-1 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wider transition ${playingLive ? 'bg-white text-stone-900' : 'bg-white/10 hover:bg-white/20'}`}
-                title="Play the Live Photo"
-              >
-                LIVE
-              </button>
+                title={t('Play the Live Photo')}
+              >{t('LIVE')}</button>
             )}
             {detail && detail.fullView !== 'video' && (
               <div className="mr-2 flex items-center rounded-full bg-white/10 p-0.5">
-                <button onClick={() => zoom.zoomBy(1 / 1.5)} disabled={zoom.scale <= 1} className="grid size-8 place-items-center rounded-full transition hover:bg-white/10 disabled:opacity-30" aria-label="Zoom out" title="Zoom out (−)">
+                <button onClick={() => zoom.zoomBy(1 / 1.5)} disabled={zoom.scale <= 1} className="grid size-8 place-items-center rounded-full transition hover:bg-white/10 disabled:opacity-30" aria-label={t('Zoom out')} title={t('Zoom out (−)')}>
                   <Minus className="size-4" />
                 </button>
-                <button onClick={zoom.reset} className="min-w-12 px-1 text-center text-[12px] tabular-nums text-stone-200 hover:text-white" title="Fit to screen (0)">
-                  {zoom.percent === null ? 'Fit' : `${zoom.percent}%`}
+                <button onClick={zoom.reset} className="min-w-12 px-1 text-center text-[12px] tabular-nums text-stone-200 hover:text-white" title={t('Fit to screen (0)')}>
+                  {zoom.percent === null ? t('Fit') : `${zoom.percent}%`}
                 </button>
-                <button onClick={() => zoom.zoomBy(1.5)} disabled={zoom.scale >= MAX_ZOOM} className="grid size-8 place-items-center rounded-full transition hover:bg-white/10 disabled:opacity-30" aria-label="Zoom in" title="Zoom in (+)">
+                <button onClick={() => zoom.zoomBy(1.5)} disabled={zoom.scale >= MAX_ZOOM} className="grid size-8 place-items-center rounded-full transition hover:bg-white/10 disabled:opacity-30" aria-label={t('Zoom in')} title={t('Zoom in (+)')}>
                   <Plus className="size-4" />
                 </button>
               </div>
@@ -226,26 +225,26 @@ export function Lightbox(props: {
               <button
                 onClick={() => setShowOriginal((o) => !o)}
                 className={`mr-1 inline-flex h-8 items-center rounded-full px-3 text-[12.5px] font-medium transition ${showOriginal ? 'bg-white text-stone-900' : 'bg-white/10 hover:bg-white/20'}`}
-                title="This photo was edited on the phone; the unedited original is kept too"
+                title={t('This photo was edited on the phone; the unedited original is kept too')}
               >
-                {showOriginal ? 'Showing the original' : 'Original'}
+                {showOriginal ? t('Showing the original') : t('Original')}
               </button>
             )}
             {detail?.mediaType === 'photo' && showFaces && (
               <button
                 onClick={() => setAddingFace((a) => !a)}
                 className={`mr-1 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition ${addingFace ? 'bg-accent-500 text-white' : 'bg-white/10 hover:bg-white/20'}`}
-                title="Draw a box around a face that was not found"
+                title={t('Draw a box around a face that was not found')}
               >
-                <UserPlus className="size-3.5" /> {addingFace ? 'Draw around the face…' : 'Add a face'}
+                <UserPlus className="size-3.5" /> {addingFace ? t('Draw around the face…') : t('Add a face')}
               </button>
             )}
             {detail?.mediaType === 'photo' && (
               <button
                 onClick={() => setShowFaces((s) => !s)}
                 className={`grid size-9 place-items-center rounded-full transition hover:bg-white/10 ${showFaces ? 'bg-white/15' : ''}`}
-                aria-label="Faces"
-                title="Show the people in this photo — name them or fix mistakes (F)"
+                aria-label={t('Faces')}
+                title={t('Show the people in this photo — name them or fix mistakes (F)')}
               >
                 <Users className="size-[18px]" />
               </button>
@@ -254,9 +253,9 @@ export function Lightbox(props: {
               <button
                 onClick={() => setEditing(true)}
                 className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-white/10 px-3 text-[12.5px] font-medium transition hover:bg-white/20"
-                title="Crop, adjust light and colour, filters (E). The original file is not changed."
+                title={t('Crop, adjust light and colour, filters (E). The original file is not changed.')}
               >
-                <SlidersHorizontal className="size-3.5" /> Edit{detail.edited ? 'ed' : ''}
+                <SlidersHorizontal className="size-3.5" />{' '}{t('Edit')}{detail.edited ? 'ed' : ''}
               </button>
             )}
             {detail?.mediaType === 'photo' && (
@@ -264,8 +263,8 @@ export function Lightbox(props: {
                 onClick={rotate}
                 disabled={rotating}
                 className="grid size-9 place-items-center rounded-full transition hover:bg-white/10 disabled:opacity-40"
-                aria-label="Rotate"
-                title="Rotate 90° clockwise (R). The original file is not changed."
+                aria-label={t('Rotate')}
+                title={t('Rotate 90° clockwise (R). The original file is not changed.')}
               >
                 <RotateCw className={`size-[18px] ${rotating ? 'animate-spin' : ''}`} />
               </button>
@@ -273,26 +272,26 @@ export function Lightbox(props: {
             <button
               onClick={toggleHidden}
               className={`grid size-9 place-items-center rounded-full transition hover:bg-white/10 ${detail?.hidden ? 'text-amber-300' : ''}`}
-              aria-label={detail?.hidden ? 'Show in Photos' : 'Hide from Photos'}
-              title={detail?.hidden ? 'Hidden from Photos — click to show again' : 'Hide from Photos (nothing is deleted)'}
+              aria-label={detail?.hidden ? t('Show in Photos') : t('Hide from Photos')}
+              title={detail?.hidden ? t('Hidden from Photos — click to show again') : t('Hide from Photos (nothing is deleted)')}
             >
               {detail?.hidden ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
             </button>
             <button
               onClick={toggleBin}
               className={`grid size-9 place-items-center rounded-full transition hover:bg-white/10 ${detail?.trashed ? 'text-red-300' : ''}`}
-              aria-label={detail?.trashed ? 'Restore from Bin' : 'Move to Bin'}
-              title={detail?.trashed ? 'In the Bin — click to restore' : 'Move to Bin'}
+              aria-label={detail?.trashed ? t('Restore from Bin') : t('Move to Bin')}
+              title={detail?.trashed ? t('In the Bin — click to restore') : t('Move to Bin')}
             >
               {detail?.trashed ? <RotateCcw className="size-[18px]" /> : <Trash2 className="size-[18px]" />}
             </button>
-            <button onClick={toggleFavorite} className="grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label="Favorite">
+            <button onClick={toggleFavorite} className="grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label={t('Favorite')}>
               <Heart className={`size-[18px] ${detail?.favorite ? 'fill-rose-500 text-rose-500' : ''}`} />
             </button>
             <button
               onClick={() => setShowInfo((s) => !s)}
               className={`grid size-9 place-items-center rounded-full transition hover:bg-white/10 ${showInfo ? 'bg-white/15' : ''}`}
-              aria-label="Info"
+              aria-label={t('Info')}
             >
               <Info className="size-[18px]" />
             </button>
@@ -364,7 +363,7 @@ export function Lightbox(props: {
           <button
             onClick={() => go(-1)}
             className="absolute left-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/30 opacity-70 backdrop-blur transition hover:bg-black/50 hover:opacity-100"
-            aria-label="Previous"
+            aria-label={t('Previous')}
           >
             <ChevronLeft className="size-6" />
           </button>
@@ -373,7 +372,7 @@ export function Lightbox(props: {
           <button
             onClick={() => go(1)}
             className="absolute right-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/30 opacity-70 backdrop-blur transition hover:bg-black/50 hover:opacity-100"
-            aria-label="Next"
+            aria-label={t('Next')}
           >
             <ChevronRight className="size-6" />
           </button>
@@ -387,12 +386,12 @@ export function Lightbox(props: {
           detail={detail}
           onClose={() => setMenu(null)}
           actions={{
-            copyImage: () => void run(() => api.copyImage(detail.id), 'Picture copied'),
-            copyFile: () => void run(() => api.copyFile(detail.id), 'File copied — paste it in a folder or chat'),
-            copyPath: () => void run(() => api.copyPath(detail.id), 'File path copied'),
+            copyImage: () => void run(() => api.copyImage(detail.id), t('Picture copied')),
+            copyFile: () => void run(() => api.copyFile(detail.id), t('File copied — paste it in a folder or chat')),
+            copyPath: () => void run(() => api.copyPath(detail.id), t('File path copied')),
             openExternal: () => void run(() => api.openExternal(detail.id)),
             showInFolder: () => void run(() => api.showInFolder(detail.id)),
-            saveCopy: () => void run(async () => (await api.saveCopy(detail.id)) && flash('Copy saved')),
+            saveCopy: () => void run(async () => (await api.saveCopy(detail.id)) && flash(t('Copy saved'))),
             rotate: () => void run(rotate),
             favorite: () => void run(toggleFavorite),
             hide: () => void run(toggleHidden),
@@ -409,8 +408,8 @@ export function Lightbox(props: {
               setMenu(null)
               setSharing(true)
             },
-            saveEditedCopy: () => void run(async () => (await api.saveEditedCopy(detail.id)) && flash('Edited copy saved')),
-            addToAlbum: (albumId, name) => void run(() => api.addToAlbum(albumId, [detail.id]), `Added to “${name}”`),
+            saveEditedCopy: () => void run(async () => (await api.saveEditedCopy(detail.id)) && flash(t('Edited copy saved'))),
+            addToAlbum: (albumId, name) => void run(() => api.addToAlbum(albumId, [detail.id]), t('Added to “{name}”', { name })),
             info: () => {
               setMenu(null)
               setShowInfo(true)
@@ -423,7 +422,7 @@ export function Lightbox(props: {
           assetId={detail.id}
           onClose={(saved) => {
             setEditing(false)
-            if (saved) flash('Edits saved — the original is unchanged')
+            if (saved) flash(t('Edits saved — the original is unchanged'))
           }}
         />
       )}
@@ -433,18 +432,18 @@ export function Lightbox(props: {
           onClose={() => setSharing(false)}
           onShare={async (opts) => {
             setSharing(false)
-            await run(() => api.share([detail.id], opts), 'Copy ready in the folder that opened')
+            await run(() => api.share([detail.id], opts), t('Copy ready in the folder that opened'))
           }}
         />
       )}
       {dating && detail && (
         <DateDialog
-          title={detail.captureTime ? 'Edit date' : 'Set date'}
+          title={detail.captureTime ? t('Edit date') : t('Set date')}
           initial={detail.captureTime}
           onClose={() => setDating(false)}
           onSubmit={async (wall) => {
             setDating(false)
-            await run(() => api.setDates([detail.id], wall), 'Date set')
+            await run(() => api.setDates([detail.id], wall), t('Date set'))
           }}
         />
       )}
@@ -493,7 +492,7 @@ function VideoPlayer(props: { id: number }) {
       })
       .catch((err: unknown) => {
         setPreparing(null)
-        setFailed(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : 'This video cannot be played.')
+        setFailed(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : t('This video cannot be played.'))
       })
   }
 
@@ -514,9 +513,8 @@ function VideoPlayer(props: { id: number }) {
         <div className="flex flex-col items-center gap-3 text-center text-[13px] text-stone-300">
           <div className="h-1.5 w-56 overflow-hidden rounded-full bg-white/10">
             <div className="h-full rounded-full bg-white/80 transition-all" style={{ width: `${Math.round(preparing * 100)}%` }} />
-          </div>
-          Preparing this video for playback… {Math.round(preparing * 100)}%
-          <span className="max-w-xs text-xs text-stone-500">It uses a format Windows can't play by itself. A playable copy is made once; the original is not changed.</span>
+          </div>{t('Preparing this video for playback…')}{' '}{Math.round(preparing * 100)}%
+          <span className="max-w-xs text-xs text-stone-500">{t('It uses a format Windows can\'t play by itself. A playable copy is made once; the original is not changed.')}</span>
         </div>
       )}
     </div>
@@ -570,21 +568,21 @@ function ViewerMenu(props: { x: number; y: number; detail: AssetDetail; actions:
         onMouseDown={(e) => e.stopPropagation()}
         className="fixed w-64 rounded-xl border border-white/10 bg-stone-900/95 p-1.5 shadow-2xl backdrop-blur animate-fade-in"
       >
-        {item('Share…', <Share2 className="size-3.5" />, a.share)}
-        {photo && item('Copy picture', <Copy className="size-3.5" />, a.copyImage, 'Ctrl+C')}
-        {item('Copy file', <Files className="size-3.5" />, a.copyFile)}
-        {item('Copy file path', <Link2 className="size-3.5" />, a.copyPath)}
+        {item(t('Share…'), <Share2 className="size-3.5" />, a.share)}
+        {photo && item(t('Copy picture'), <Copy className="size-3.5" />, a.copyImage, 'Ctrl+C')}
+        {item(t('Copy file'), <Files className="size-3.5" />, a.copyFile)}
+        {item(t('Copy file path'), <Link2 className="size-3.5" />, a.copyPath)}
         {sep}
-        {item('Open in another app', <ExternalLink className="size-3.5" />, a.openExternal)}
-        {item('Show in Explorer', <FolderOpen className="size-3.5" />, a.showInFolder)}
-        {item(d.edited ? 'Save original copy…' : 'Save a copy…', <Download className="size-3.5" />, a.saveCopy)}
-        {d.edited && item('Save edited copy…', <Download className="size-3.5" />, a.saveEditedCopy)}
+        {item(t('Open in another app'), <ExternalLink className="size-3.5" />, a.openExternal)}
+        {item(t('Show in Explorer'), <FolderOpen className="size-3.5" />, a.showInFolder)}
+        {item(d.edited ? t('Save original copy…') : t('Save a copy…'), <Download className="size-3.5" />, a.saveCopy)}
+        {d.edited && item(t('Save edited copy…'), <Download className="size-3.5" />, a.saveEditedCopy)}
         {sep}
-        {photo && item('Edit…', <SlidersHorizontal className="size-3.5" />, a.edit, 'E')}
-        {photo && item('Rotate', <RotateCw className="size-3.5" />, a.rotate, 'R')}
-        {item(d.favorite ? 'Remove from favourites' : 'Add to favourites', <Heart className="size-3.5" />, a.favorite)}
+        {photo && item(t('Edit…'), <SlidersHorizontal className="size-3.5" />, a.edit, 'E')}
+        {photo && item(t('Rotate'), <RotateCw className="size-3.5" />, a.rotate, 'R')}
+        {item(d.favorite ? t('Remove from favourites') : t('Add to favourites'), <Heart className="size-3.5" />, a.favorite)}
         {item(
-          'Add to album',
+          t('Add to album'),
           <Album className="size-3.5" />,
           () => {
             setShowAlbums((s) => !s)
@@ -594,8 +592,8 @@ function ViewerMenu(props: { x: number; y: number; detail: AssetDetail; actions:
         )}
         {showAlbums && (
           <div className="scroll-thin mx-1 mb-1 max-h-48 overflow-y-auto rounded-lg bg-white/5 p-1">
-            {albums === null && <div className="px-2.5 py-1.5 text-[12px] text-stone-500">Loading…</div>}
-            {albums?.length === 0 && <div className="px-2.5 py-1.5 text-[12px] text-stone-500">No albums yet</div>}
+            {albums === null && <div className="px-2.5 py-1.5 text-[12px] text-stone-500">{t('Loading…')}</div>}
+            {albums?.length === 0 && <div className="px-2.5 py-1.5 text-[12px] text-stone-500">{t('No albums yet')}</div>}
             {albums?.map((al) => (
               <button
                 key={al.id}
@@ -607,11 +605,11 @@ function ViewerMenu(props: { x: number; y: number; detail: AssetDetail; actions:
             ))}
           </div>
         )}
-        {item(d.captureTime ? 'Edit date…' : 'Set date…', <Calendar className="size-3.5" />, a.setDate)}
-        {item(d.hidden ? 'Show in Photos' : 'Hide from Photos', d.hidden ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />, a.hide)}
-        {item('Info', <Info className="size-3.5" />, a.info, 'I')}
+        {item(d.captureTime ? t('Edit date…') : t('Set date…'), <Calendar className="size-3.5" />, a.setDate)}
+        {item(d.hidden ? t('Show in Photos') : t('Hide from Photos'), d.hidden ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />, a.hide)}
+        {item(t('Info'), <Info className="size-3.5" />, a.info, 'I')}
         {sep}
-        {item(d.trashed ? 'Restore from Bin' : 'Move to Bin', d.trashed ? <RotateCcw className="size-3.5" /> : <Trash2 className="size-3.5" />, a.bin)}
+        {item(d.trashed ? t('Restore from Bin') : t('Move to Bin'), d.trashed ? <RotateCcw className="size-3.5" /> : <Trash2 className="size-3.5" />, a.bin)}
       </div>
     </div>
   )
@@ -750,7 +748,7 @@ function CopyHash(props: { value: string }) {
         setTimeout(() => setCopied(false), 1400)
       }}
       className="group flex w-full items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-left font-mono text-[11.5px] leading-relaxed text-stone-300 transition hover:bg-white/10"
-      title="Copy SHA-256"
+      title={t('Copy SHA-256')}
     >
       <span className="min-w-0 flex-1 break-all select-text">{props.value}</span>
       {copied ? <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-400" /> : <Copy className="mt-0.5 size-3.5 shrink-0 opacity-50 group-hover:opacity-100" />}
@@ -772,11 +770,11 @@ function Caption(props: { d: AssetDetail; onChanged: () => void }) {
   }
   if (!editing) {
     return (
-      <button onClick={() => setEditing(true)} className="mt-3 block w-full text-left" title="Add or edit a caption">
+      <button onClick={() => setEditing(true)} className="mt-3 block w-full text-left" title={t('Add or edit a caption')}>
         {props.d.description ? (
           <p className="select-text whitespace-pre-wrap text-[13.5px] leading-relaxed text-stone-200 hover:text-white">{props.d.description}</p>
         ) : (
-          <span className="text-[13px] text-stone-500 hover:text-stone-300">Add a caption…</span>
+          <span className="text-[13px] text-stone-500 hover:text-stone-300">{t('Add a caption…')}</span>
         )}
       </button>
     )
@@ -795,7 +793,7 @@ function Caption(props: { d: AssetDetail; onChanged: () => void }) {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void save()
       }}
       rows={3}
-      placeholder="What's happening here?"
+      placeholder={t('What\'s happening here?')}
       className="mt-3 w-full resize-none rounded-lg bg-white/10 p-2 text-[13.5px] leading-relaxed text-stone-100 outline-none ring-accent-400 focus:ring-1"
     />
   )
@@ -830,7 +828,7 @@ function Tags(props: { d: AssetDetail; onChanged: () => void }) {
                 props.onChanged()
               }}
               className="grid size-4 place-items-center rounded-full hover:bg-white/15"
-              aria-label={`Remove ${t}`}
+              aria-label={`× ${t}`}
             >
               <X className="size-3" />
             </button>
@@ -846,7 +844,7 @@ function Tags(props: { d: AssetDetail; onChanged: () => void }) {
             void add(text)
           }
         }}
-        placeholder="Add a tag…"
+        placeholder={t('Add a tag…')}
         className="mt-2 h-8 w-full rounded-lg bg-white/10 px-2.5 text-[12.5px] text-stone-100 outline-none placeholder:text-stone-500 focus:ring-1 focus:ring-accent-400"
       />
       {suggestions.length > 0 && (
@@ -880,20 +878,20 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
         <Caption d={d} onChanged={onChanged} />
       </div>
 
-      <Section title="Tags" icon={<Tag className="size-3.5" />}>
+      <Section title={t('Tags')} icon={<Tag className="size-3.5" />}>
         <Tags d={d} onChanged={onChanged} />
       </Section>
 
-      <Section title="Date" icon={<Calendar className="size-3.5" />}>
+      <Section title={t('Date')} icon={<Calendar className="size-3.5" />}>
         {d.captureTime ? (
           <>
-            <Row label="Taken">
+            <Row label={t('Taken')}>
               {wallClock(d.captureTime)}
               {d.captureOffsetMinutes !== null && <span className="text-stone-400"> {offsetLabel(d.captureOffsetMinutes)}</span>}
             </Row>
-            <Row label="Source">
+            <Row label={t('Source')}>
               {timeSourceLabel(d.captureTimeSource)}
-              {inferred && <span className="ml-2 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10.5px] font-medium text-amber-300">estimated</span>}
+              {inferred && <span className="ml-2 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10.5px] font-medium text-amber-300">{t('estimated')}</span>}
             </Row>
             {d.dateEvidence.length > 0 && (
               <ul className="mt-1.5 space-y-1 text-[12px] leading-relaxed text-stone-400">
@@ -908,20 +906,20 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
             {timeSourceLabel('file_modified')} ({sortTimeLabel(d.sortTime)}).
           </div>
         )}
-        <Row label="Imported">{isoLocal(d.importedAt)}</Row>
+        <Row label={t('Imported')}>{isoLocal(d.importedAt)}</Row>
         <button onClick={() => setEditingDate(true)} className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-[12.5px] transition hover:bg-white/10">
           <Calendar className="size-3.5" />
-          {d.captureTime ? 'Edit date' : 'Set date'}
+          {d.captureTime ? t('Edit date') : t('Set date')}
         </button>
         {editingDate && (
           <DateDialog
-            title={d.captureTime ? 'Edit date' : 'Set date'}
+            title={d.captureTime ? t('Edit date') : t('Set date')}
             initial={d.captureTime}
             allowRemove={d.captureTimeSource === 'manual' || inferred}
             label={
               d.captureTimeSource && !inferred && d.captureTimeSource !== 'manual'
-                ? 'This overrides the date recorded in the file (the original is kept in its metadata).'
-                : 'Hand-set dates are never overwritten automatically.'
+                ? t('This overrides the date recorded in the file (the original is kept in its metadata).')
+                : t('Hand-set dates are never overwritten automatically.')
             }
             onClose={() => setEditingDate(false)}
             onSubmit={async (wall) => {
@@ -933,19 +931,19 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
         )}
       </Section>
 
-      <Section title="Details" icon={<Camera className="size-3.5" />}>
-        <Row label="Type">
+      <Section title={t('Details')} icon={<Camera className="size-3.5" />}>
+        <Row label={t('Type')}>
           {mimeLabel(d.mimeType)} {d.mediaType === 'video' ? 'video' : 'photo'}
         </Row>
         {d.width && d.height && (
-          <Row label="Dimensions">
+          <Row label={t('Dimensions')}>
             {d.width} × {d.height}
-            {d.mediaType === 'photo' && <span className="text-stone-400"> · {((d.width * d.height) / 1e6).toFixed(1)} MP</span>}
+            {d.mediaType === 'photo' && <span className="text-stone-400"> · {((d.width * d.height) / 1e6).toFixed(1)}{' '}{t('MP')}</span>}
           </Row>
         )}
-        <Row label="Size">{bytes(d.sizeBytes)}</Row>
-        {camera && <Row label="Camera">{camera}</Row>}
-        {d.lensModel && <Row label="Lens">{d.lensModel}</Row>}
+        <Row label={t('Size')}>{bytes(d.sizeBytes)}</Row>
+        {camera && <Row label={t('Camera')}>{camera}</Row>}
+        {d.lensModel && <Row label={t('Lens')}>{d.lensModel}</Row>}
         {exposure.map(([k, v]) => (
           <Row key={k} label={k}>
             {v}
@@ -953,38 +951,32 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
         ))}
       </Section>
 
-      <Section title="Location" icon={<MapPin className="size-3.5" />}>
+      <Section title={t('Location')} icon={<MapPin className="size-3.5" />}>
         {d.latitude !== null && d.longitude !== null ? (
           <>
-            {d.place && <Row label="Place">Near {d.place}</Row>}
-            <Row label="Coordinates">
+            {d.place && <Row label={t('Place')}>{t('Near')}{' '}{d.place}</Row>}
+            <Row label={t('Coordinates')}>
               {d.latitude.toFixed(5)}, {d.longitude.toFixed(5)}
-              {d.locationSource === 'manual' && <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[10.5px] text-stone-300">set by you</span>}
+              {d.locationSource === 'manual' && <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[10.5px] text-stone-300">{t('set by you')}</span>}
             </Row>
-            {d.altitude !== null && <Row label="Altitude">{Math.round(d.altitude)} m</Row>}
+            {d.altitude !== null && <Row label={t('Altitude')}>{Math.round(d.altitude)} m</Row>}
             <div className="mt-2 flex gap-3">
-              <button onClick={() => setPlacing(true)} className="text-[12.5px] text-accent-400 hover:underline">
-                Change
-              </button>
+              <button onClick={() => setPlacing(true)} className="text-[12.5px] text-accent-400 hover:underline">{t('Change')}</button>
               <a
                 href={`https://www.openstreetmap.org/?mlat=${d.latitude}&mlon=${d.longitude}#map=15/${d.latitude}/${d.longitude}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[12.5px] text-accent-400 hover:underline"
-              >
-                Open in OpenStreetMap ↗
-              </a>
+              >{t('Open in OpenStreetMap ↗')}</a>
             </div>
           </>
         ) : (
-          <button onClick={() => setPlacing(true)} className="text-[12.5px] text-accent-400 hover:underline">
-            Set location…
-          </button>
+          <button onClick={() => setPlacing(true)} className="text-[12.5px] text-accent-400 hover:underline">{t('Set location…')}</button>
         )}
       </Section>
       {placing && (
         <LocationPicker
-          title="Where was this taken?"
+          title={t('Where was this taken?')}
           initial={d.latitude !== null && d.longitude !== null ? { lat: d.latitude, lon: d.longitude } : null}
           onClose={() => setPlacing(false)}
           onRemove={
@@ -1004,15 +996,15 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
         />
       )}
 
-      <Section title="Origin" icon={<Smartphone className="size-3.5" />}>
-        <Row label="From">
+      <Section title={t('Origin')} icon={<Smartphone className="size-3.5" />}>
+        <Row label={t('From')}>
           {originLabel(d.origin)}
           {d.originConfidence === 'probable' && (
-            <span className="ml-2 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10.5px] font-medium text-amber-300">probable</span>
+            <span className="ml-2 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10.5px] font-medium text-amber-300">{t('probable')}</span>
           )}
         </Row>
-        {d.kind && d.kind !== 'photo' && d.kind !== 'video' && <Row label="Kind">{kindLabel(d.kind)}</Row>}
-        {d.hidden && <Row label="Timeline">Hidden from Photos</Row>}
+        {d.kind && d.kind !== 'photo' && d.kind !== 'video' && <Row label={t('Kind')}>{kindLabel(d.kind)}</Row>}
+        {d.hidden && <Row label={t('Timeline')}>{t('Hidden from Photos')}</Row>}
         {[...d.originEvidence, ...d.kindEvidence].length > 0 && (
           <ul className="mt-2 space-y-1 text-[12px] leading-relaxed text-stone-400">
             {[...d.originEvidence, ...d.kindEvidence].map((e) => (
@@ -1020,15 +1012,15 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
             ))}
           </ul>
         )}
-        {!d.origin && d.originEvidence.length === 0 && <div className="mt-1 text-[12px] text-stone-500">No camera data or recognisable app pattern.</div>}
+        {!d.origin && d.originEvidence.length === 0 && <div className="mt-1 text-[12px] text-stone-500">{t('No camera data or recognisable app pattern.')}</div>}
       </Section>
 
       {d.people.length > 0 && (
-        <Section title="People" icon={<Users className="size-3.5" />}>
+        <Section title={t('People')} icon={<Users className="size-3.5" />}>
           <div className="flex flex-wrap gap-1.5">
             {d.people.map((p) => (
               <span key={p.id} className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] text-stone-200">
-                {p.name ?? 'Unnamed person'}
+                {p.name ?? t('Unnamed person')}
               </span>
             ))}
           </div>
@@ -1036,7 +1028,7 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
       )}
 
       {d.albums.length > 0 && (
-        <Section title="Albums" icon={<Album className="size-3.5" />}>
+        <Section title={t('Albums')} icon={<Album className="size-3.5" />}>
           <div className="flex flex-wrap gap-1.5">
             {d.albums.map((a) => (
               <span key={a.id} className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] text-stone-200">
@@ -1047,40 +1039,37 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
         </Section>
       )}
 
-      <Section title="Archive" icon={<HardDrive className="size-3.5" />}>
+      <Section title={t('Archive')} icon={<HardDrive className="size-3.5" />}>
         {d.files.map((f) => (
           <div key={f.id} className="mb-2">
             <div className="break-all text-[13px]">{f.relativePath}</div>
             <div className="text-xs text-stone-400">
               {f.locationName}
-              {f.verifiedAt && ` · verified ${isoLocal(f.verifiedAt)}`}
+              {f.verifiedAt && t(' · verified {v0}', { v0: isoLocal(f.verifiedAt) })}
             </div>
           </div>
         ))}
         {d.backups.map((b) => (
           <div key={b.path} className="mb-2">
             <div className="break-all text-[13px]">{b.path}</div>
-            <div className={`text-xs ${b.status === 'ok' ? 'text-stone-400' : 'text-red-400'}`}>
-              Backup copy · {b.status === 'ok' ? `verified ${isoLocal(b.verifiedAt)}` : 'missing or damaged'}
+            <div className={`text-xs ${b.status === 'ok' ? 'text-stone-400' : 'text-red-400'}`}>{t('Backup copy ·')}{' '}{b.status === 'ok' ? t('verified {v0}', { v0: isoLocal(b.verifiedAt) }) : t('missing or damaged')}
             </div>
           </div>
         ))}
-        {d.backups.length === 0 && <div className="mb-2 text-xs text-amber-300/80">No backup copy yet — add a backup location in Storage.</div>}
+        {d.backups.length === 0 && <div className="mb-2 text-xs text-amber-300/80">{t('No backup copy yet — add a backup location in Storage.')}</div>}
         <button
           onClick={() => void api.showInFolder(d.id)}
           className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-[12.5px] transition hover:bg-white/10"
         >
-          <FolderOpen className="size-3.5" />
-          Show in folder
-        </button>
+          <FolderOpen className="size-3.5" />{t('Show in folder')}</button>
       </Section>
 
-      <Section title="Identity" icon={<Fingerprint className="size-3.5" />}>
-        <div className="mb-2 text-xs text-stone-400">SHA-256 — byte-for-byte fingerprint of the original</div>
+      <Section title={t('Identity')} icon={<Fingerprint className="size-3.5" />}>
+        <div className="mb-2 text-xs text-stone-400">{t('SHA-256 — byte-for-byte fingerprint of the original')}</div>
         <CopyHash value={d.sha256} />
       </Section>
 
-      <Section title={`Found in ${plural(d.sources.length, 'place')}`} icon={<History className="size-3.5" />}>
+      <Section title={t('Found in {length}', { length: plural(d.sources.length, 'place') })} icon={<History className="size-3.5" />}>
         <div className="space-y-3">
           {d.sources.map((s) => {
             const { archive, inner } = splitArchivePath(s.sourcePath, s.containerPath)
@@ -1093,27 +1082,24 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
                     <span className="shrink-0 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-stone-300">{sourceTypeLabel(s.sourceType)}</span>
                   )}
                 </div>
-                {archive && <div className="mt-0.5 break-all text-xs text-stone-300">in {basename(archive)}</div>}
+                {archive && <div className="mt-0.5 break-all text-xs text-stone-300">{t('in')}{' '}{basename(archive)}</div>}
                 <div className="mt-0.5 break-all text-xs text-stone-400">{archive ? folder : s.sourcePath.slice(0, s.sourcePath.length - basename(s.sourcePath).length)}</div>
                 {(s.album || s.sidecarPath) && (
                   <div className="mt-1 text-[11.5px] text-stone-400">
-                    {s.album && <>Album “{s.album}”</>}
+                    {s.album && <>{t('Album “')}{s.album}”</>}
                     {s.album && s.sidecarPath && ' · '}
-                    {s.sidecarPath && 'Google metadata attached'}
+                    {s.sidecarPath && t('Google metadata attached')}
                   </div>
                 )}
-                <div className="mt-1.5 text-[11.5px] text-stone-500">
-                  First seen {isoLocal(s.firstSeenAt)}
-                  {s.timesSeen > 1 && ` · seen in ${s.timesSeen} imports`}
+                <div className="mt-1.5 text-[11.5px] text-stone-500">{t('First seen')}{' '}{isoLocal(s.firstSeenAt)}
+                  {s.timesSeen > 1 && t(' · seen in {timesSeen} imports', { timesSeen: s.timesSeen })}
                 </div>
               </div>
             )
           })}
         </div>
         {d.sources.length > 1 && (
-          <div className="mt-3 text-xs leading-relaxed text-stone-400">
-            These files are byte-for-byte identical. Photo Vault keeps one copy in the library and remembers every place it was found.
-          </div>
+          <div className="mt-3 text-xs leading-relaxed text-stone-400">{t('These files are byte-for-byte identical. Photo Vault keeps one copy in the library and remembers every place it was found.')}</div>
         )}
       </Section>
     </div>

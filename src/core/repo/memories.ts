@@ -3,7 +3,7 @@ import type { GeometryCollection, Topology } from 'topojson-specification'
 import type { Memory } from '@shared/types'
 import countriesTopo from 'world-atlas/countries-110m.json'
 import type { Library } from '../library/library'
-import { nearestPlace } from '../geo/places'
+import { countryName, nearestPlace } from '../geo/places'
 
 /**
  * Memories, all computed from the catalogue on demand (no extra storage):
@@ -96,9 +96,27 @@ function covers(rows: Row[], n = 4): number[] {
   return pick.map((r) => r.id)
 }
 
-const fmtDay = (day: string, opts: Intl.DateTimeFormatOptions): string => new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', { ...opts, timeZone: 'UTC' })
+/** Titles in the interface language. */
+const TEXT = {
+  en: {
+    yearsAgo: (n: number) => `${n} year${n === 1 ? '' : 's'} ago`,
+    tripTo: (place: string) => `Trip to ${place}`,
+    trip: 'Trip',
+    busyDay: 'a busy day',
+    locale: 'en-GB'
+  },
+  pt: {
+    yearsAgo: (n: number) => `Há ${n} ano${n === 1 ? '' : 's'}`,
+    tripTo: (place: string) => `Viagem a ${place}`,
+    trip: 'Viagem',
+    busyDay: 'um dia em cheio',
+    locale: 'pt-PT'
+  }
+}
 
-export function memories(library: Library, today = new Date()): Memory[] {
+export function memories(library: Library, today = new Date(), lang: 'en' | 'pt' = 'en'): Memory[] {
+  const tx = TEXT[lang]
+  const fmtDay = (day: string, opts: Intl.DateTimeFormatOptions): string => new Date(`${day}T12:00:00Z`).toLocaleDateString(tx.locale, { ...opts, timeZone: 'UTC' })
   const rows = ownPhotos(library)
   const out: Memory[] = []
 
@@ -123,7 +141,7 @@ export function memories(library: Library, today = new Date()): Memory[] {
     out.push({
       key: `day-${year}`,
       kind: 'on_this_day',
-      title: `${ago} year${ago === 1 ? '' : 's'} ago`,
+      title: tx.yearsAgo(ago),
       subtitle: fmtDay((use[0] as Row).day, { day: 'numeric', month: 'long', year: 'numeric' }),
       count: use.length,
       coverIds: covers(use),
@@ -174,7 +192,7 @@ export function memories(library: Library, today = new Date()): Memory[] {
       const sample = located.filter((_, i) => i % Math.max(1, Math.floor(located.length / 60)) === 0)
       for (const r of sample) {
         const p = nearestPlace(r.lat as number, r.lon as number)
-        const c = p?.country ?? countryAt(r.lat as number, r.lon as number)
+        const c = p ? countryName(p.countryCode, lang) : countryAt(r.lat as number, r.lon as number)
         if (c) countries.set(c, (countries.get(c) ?? 0) + 1)
         if (p) cities.set(p.city, (cities.get(p.city) ?? 0) + 1)
       }
@@ -187,7 +205,7 @@ export function memories(library: Library, today = new Date()): Memory[] {
       trips.push({
         key: `trip-${first}`,
         kind: 'trip',
-        title: cityTrip ? `Trip to ${cityTrip}` : country ? `Trip to ${country}` : 'Trip',
+        title: cityTrip ? tx.tripTo(cityTrip) : country ? tx.tripTo(country) : tx.trip,
         places: towns,
         subtitle:
           first === last
@@ -219,7 +237,7 @@ export function memories(library: Library, today = new Date()): Memory[] {
         key: `event-${day}`,
         kind: 'event',
         title: fmtDay(day, { weekday: 'long', day: 'numeric', month: 'long' }),
-        subtitle: `${day.slice(0, 4)} · a busy day`,
+        subtitle: `${day.slice(0, 4)} · ${tx.busyDay}`,
         count: list.length,
         coverIds: covers(list),
         ids: list.map((r) => r.id),

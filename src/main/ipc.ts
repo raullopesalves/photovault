@@ -29,7 +29,7 @@ import { cancelPhoneCopy, copyPhone } from './phoneImport'
 import { listPhones } from '@core/sources/phone'
 import { checkForUpdates, installUpdateNow, setUpdateToken, updateStatus } from './updater'
 import type { LibraryController } from './controller'
-import { loadSettings, saveSettings, type StoredSettings } from './settings'
+import { languageOf, loadSettings, saveSettings, type StoredSettings } from './settings'
 
 function int(v: unknown, name: string, min = 0): number {
   if (typeof v !== 'number' || !Number.isSafeInteger(v) || v < min) throw new Error(`Invalid ${name}`)
@@ -97,6 +97,8 @@ const CLASSIFICATIONS = new Set<ItemClassification | 'all'>(['all', 'pending', '
 
 export function registerIpc(controller: LibraryController, getWindow: () => BrowserWindow | null, applyTheme: (s: StoredSettings) => void): void {
   let settings = loadSettings()
+  /** Native dialog text in the interface language. */
+  const tr = (en: string, pt: string): string => (languageOf(settings) === 'pt' ? pt : en)
   const changed = (reason: LibraryChangeReason): void => getWindow()?.webContents.send('library:changed', reason)
 
   const lib = () => {
@@ -124,11 +126,11 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
 
   ipcMain.handle('app:state', () => controller.state())
   ipcMain.handle('library:create', async () => {
-    const root = await chooseLibraryFolder('Choose where to keep your Photo Vault library')
+    const root = await chooseLibraryFolder(tr('Choose where to keep your Photo Vault library', 'Escolha onde guardar a sua biblioteca do Photo Vault'))
     return root ? openAndRemember(root, true) : controller.state()
   })
   ipcMain.handle('library:open', async () => {
-    const root = await chooseLibraryFolder('Open an existing Photo Vault library')
+    const root = await chooseLibraryFolder(tr('Open an existing Photo Vault library', 'Abrir uma biblioteca do Photo Vault existente'))
     return root ? openAndRemember(root, false) : controller.state()
   })
   ipcMain.handle('library:timeline', (_e, q: unknown) => timeline(lib(), query(q)))
@@ -194,7 +196,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     const list = idList(ids)
     const win = getWindow()
     const opts: Electron.OpenDialogOptions = {
-      title: `Choose a folder to export ${list.length} item${list.length === 1 ? '' : 's'} to`,
+      title: tr(`Choose a folder to export ${list.length} item${list.length === 1 ? '' : 's'} to`, `Escolha uma pasta para exportar ${list.length} ${list.length === 1 ? 'item' : 'itens'}`),
       properties: ['openDirectory', 'createDirectory']
     }
     const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
@@ -226,7 +228,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('update:check', () => checkForUpdates())
   ipcMain.handle('update:setToken', (_e, token: unknown) => setUpdateToken(typeof token === 'string' && token.trim() ? token.trim().slice(0, 300) : null))
   ipcMain.handle('update:install', () => installUpdateNow())
-  ipcMain.handle('memories:list', () => memories(lib()))
+  ipcMain.handle('memories:list', () => memories(lib(), new Date(), languageOf(settings)))
   ipcMain.handle('share:prepare', async (_e, ids: unknown, opts: unknown) => {
     const o = (opts ?? {}) as { size?: unknown; includeDate?: unknown }
     const size = o.size === 'original' || o.size === 'small' ? o.size : 'large'
@@ -338,7 +340,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('watch:add', async () => {
     lib()
     const win = getWindow()
-    const opts: Electron.OpenDialogOptions = { title: 'Choose a folder to watch for new photos', properties: ['openDirectory'] }
+    const opts: Electron.OpenDialogOptions = { title: tr('Choose a folder to watch for new photos', 'Escolha uma pasta a vigiar para novas fotografias'), properties: ['openDirectory'] }
     const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
     if (r.canceled || !r.filePaths[0]) return null
     return controller.watch!.add(r.filePaths[0])
@@ -452,7 +454,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('edit:saveCopy', async (_e, id: unknown) => {
     const { jpeg, name } = await renderEdited(lib(), int(id, 'id', 1))
     const win = getWindow()
-    const opts: Electron.SaveDialogOptions = { title: 'Save edited copy', defaultPath: name, filters: [{ name: 'JPEG', extensions: ['jpg'] }] }
+    const opts: Electron.SaveDialogOptions = { title: tr('Save edited copy', 'Guardar cópia editada'), defaultPath: name, filters: [{ name: 'JPEG', extensions: ['jpg'] }] }
     const r = win ? await dialog.showSaveDialog(win, opts) : await dialog.showSaveDialog(opts)
     if (r.canceled || !r.filePath) return false
     await writeFile(r.filePath, jpeg)
@@ -483,7 +485,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('asset:saveCopy', async (_e, id: unknown) => {
     const src = assetSource(id)
     const win = getWindow()
-    const opts: Electron.SaveDialogOptions = { title: 'Save a copy', defaultPath: src.name }
+    const opts: Electron.SaveDialogOptions = { title: tr('Save a copy', 'Guardar uma cópia'), defaultPath: src.name }
     const r = win ? await dialog.showSaveDialog(win, opts) : await dialog.showSaveDialog(opts)
     if (r.canceled || !r.filePath) return false
     await copyFile(src.absolutePath, r.filePath)
@@ -496,11 +498,11 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     const opts: Electron.OpenDialogOptions =
       kind === 'zip'
         ? {
-            title: 'Choose ZIP archives to import (e.g. Google Takeout)',
+            title: tr('Choose ZIP archives to import (e.g. Google Takeout)', 'Escolha arquivos ZIP para importar (p. ex. Google Takeout)'),
             properties: ['openFile', 'multiSelections'],
             filters: [{ name: 'ZIP archives', extensions: ['zip'] }]
           }
-        : { title: 'Choose a folder of photos to import', properties: ['openDirectory'] }
+        : { title: tr('Choose a folder of photos to import', 'Escolha uma pasta de fotografias para importar'), properties: ['openDirectory'] }
     const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
     return r.canceled || r.filePaths.length === 0 ? null : r.filePaths
   })
@@ -543,7 +545,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     if (!backups) throw new Error('No library is open.')
     const win = getWindow()
     const opts = {
-      title: 'Choose a backup location (ideally another drive)',
+      title: tr('Choose a backup location (ideally another drive)', 'Escolha um local de cópia (de preferência noutro disco)'),
       properties: ['openDirectory', 'createDirectory', 'promptToCreate'] as Array<'openDirectory' | 'createDirectory' | 'promptToCreate'>
     }
     const r = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
@@ -571,13 +573,14 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   })
   ipcMain.handle('db:openSnapshots', () => shell.openPath(snapshotDir(lib())))
 
-  ipcMain.handle('settings:get', (): Settings => ({ theme: settings.theme }))
+  ipcMain.handle('settings:get', (): Settings => ({ theme: settings.theme, language: languageOf(settings) }))
   ipcMain.handle('settings:set', (_e, patch: unknown): Settings => {
     const p = (patch ?? {}) as Partial<Settings>
     if (p.theme === 'system' || p.theme === 'light' || p.theme === 'dark') settings = { ...settings, theme: p.theme }
+    if (p.language === 'en' || p.language === 'pt') settings = { ...settings, language: p.language }
     saveSettings(settings)
     applyTheme(settings)
-    return { theme: settings.theme }
+    return { theme: settings.theme, language: languageOf(settings) }
   })
 
   nativeTheme.on('updated', () => applyTheme(settings))

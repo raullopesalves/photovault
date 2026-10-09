@@ -7,6 +7,7 @@ import { FilterBar } from '../components/FilterBar'
 import { api, bytes, n, plural } from '../lib/format'
 import { PageHeader } from './Placeholder'
 import { NoMatches } from './PhotosView'
+import { locale, t } from '../lib/i18n'
 
 const faceUrl = (faceId: number): string => `pv-media://face/${faceId}`
 
@@ -44,10 +45,10 @@ function usePeopleStatus(): PeopleStatus | null {
 }
 
 function statusLine(s: PeopleStatus): string | null {
-  if (s.phase === 'downloading' && s.download) return `Downloading the face models… ${bytes(s.download.loaded)} of ${bytes(s.download.total)}`
-  if (s.phase === 'scanning') return `Looking for faces… ${n(s.scanned)} of ${n(s.total)} photos (${s.total ? Math.floor((s.scanned / s.total) * 100) : 0}%) — people appear as they are found`
-  if (s.phase === 'grouping') return 'Grouping faces into people…'
-  if (s.phase === 'error') return `Something went wrong: ${s.error}`
+  if (s.phase === 'downloading' && s.download) return t('Downloading the face models… {v0} of {v1}', { v0: bytes(s.download.loaded), v1: bytes(s.download.total) })
+  if (s.phase === 'scanning') return t('Looking for faces… {scanned} of {total} photos ({v2}%) — people appear as they are found', { scanned: n(s.scanned), total: n(s.total), v2: s.total ? Math.floor((s.scanned / s.total) * 100) : 0 })
+  if (s.phase === 'grouping') return t('Grouping faces into people…')
+  if (s.phase === 'error') return t('Something went wrong: {error}', { error: s.error })
   return null
 }
 
@@ -76,16 +77,14 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
 
   return (
     <div className="scroll-thin h-full overflow-y-auto">
-      <PageHeader title="People" subtitle="Photos grouped by the faces in them. Name someone to find them by name in search; merge duplicates; fix mistakes from a person's page." />
+      <PageHeader title={t('People')} subtitle={t('Photos grouped by the faces in them. Name someone to find them by name in search; merge duplicates; fix mistakes from a person\'s page.')} />
       <div className="mx-auto max-w-5xl px-8 pb-12">
         {line && (
           <div className={`mb-6 flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-[13px] shadow-sm shadow-stone-900/5 dark:bg-stone-900 ${status.phase === 'error' ? 'text-red-600 dark:text-red-400' : ''}`}>
             {status.phase !== 'error' && <LoaderCircle className="size-3.5 shrink-0 animate-spin" />}
             {line}
             {status.phase === 'error' && (
-              <button onClick={() => void api.setPeopleEnabled(true)} className="ml-auto rounded-lg px-3 py-1 font-medium hover:bg-stone-100 dark:hover:bg-stone-800">
-                Try again
-              </button>
+              <button onClick={() => void api.setPeopleEnabled(true)} className="ml-auto rounded-lg px-3 py-1 font-medium hover:bg-stone-100 dark:hover:bg-stone-800">{t('Try again')}</button>
             )}
           </div>
         )}
@@ -96,23 +95,18 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
               <Face person={suggestions[0]!.b} size={40} />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-[14px] font-medium">Same person?</div>
+              <div className="text-[14px] font-medium">{t('Same person?')}</div>
               <div className="text-xs text-stone-500 dark:text-stone-400">
-                {plural(suggestions.length, 'pair')} of people look alike. Confirming joins their photos; your answers are remembered.
-              </div>
+                {plural(suggestions.length, 'pair')}{' '}{t('of people look alike. Confirming joins their photos; your answers are remembered.')}</div>
             </div>
             <button
               onClick={() => setReviewing(true)}
               className="h-9 shrink-0 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900"
-            >
-              Review
-            </button>
+            >{t('Review')}</button>
           </div>
         )}
         {people && visible.length === 0 && status.phase === 'ready' && (
-          <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">
-            No people found yet. A person appears once their face is on at least 3 photos.
-          </div>
+          <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">{t('No people found yet. A person appears once their face is on at least 3 photos.')}</div>
         )}
         <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-x-4 gap-y-6">
           {visible.map((p) => (
@@ -122,7 +116,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
         {hidden.length > 0 && (
           <div className="mt-10">
             <button onClick={() => setShowHidden((v) => !v)} className="mb-4 text-[13px] font-medium text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
-              {showHidden ? 'Hide' : 'Show'} hidden people ({hidden.length})
+              {showHidden ? t('Hide') : t('Show')}{' '}{t('hidden people (')}{hidden.length})
             </button>
             {showHidden && (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-x-4 gap-y-6 opacity-70">
@@ -134,22 +128,16 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
           </div>
         )}
         <div className="mt-12 flex flex-wrap items-center gap-3 border-t border-stone-200 pt-5 text-xs text-stone-500 dark:border-stone-800 dark:text-stone-400">
-          <ShieldCheck className="size-4" />
-          Faces are found and compared on this computer only. {n(status.faces)} faces on {n(status.scanned)} photos.
-          <button onClick={() => void api.setPeopleEnabled(false)} className="ml-auto rounded-lg px-2.5 py-1 font-medium hover:bg-stone-200/60 dark:hover:bg-stone-800">
-            Pause
-          </button>
-          <button onClick={() => setClearing(true)} className="rounded-lg px-2.5 py-1 font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
-            Turn off and delete face data
-          </button>
+          <ShieldCheck className="size-4" />{t('Faces are found and compared on this computer only.')}{' '}{n(status.faces)}{' '}{t('faces on')}{' '}{n(status.scanned)}{' '}{t('photos.')}<button onClick={() => void api.setPeopleEnabled(false)} className="ml-auto rounded-lg px-2.5 py-1 font-medium hover:bg-stone-200/60 dark:hover:bg-stone-800">{t('Pause')}</button>
+          <button onClick={() => setClearing(true)} className="rounded-lg px-2.5 py-1 font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">{t('Turn off and delete face data')}</button>
         </div>
       </div>
       {reviewing && <SamePersonReview suggestions={suggestions} onClose={() => setReviewing(false)} />}
       {clearing && (
         <ConfirmDialog
-          title="Delete all face data?"
-          body="The faces found, the people and their names are forgotten. Your photos are not touched. You can turn People on again later; faces will be looked for again from scratch."
-          confirm="Delete face data"
+          title={t('Delete all face data?')}
+          body={t('The faces found, the people and their names are forgotten. Your photos are not touched. You can turn People on again later; faces will be looked for again from scratch.')}
+          confirm={t('Delete face data')}
           destructive
           onClose={() => setClearing(false)}
           onConfirm={async () => {
@@ -216,7 +204,7 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
     <div className="flex flex-1 flex-col items-center gap-3">
       <Face person={p} size={120} />
       <div className="text-center">
-        <div className="text-[14px] font-medium">{p.name ?? <span className="text-stone-400">Unnamed</span>}</div>
+        <div className="text-[14px] font-medium">{p.name ?? <span className="text-stone-400">{t('Unnamed')}</span>}</div>
         <div className="text-xs text-stone-500">{plural(p.photos, 'photo')}</div>
       </div>
       <div className="flex gap-1.5">
@@ -232,12 +220,11 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
       <div className="w-[640px] rounded-2xl bg-white p-6 shadow-2xl dark:bg-stone-900" onClick={(e) => e.stopPropagation()}>
         <div className="mb-6 flex items-center">
           <div className="flex-1">
-            <div className="text-[17px] font-semibold">Same or different person?</div>
+            <div className="text-[17px] font-semibold">{t('Same or different person?')}</div>
             <div className="text-xs text-stone-500 dark:text-stone-400">
-              {done} answered · {queue.filter((s) => !gone.has(s.a.id) && !gone.has(s.b.id)).length} to go
-            </div>
+              {done}{' '}{t('answered ·')}{' '}{queue.filter((s) => !gone.has(s.a.id) && !gone.has(s.b.id)).length}{' '}{t('to go')}</div>
           </div>
-          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="Close">
+          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label={t('Close')}>
             <X className="size-4" />
           </button>
         </div>
@@ -254,18 +241,16 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
             onClick={() => void answer(false)}
             className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-stone-100 px-5 text-[13.5px] font-medium hover:bg-stone-200 disabled:opacity-50 dark:bg-stone-800 dark:hover:bg-stone-700"
           >
-            <X className="size-4" /> Different people <kbd className="ml-1 text-[11px] opacity-50">D</kbd>
+            <X className="size-4" />{' '}{t('Different people')}{' '}<kbd className="ml-1 text-[11px] opacity-50">D</kbd>
           </button>
           <button
             disabled={busy}
             onClick={() => void answer(true)}
             className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-stone-900 px-5 text-[13.5px] font-medium text-white hover:bg-stone-800 disabled:opacity-50 dark:bg-white dark:text-stone-900"
           >
-            <Check className="size-4" /> Same person <kbd className="ml-1 text-[11px] opacity-50">S</kbd>
+            <Check className="size-4" />{' '}{t('Same person')}{' '}<kbd className="ml-1 text-[11px] opacity-50">S</kbd>
           </button>
-          <button disabled={busy} onClick={() => void answer(null)} className="h-10 rounded-xl px-4 text-[13px] font-medium text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">
-            Not sure
-          </button>
+          <button disabled={busy} onClick={() => void answer(null)} className="h-10 rounded-xl px-4 text-[13px] font-medium text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">{t('Not sure')}</button>
         </div>
       </div>
     </div>
@@ -279,7 +264,7 @@ function PersonCard(props: { person: Person; onOpen: () => void }) {
       <div className="rounded-full ring-accent-500 ring-offset-2 ring-offset-stone-50 transition group-hover:ring-2 dark:ring-offset-stone-950">
         <Face person={p} size={112} />
       </div>
-      <div className="w-full truncate text-[13.5px] font-medium">{p.name ?? <span className="text-stone-400">Add a name</span>}</div>
+      <div className="w-full truncate text-[13.5px] font-medium">{p.name ?? <span className="text-stone-400">{t('Add a name')}</span>}</div>
       <div className="-mt-1.5 text-xs text-stone-500 dark:text-stone-400">{plural(p.photos, 'photo')}</div>
     </button>
   )
@@ -293,22 +278,18 @@ function TurnOn() {
         <div className="mx-auto mb-6 grid size-20 place-items-center rounded-3xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
           <Users className="size-9" strokeWidth={1.4} />
         </div>
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">People</h1>
-        <p className="mx-auto mt-3 max-w-md text-[14.5px] leading-relaxed text-stone-600 dark:text-stone-400">
-          Group your photos by the people in them, like Google Photos — but entirely on this computer. Nothing is uploaded, and face data can be deleted at any
-          time.
-        </p>
+        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">{t('People')}</h1>
+        <p className="mx-auto mt-3 max-w-md text-[14.5px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Group your photos by the people in them, like Google Photos — but entirely on this computer. Nothing is uploaded, and face data can be deleted at any time.')}</p>
         <ul className="mx-auto mt-5 max-w-sm space-y-1.5 text-left text-[13px] text-stone-500 dark:text-stone-400">
-          <li>• Downloads two small open models once (about 39 MB).</li>
-          <li>• Then looks at every photo in the background (about 10 per second).</li>
-          <li>• You name people, merge look-alike groups and fix mistakes; your corrections are kept.</li>
+          <li>{t('• Downloads two small open models once (about 39 MB).')}</li>
+          <li>{t('• Then looks at every photo in the background (about 10 per second).')}</li>
+          <li>{t('• You name people, merge look-alike groups and fix mistakes; your corrections are kept.')}</li>
         </ul>
         <button
           onClick={() => void api.setPeopleEnabled(true)}
           className="mt-8 inline-flex h-11 items-center gap-2 rounded-xl bg-stone-900 px-6 text-[14px] font-medium text-white shadow-sm transition hover:bg-stone-800 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
         >
-          <Users className="size-4" /> Find people in my photos
-        </button>
+          <Users className="size-4" />{' '}{t('Find people in my photos')}</button>
         {status?.phase === 'error' && <div className="mt-4 text-[13px] text-red-600 dark:text-red-400">{status.error}</div>}
       </div>
     </div>
@@ -336,13 +317,13 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
 
   const tabs = (
     <div className="inline-flex rounded-lg bg-stone-200/60 p-0.5 text-[12.5px] font-medium dark:bg-stone-800/80">
-      {(['photos', 'faces'] as const).map((t) => (
+      {(['photos', 'faces'] as const).map((tb) => (
         <button
-          key={t}
-          onClick={() => setTab(t)}
-          className={`rounded-md px-3 py-1 transition ${tab === t ? 'bg-white shadow-sm dark:bg-stone-700' : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'}`}
+          key={tb}
+          onClick={() => setTab(tb)}
+          className={`rounded-md px-3 py-1 transition ${tab === tb ? 'bg-white shadow-sm dark:bg-stone-700' : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'}`}
         >
-          {t === 'photos' ? 'Photos' : 'Faces'}
+          {tb === 'photos' ? t('Photos') : t('Faces')}
         </button>
       ))}
     </div>
@@ -350,12 +331,12 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
 
   const title = (
           <span className="flex items-center gap-3">
-            <button onClick={props.onBack} className={`no-drag ${iconBtn}`} aria-label="All people">
+            <button onClick={props.onBack} className={`no-drag ${iconBtn}`} aria-label={t('All people')}>
               <ArrowLeft className="size-4" />
             </button>
             <Face person={person} size={40} />
             <button onClick={() => setNaming(true)} className="no-drag hover:text-accent-600">
-              {person.name ?? <span className="text-stone-400">Add a name</span>}
+              {person.name ?? <span className="text-stone-400">{t('Add a name')}</span>}
             </button>
           </span>
   )
@@ -366,9 +347,9 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
                 <button
                   onClick={() => setShowMerges((s) => !s)}
                   className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium text-stone-600 hover:bg-stone-200/70 dark:text-stone-300 dark:hover:bg-stone-800"
-                  title="People merged into this one — undo any of them"
+                  title={t('People merged into this one — undo any of them')}
                 >
-                  <Undo2 className="size-3.5" /> Merges ({merges.length})
+                  <Undo2 className="size-3.5" />{' '}{t('Merges (')}{merges.length})
                 </button>
                 {showMerges && (
                   <MergesMenu
@@ -383,10 +364,10 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
                 )}
               </div>
             )}
-            <button onClick={() => setNaming(true)} className={iconBtn} aria-label="Rename" title="Name this person">
+            <button onClick={() => setNaming(true)} className={iconBtn} aria-label={t('Rename')} title={t('Name this person')}>
               <Pencil className="size-4" />
             </button>
-            <button onClick={() => setMerging(true)} className={iconBtn} aria-label="Merge" title="Same person as someone else? Merge">
+            <button onClick={() => setMerging(true)} className={iconBtn} aria-label={t('Merge')} title={t('Same person as someone else? Merge')}>
               <Merge className="size-4" />
             </button>
             <button
@@ -395,8 +376,8 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
                 setPerson({ ...person, hidden: !person.hidden })
               }}
               className={iconBtn}
-              aria-label={person.hidden ? 'Show person' : 'Hide person'}
-              title={person.hidden ? 'Show this person in People again' : 'Hide this person from People (photos stay)'}
+              aria-label={person.hidden ? t('Show person') : t('Hide person')}
+              title={person.hidden ? t('Show this person in People again') : t('Hide this person from People (photos stay)')}
             >
               {person.hidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
             </button>
@@ -425,11 +406,11 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
       )}
       {naming && (
         <PromptDialog
-          title={person.name ? 'Rename' : 'Who is this?'}
-          label="Name"
+          title={person.name ? t('Rename') : t('Who is this?')}
+          label={t('Name')}
           initial={person.name ?? ''}
-          placeholder="Name"
-          confirm="Save"
+          placeholder={t('Name')}
+          confirm={t('Save')}
           onClose={() => setNaming(false)}
           onSubmit={async (value) => {
             setNaming(false)
@@ -441,9 +422,9 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
       )}
       {conflict && (
         <ConfirmDialog
-          title={`Is this also ${conflict.other.name}?`}
-          body={`“${conflict.other.name}” already exists with ${plural(conflict.other.photos, 'photo')}. Merge these photos into ${conflict.other.name}?`}
-          confirm="Merge"
+          title={t('Is this also {name}?', { name: conflict.other.name })}
+          body={t('“{name}” already exists with {photos}. Merge these photos into {v2}?', { name: conflict.other.name, photos: plural(conflict.other.photos, 'photo'), v2: conflict.other.name })}
+          confirm={t('Merge')}
           onClose={() => setConflict(null)}
           onConfirm={async () => {
             const target = conflict.other.id
@@ -477,7 +458,7 @@ function MergesMenu(props: { merges: PersonMerge[]; onUndo: (m: PersonMerge) => 
     <>
       <div className="fixed inset-0 z-30" onClick={props.onClose} />
       <div className="absolute right-0 top-10 z-40 w-80 rounded-xl bg-white p-2 shadow-2xl ring-1 ring-stone-900/5 dark:bg-stone-900 dark:ring-white/10">
-        <div className="px-2 pb-2 pt-1 text-xs text-stone-500 dark:text-stone-400">Merged into this person. Undo splits those faces off again (and they won't be merged back).</div>
+        <div className="px-2 pb-2 pt-1 text-xs text-stone-500 dark:text-stone-400">{t('Merged into this person. Undo splits those faces off again (and they won\'t be merged back).')}</div>
         {props.merges.map((m) => (
           <div key={m.id} className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-stone-50 dark:hover:bg-stone-800/60">
             <div className="flex -space-x-2">
@@ -486,14 +467,12 @@ function MergesMenu(props: { merges: PersonMerge[]; onUndo: (m: PersonMerge) => 
               ))}
             </div>
             <div className="min-w-0 flex-1 text-[12.5px]">
-              <div className="truncate font-medium">{m.name ?? 'Unnamed person'}</div>
+              <div className="truncate font-medium">{m.name ?? t('Unnamed person')}</div>
               <div className="text-[11px] text-stone-500">
-                {plural(m.faces, 'face')} · {m.automatic ? 'automatic' : 'by you'} · {new Date(m.mergedAt).toLocaleDateString()}
+                {plural(m.faces, 'face')} · {m.automatic ? t('automatic') : t('by you')} · {new Date(m.mergedAt).toLocaleDateString(locale())}
               </div>
             </div>
-            <button onClick={() => props.onUndo(m)} className="rounded-md px-2 py-1 text-[12px] font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">
-              Undo
-            </button>
+            <button onClick={() => props.onUndo(m)} className="rounded-md px-2 py-1 text-[12px] font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">{t('Undo')}</button>
           </div>
         ))}
       </div>
@@ -530,7 +509,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
     last.current = id
   }
   const ids = [...selected]
-  const name = props.person.name ?? 'this person'
+  const name = props.person.name ?? t('this person')
 
   return (
     <div className="scroll-thin relative h-full overflow-y-auto">
@@ -544,7 +523,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
         </div>
         <div className="no-drag mt-3 flex items-center gap-3">
           {props.tabs}
-          <span className="text-xs text-stone-500 dark:text-stone-400">Click faces that aren't {name} (Shift-click for a range), then remove or move them.</span>
+          <span className="text-xs text-stone-500 dark:text-stone-400">{t('Click faces that aren\'t')}{' '}{name}{' '}{t('(Shift-click for a range), then remove or move them.')}</span>
         </div>
       </header>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2 px-7 pb-28 pt-2">
@@ -568,7 +547,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
       </div>
       {ids.length > 0 && (
         <div className="no-drag fixed bottom-6 left-[calc(50%+114px)] z-30 flex -translate-x-1/2 items-center gap-1 rounded-full bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl animate-rise-in dark:bg-stone-800/95">
-          <button onClick={() => setSelected(new Set())} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label="Clear selection">
+          <button onClick={() => setSelected(new Set())} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label={t('Clear selection')}>
             <X className="size-4" />
           </button>
           <span className="px-2 text-[13px] font-semibold text-white">{plural(ids.length, 'face')}</span>
@@ -580,18 +559,17 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
             }}
             className="inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-white/90 hover:bg-white/15"
           >
-            <UserX className="size-4" /> Not {name}
+            <UserX className="size-4" />{' '}{t('Not')}{' '}{name}
           </button>
           <button onClick={() => setMoving(true)} className="inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-white/90 hover:bg-white/15">
-            <ArrowRightLeft className="size-4" /> Move to…
-          </button>
+            <ArrowRightLeft className="size-4" />{' '}{t('Move to…')}</button>
         </div>
       )}
       {moving && (
         <MergePicker
           exclude={props.person.id}
-          title="Move faces to…"
-          subtitle="Pick who they are, or start a new person."
+          title={t('Move faces to…')}
+          subtitle={t('Pick who they are, or start a new person.')}
           allowNew
           onClose={() => setMoving(false)}
           onNew={() => {
@@ -607,10 +585,10 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
       )}
       {naming && (
         <PromptDialog
-          title="New person"
-          label="Name (optional)"
-          placeholder="Name"
-          confirm="Create"
+          title={t('New person')}
+          label={t('Name (optional)')}
+          placeholder={t('Name')}
+          confirm={t('Create')}
           onClose={() => setNaming(false)}
           onSubmit={async (value) => {
             setNaming(false)
@@ -646,10 +624,10 @@ function MergePicker(props: {
       <div className="flex max-h-[75vh] w-[560px] flex-col rounded-2xl bg-white shadow-2xl dark:bg-stone-900" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-3 border-b border-stone-100 px-5 py-4 dark:border-stone-800">
           <div className="flex-1">
-            <div className="text-[15px] font-semibold">{props.title ?? 'Merge with…'}</div>
-            <div className="text-xs text-stone-500 dark:text-stone-400">{props.subtitle ?? 'Pick the same person. Their photos become one person.'}</div>
+            <div className="text-[15px] font-semibold">{props.title ?? t('Merge with…')}</div>
+            <div className="text-xs text-stone-500 dark:text-stone-400">{props.subtitle ?? t('Pick the same person. Their photos become one person.')}</div>
           </div>
-          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="Close">
+          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label={t('Close')}>
             <X className="size-4" />
           </button>
         </div>
@@ -658,7 +636,7 @@ function MergePicker(props: {
             autoFocus
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter by name"
+            placeholder={t('Filter by name')}
             className="h-9 w-full rounded-lg bg-stone-100 px-3 text-[13px] outline-none ring-accent-500 focus:ring-2 dark:bg-stone-800"
           />
         </div>
@@ -668,7 +646,7 @@ function MergePicker(props: {
               <div className="grid size-[84px] place-items-center rounded-full border-2 border-dashed border-stone-300 text-stone-400 transition group-hover:border-accent-500 group-hover:text-accent-500 dark:border-stone-700">
                 <UserPlus className="size-7" />
               </div>
-              <div className="w-full truncate text-[12.5px] font-medium">New person</div>
+              <div className="w-full truncate text-[12.5px] font-medium">{t('New person')}</div>
             </button>
           )}
           {shown.map((p) => (
@@ -676,11 +654,11 @@ function MergePicker(props: {
               <div className="rounded-full ring-accent-500 transition group-hover:ring-2">
                 <Face person={p} size={84} />
               </div>
-              <div className="w-full truncate text-[12.5px] font-medium">{p.name ?? <span className="text-stone-400">Unnamed</span>}</div>
+              <div className="w-full truncate text-[12.5px] font-medium">{p.name ?? <span className="text-stone-400">{t('Unnamed')}</span>}</div>
               <div className="-mt-1 text-[11px] text-stone-500">{plural(p.photos, 'photo')}</div>
             </button>
           ))}
-          {people && shown.length === 0 && <div className="col-span-4 py-6 text-center text-[13px] text-stone-500">Nobody else matches.</div>}
+          {people && shown.length === 0 && <div className="col-span-4 py-6 text-center text-[13px] text-stone-500">{t('Nobody else matches.')}</div>}
         </div>
       </div>
     </div>

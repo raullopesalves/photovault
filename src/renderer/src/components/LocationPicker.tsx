@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { feature } from 'topojson-client'
 import type { GeometryCollection, Topology } from 'topojson-specification'
 import { Layers, MapPin, X } from 'lucide-react'
+import { t } from '../lib/i18n'
 
 /**
  * Pick a place on a map (click to drop the pin, or type coordinates). Offline country outlines by default;
@@ -96,7 +97,7 @@ export function LocationPicker(props: {
         <div className="flex items-center gap-3 border-b border-stone-100 px-5 py-3.5 dark:border-stone-800">
           <MapPin className="size-4 text-stone-400" />
           <div className="flex-1 text-[15px] font-semibold">{props.title}</div>
-          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="Close">
+          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label={t('Close')}>
             <X className="size-4" />
           </button>
         </div>
@@ -107,9 +108,9 @@ export function LocationPicker(props: {
             className={`absolute left-14 top-3 z-[500] inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium shadow-md ${
               detailed ? 'bg-accent-500 text-white' : 'bg-white text-stone-700 dark:bg-stone-800 dark:text-stone-200'
             }`}
-            title={detailed ? 'OpenStreetMap (the visible area is requested from tile.openstreetmap.org)' : 'Offline map — click for streets and towns'}
+            title={detailed ? t('OpenStreetMap (the visible area is requested from tile.openstreetmap.org)') : t('Offline map — click for streets and towns')}
           >
-            <Layers className="size-3.5" /> {detailed ? 'Detailed map' : 'Offline map'}
+            <Layers className="size-3.5" /> {detailed ? t('Detailed map') : t('Offline map')}
           </button>
         </div>
         <div className="flex items-center gap-2 border-t border-stone-100 px-5 py-3 dark:border-stone-800">
@@ -117,30 +118,22 @@ export function LocationPicker(props: {
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && parsed && place(parsed.lat, parsed.lon, true)}
-            placeholder="Click the map, or type latitude, longitude"
+            placeholder={t('Click the map, or type latitude, longitude')}
             className="h-9 w-72 rounded-lg bg-stone-100 px-3 text-[13px] outline-none ring-accent-500 focus:ring-2 dark:bg-stone-800"
           />
           {parsed && (!pos || parsed.lat !== pos.lat || parsed.lon !== pos.lon) && (
-            <button onClick={() => place(parsed.lat, parsed.lon, true)} className="h-9 rounded-lg px-3 text-[12.5px] font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">
-              Go
-            </button>
+            <button onClick={() => place(parsed.lat, parsed.lon, true)} className="h-9 rounded-lg px-3 text-[12.5px] font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">{t('Go')}</button>
           )}
           <div className="flex-1" />
           {props.onRemove && (
-            <button onClick={props.onRemove} className="h-9 rounded-lg px-3 text-[13px] font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
-              Remove location
-            </button>
+            <button onClick={props.onRemove} className="h-9 rounded-lg px-3 text-[13px] font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">{t('Remove location')}</button>
           )}
-          <button onClick={props.onClose} className="h-9 rounded-lg px-4 text-[13px] font-medium hover:bg-stone-100 dark:hover:bg-stone-800">
-            Cancel
-          </button>
+          <button onClick={props.onClose} className="h-9 rounded-lg px-4 text-[13px] font-medium hover:bg-stone-100 dark:hover:bg-stone-800">{t('Cancel')}</button>
           <button
             disabled={!pos}
             onClick={() => pos && props.onPick(pos)}
             className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900"
-          >
-            Save location
-          </button>
+          >{t('Save location')}</button>
         </div>
       </div>
     </div>

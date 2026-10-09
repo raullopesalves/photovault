@@ -3,41 +3,42 @@ import { Album, BrushCleaning, Map as MapIcon, Sparkles, Users, Copy, EyeOff, Fo
 import type { ImportProgress, LibraryInfo } from '@shared/types'
 import { etaLabel, n } from '../lib/format'
 import { ImportMenu, type ImportKind } from './ImportMenu'
+import { t } from '../lib/i18n'
 
 export type View = 'photos' | 'memories' | 'favorites' | 'albums' | 'people' | 'map' | 'cleanup' | 'imports' | 'duplicates' | 'hidden' | 'bin' | 'storage' | 'settings'
 
 const NAV: Array<{ id: View; label: string; icon: ReactNode; soon?: boolean }> = [
-  { id: 'photos', label: 'Photos', icon: <Images className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'memories', label: 'Memories', icon: <Sparkles className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'favorites', label: 'Favourites', icon: <Heart className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'albums', label: 'Albums', icon: <Album className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'people', label: 'People', icon: <Users className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'map', label: 'Map', icon: <MapIcon className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'cleanup', label: 'Cleanup', icon: <BrushCleaning className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'imports', label: 'Imports', icon: <FolderInput className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'duplicates', label: 'Duplicates', icon: <Copy className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'hidden', label: 'Hidden', icon: <EyeOff className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'bin', label: 'Bin', icon: <Trash2 className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'storage', label: 'Storage', icon: <HardDrive className="size-[18px]" strokeWidth={1.75} /> },
-  { id: 'settings', label: 'Settings', icon: <Settings className="size-[18px]" strokeWidth={1.75} /> }
+  { id: 'photos', label: t('Photos'), icon: <Images className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'memories', label: t('Memories'), icon: <Sparkles className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'favorites', label: t('Favourites'), icon: <Heart className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'albums', label: t('Albums'), icon: <Album className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'people', label: t('People'), icon: <Users className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'map', label: t('Map'), icon: <MapIcon className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'cleanup', label: t('Cleanup'), icon: <BrushCleaning className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'imports', label: t('Imports'), icon: <FolderInput className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'duplicates', label: t('Duplicates'), icon: <Copy className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'hidden', label: t('Hidden'), icon: <EyeOff className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'bin', label: t('Bin'), icon: <Trash2 className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'storage', label: t('Storage'), icon: <HardDrive className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'settings', label: t('Settings'), icon: <Settings className="size-[18px]" strokeWidth={1.75} /> }
 ]
 
 function progressText(p: ImportProgress): string {
   switch (p.phase) {
     case 'scanning':
-      return `Scanning… ${n(p.filesDiscovered)} files`
+      return t('Scanning… {filesDiscovered} files', { filesDiscovered: n(p.filesDiscovered) })
     case 'sidecars':
-      return 'Reading Google metadata…'
+      return t('Reading Google metadata…')
     case 'analyzing':
-      return `Checking ${n(p.analyzed)} of ${n(p.analyzeTotal)}`
+      return t('Checking {analyzed} of {analyzeTotal}', { analyzed: n(p.analyzed), analyzeTotal: n(p.analyzeTotal) })
     case 'classifying':
-      return 'Checking duplicates…'
+      return t('Checking duplicates…')
     case 'ready':
-      return 'Import ready to review'
+      return t('Import ready to review')
     case 'importing':
-      return `Importing ${n(p.committed)} of ${n(p.commitTotal)}`
+      return t('Importing {committed} of {commitTotal}', { committed: n(p.committed), commitTotal: n(p.commitTotal) })
     case 'linking':
-      return 'Recording sources…'
+      return t('Recording sources…')
     default:
       return ''
   }
@@ -64,8 +65,8 @@ export function Sidebar(props: {
     <aside className="drag flex w-[228px] shrink-0 flex-col border-r border-stone-200/70 bg-stone-100/70 dark:border-stone-800/70 dark:bg-stone-900/60">
       <div className="h-11 shrink-0" />
       <div className="px-5 pb-6 pt-1">
-        <div className="font-[family-name:var(--font-display)] text-[19px] font-semibold tracking-tight">Photo Vault</div>
-        <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{n(props.library.assetCount)} items</div>
+        <div className="font-[family-name:var(--font-display)] text-[19px] font-semibold tracking-tight">{t('Photo Vault')}</div>
+        <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{n(props.library.assetCount)}{' '}{t('items')}</div>
       </div>
 
       <nav className="no-drag flex flex-col gap-0.5 px-3">
@@ -83,11 +84,11 @@ export function Sidebar(props: {
             >
               <span className={active ? 'text-accent-600 dark:text-accent-400' : ''}>{item.icon}</span>
               <span className="flex-1">{item.label}</span>
-              {item.soon && <span className="text-[10px] uppercase tracking-wider text-stone-400 dark:text-stone-500">Soon</span>}
+              {item.soon && <span className="text-[10px] uppercase tracking-wider text-stone-400 dark:text-stone-500">{t('Soon')}</span>}
               {item.id === 'hidden' && props.library.hiddenCount > 0 && <span className="text-[11px] tabular-nums text-stone-400">{n(props.library.hiddenCount)}</span>}
               {item.id === 'bin' && props.library.binCount > 0 && <span className="text-[11px] tabular-nums text-stone-400">{n(props.library.binCount)}</span>}
               {item.id === 'storage' && props.library.unprotectedCount > 0 && props.library.assetCount > 0 && (
-                <span className="size-2 rounded-full bg-amber-500" title={`${n(props.library.unprotectedCount)} items have no backup copy`} />
+                <span className="size-2 rounded-full bg-amber-500" title={t('{unprotectedCount} items have no backup copy', { unprotectedCount: n(props.library.unprotectedCount) })} />
               )}
             </button>
           )
@@ -108,7 +109,7 @@ export function Sidebar(props: {
               ) : (
                 <LoaderCircle className="size-3.5 animate-spin text-accent-500" />
               )}
-              {progress.phase === 'ready' ? 'Review import' : 'Importing'}
+              {progress.phase === 'ready' ? t('Review import') : t('Importing')}
             </div>
             <div className="mt-1 truncate text-xs text-stone-500 dark:text-stone-400">{progressText(progress)}</div>
             {(progress.phase === 'analyzing' || progress.phase === 'importing') && progress.etaSeconds !== null && (
@@ -125,9 +126,7 @@ export function Sidebar(props: {
             onImport={props.onImport}
             className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-stone-900 text-[13.5px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
           >
-            <Plus className="size-4" strokeWidth={2.25} />
-            Import photos
-          </ImportMenu>
+            <Plus className="size-4" strokeWidth={2.25} />{t('Import photos')}</ImportMenu>
         )}
       </div>
     </aside>

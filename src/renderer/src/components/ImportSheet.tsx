@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Check, ChevronDown, CircleAlert, Copy, FileQuestion, FolderInput, LoaderCircle, ShieldCheck, X } from 'lucide-react'
 import type { ImportItemInfo, ImportProgress, ImportSummary, ItemClassification } from '@shared/types'
 import { api, basename, bytes, clockLabel, etaLabel, n, plural, rateLabel, sourcesLabel, sourceTypeLabel } from '../lib/format'
+import { t } from '../lib/i18n'
 
 const WORKING = new Set(['scanning', 'sidecars', 'analyzing', 'classifying', 'importing', 'linking'])
 
@@ -21,8 +22,8 @@ export function ImportSheet(props: {
         <button
           onClick={working || p?.phase === 'ready' ? props.onHide : props.onClose}
           className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
-          aria-label={working ? 'Hide' : 'Close'}
-          title={working ? 'Continue in background' : 'Close'}
+          aria-label={working ? t('Hide') : t('Close')}
+          title={working ? t('Continue in background') : t('Close')}
         >
           <X className="size-4" />
         </button>
@@ -39,9 +40,9 @@ export function ImportSheet(props: {
         ) : p.phase === 'completed' && p.summary ? (
           <Completed s={p.summary} onShowPhotos={props.onShowPhotos} onClose={props.onClose} />
         ) : p.phase === 'cancelled' ? (
-          <Message icon={<X className="size-5" />} title="Import cancelled" body="Nothing more will be copied. Anything already imported stays safely in your library." onClose={props.onClose} />
+          <Message icon={<X className="size-5" />} title={t('Import cancelled')} body={t('Nothing more will be copied. Anything already imported stays safely in your library.')} onClose={props.onClose} />
         ) : (
-          <ErrorState title="Import stopped" message={p.error ?? 'The import failed.'} onClose={props.onClose} />
+          <ErrorState title={t('Import stopped')} message={p.error ?? t('The import failed.')} onClose={props.onClose} />
         )}
       </div>
     </div>
@@ -120,30 +121,30 @@ function Analyzing({ p }: { p: ImportProgress }) {
     <div className="pb-8">
       <Header
         icon={<FolderInput className="size-5" />}
-        title={p.phase === 'scanning' ? 'Scanning…' : 'Analysing…'}
+        title={p.phase === 'scanning' ? t('Scanning…') : t('Analysing…')}
         subtitle={p.archivesFound > 0 ? `${p.sourcePath} · ${plural(p.archivesFound, 'ZIP archive')}` : p.sourcePath}
       />
       <div className="mt-6 grid grid-cols-4 gap-4 px-8">
-        <Stat label="files found" value={p.filesDiscovered} />
-        <Stat label="photos" value={p.photosFound} />
-        <Stat label="videos" value={p.videosFound} />
-        <Stat label="other files" value={p.ignoredFound + p.sidecarsFound} muted />
+        <Stat label={t('files found')} value={p.filesDiscovered} />
+        <Stat label={t('photos')} value={p.photosFound} />
+        <Stat label={t('videos')} value={p.videosFound} />
+        <Stat label={t('other files')} value={p.ignoredFound + p.sidecarsFound} muted />
       </div>
       <div className="mx-8 mt-7 space-y-3 rounded-xl bg-stone-50 p-4 dark:bg-stone-800/50">
-        <Step state={st(0)} label={p.archivesFound > 0 ? 'Finding photos and videos (inside ZIPs too)' : 'Finding photos and videos'} detail={at === 0 ? n(p.filesDiscovered) : undefined} />
+        <Step state={st(0)} label={p.archivesFound > 0 ? t('Finding photos and videos (inside ZIPs too)') : t('Finding photos and videos')} detail={at === 0 ? n(p.filesDiscovered) : undefined} />
         {jsonSidecars > 0 && (
-          <Step state={st(1)} label="Reading export metadata (Google Takeout JSON)" detail={at === 1 ? `${n(p.sidecarsRead)} / ${n(jsonSidecars)}` : undefined} />
+          <Step state={st(1)} label={t('Reading export metadata (Google Takeout JSON)')} detail={at === 1 ? `${n(p.sidecarsRead)} / ${n(jsonSidecars)}` : undefined} />
         )}
         <Step
           state={st(2)}
-          label="Reading metadata and fingerprinting (SHA-256)"
+          label={t('Reading metadata and fingerprinting (SHA-256)')}
           detail={at === 2 ? `${n(p.analyzed)} / ${n(p.analyzeTotal)}` : undefined}
         />
-        <Step state={st(3)} label="Checking for duplicates" />
+        <Step state={st(3)} label={t('Checking for duplicates')} />
       </div>
       {p.phase === 'scanning' && (
         <div className="mx-8 mt-5 flex justify-between text-xs text-stone-500 dark:text-stone-400">
-          <span>Counting files — the time estimate starts once the total is known</span>
+          <span>{t('Counting files — the time estimate starts once the total is known')}</span>
           <span className="tabular-nums">{clockLabel(p.elapsedSeconds)}</span>
         </div>
       )}
@@ -156,20 +157,17 @@ function Analyzing({ p }: { p: ImportProgress }) {
             <span className="shrink-0 tabular-nums">{bytes(p.bytesProcessed)}</span>
           </div>
           {p.hashesReused > 0 && (
-            <div className="mt-1 text-xs text-stone-500 dark:text-stone-400">{plural(p.hashesReused, 'unchanged file')} recognised from earlier imports</div>
+            <div className="mt-1 text-xs text-stone-500 dark:text-stone-400">{plural(p.hashesReused, 'unchanged file')}{' '}{t('recognised from earlier imports')}</div>
           )}
         </div>
       )}
       <p className="mx-8 mt-6 flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
-        <ShieldCheck className="size-3.5" /> Read-only: nothing is copied until you confirm.
-      </p>
+        <ShieldCheck className="size-3.5" />{' '}{t('Read-only: nothing is copied until you confirm.')}</p>
       <div className="mx-8 mt-5 flex justify-end">
         <button
           onClick={() => void api.cancelImport(p.importId)}
           className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
-        >
-          Cancel
-        </button>
+        >{t('Cancel')}</button>
       </div>
     </div>
   )
@@ -188,7 +186,7 @@ function Ready({ p, s }: { p: ImportProgress; s: ImportSummary }) {
         <Header
           icon={nothingNew ? <Check className="size-5" strokeWidth={2.5} /> : <FolderInput className="size-5" />}
           tone={nothingNew ? 'success' : 'default'}
-          title={nothingNew ? (mediaFound === 0 ? 'No photos found' : 'Already in your library') : 'Import ready'}
+          title={nothingNew ? (mediaFound === 0 ? t('No photos found') : t('Already in your library')) : t('Import ready')}
           subtitle={s.sources.length > 1 ? sourcesLabel(s.sources) : s.sourcePath}
           badge={s.sourceType !== 'LOCAL_FOLDER' ? sourceTypeLabel(s.sourceType) : undefined}
         />
@@ -196,21 +194,21 @@ function Ready({ p, s }: { p: ImportProgress; s: ImportSummary }) {
           <SummaryRow
             strong
             value={s.newAssets}
-            label={s.newAssets === 1 ? 'new item' : 'new items'}
+            label={s.newAssets === 1 ? t('new item') : t('new items')}
             detail={
               s.newAssets > 0
                 ? [s.newPhotos > 0 && plural(s.newPhotos, 'photo'), s.newVideos > 0 && plural(s.newVideos, 'video'), bytes(s.bytesNew)].filter(Boolean).join(' · ')
-                : 'Nothing new to copy'
+                : t('Nothing new to copy')
             }
           />
           <SummaryRow
             value={duplicates}
-            label={duplicates === 1 ? 'exact duplicate' : 'exact duplicates'}
+            label={duplicates === 1 ? t('exact duplicate') : t('exact duplicates')}
             detail={
               duplicates > 0
                 ? [
-                    s.duplicatesLibrary > 0 && `${n(s.duplicatesLibrary)} already in library`,
-                    s.duplicatesBatch > 0 && `${n(s.duplicatesBatch)} repeated within this import`
+                    s.duplicatesLibrary > 0 && t('{duplicatesLibrary} already in library', { duplicatesLibrary: n(s.duplicatesLibrary) }),
+                    s.duplicatesBatch > 0 && t('{duplicatesBatch} repeated within this import', { duplicatesBatch: n(s.duplicatesBatch) })
                   ]
                     .filter(Boolean)
                     .join(' · ')
@@ -221,57 +219,46 @@ function Ready({ p, s }: { p: ImportProgress; s: ImportSummary }) {
           {s.deletedBefore > 0 && (
             <SummaryRow
               value={s.deletedBefore}
-              label={s.deletedBefore === 1 ? 'deleted before' : 'deleted before'}
+              label={s.deletedBefore === 1 ? t('deleted before') : t('deleted before')}
               detail="You deleted these from the library earlier — not imported again (can be allowed in Settings)"
               icon={<X className="size-3.5" />}
             />
           )}
-          {problems > 0 && <SummaryRow value={problems} label="not imported" detail="Unreadable, unsafe or not a recognised photo/video" icon={<FileQuestion className="size-3.5" />} />}
+          {problems > 0 && <SummaryRow value={problems} label={t('not imported')} detail="Unreadable, unsafe or not a recognised photo/video" icon={<FileQuestion className="size-3.5" />} />}
         </div>
 
         {s.takeoutItems > 0 && (
           <div className="mx-8 mt-4 rounded-xl bg-accent-50/70 px-4 py-3 text-[12.5px] leading-relaxed text-stone-700 dark:bg-accent-500/10 dark:text-stone-300">
-            <span className="font-medium">Google metadata found for {n(s.sidecarsMatched)} of {n(mediaFound)} items.</span> Dates, locations, descriptions and
-            favourites from Takeout fill in what the files themselves don’t record; a camera’s own EXIF date always takes precedence. Album folders are
-            remembered.
-          </div>
+            <span className="font-medium">{t('Google metadata found for')}{' '}{n(s.sidecarsMatched)}{' '}{t('of')}{' '}{n(mediaFound)}{' '}{t('items.')}</span>{' '}{t('Dates, locations, descriptions and favourites from Takeout fill in what the files themselves don’t record; a camera’s own EXIF date always takes precedence. Album folders are remembered.')}</div>
         )}
 
         {duplicates > 0 && (
-          <div className="mx-8 mt-4 rounded-xl bg-stone-50 px-4 py-3 text-[12.5px] leading-relaxed text-stone-600 dark:bg-stone-800/50 dark:text-stone-400">
-            Duplicates are byte-for-byte identical to a photo you already have (same SHA-256 fingerprint), whatever their file name. They won’t be copied
-            again — Photo Vault just records where else they were found.
-            {s.bytesDuplicate > 0 && <span className="font-medium text-stone-800 dark:text-stone-200"> Storage saved: {bytes(s.bytesDuplicate)}.</span>}
+          <div className="mx-8 mt-4 rounded-xl bg-stone-50 px-4 py-3 text-[12.5px] leading-relaxed text-stone-600 dark:bg-stone-800/50 dark:text-stone-400">{t('Duplicates are byte-for-byte identical to a photo you already have (same SHA-256 fingerprint), whatever their file name. They won’t be copied again — Photo Vault just records where else they were found.')}{s.bytesDuplicate > 0 && <span className="font-medium text-stone-800 dark:text-stone-200">{' '}{t('Storage saved:')}{' '}{bytes(s.bytesDuplicate)}.</span>}
           </div>
         )}
 
         <div className="mx-8 mt-4 space-y-1">
-          {duplicates > 0 && <ItemList importId={p.importId} classification="duplicate_library" title="Already in library" count={s.duplicatesLibrary} />}
-          {s.duplicatesBatch > 0 && <ItemList importId={p.importId} classification="duplicate_batch" title="Repeated within this import" count={s.duplicatesBatch} />}
-          {s.deletedBefore > 0 && <ItemList importId={p.importId} classification="deleted_before" title="Deleted before" count={s.deletedBefore} />}
-          {s.unsupported > 0 && <ItemList importId={p.importId} classification="unsupported" title="Not recognised" count={s.unsupported} />}
-          {s.errors > 0 && <ItemList importId={p.importId} classification="error" title="Could not be read" count={s.errors} />}
+          {duplicates > 0 && <ItemList importId={p.importId} classification="duplicate_library" title={t('Already in library')} count={s.duplicatesLibrary} />}
+          {s.duplicatesBatch > 0 && <ItemList importId={p.importId} classification="duplicate_batch" title={t('Repeated within this import')} count={s.duplicatesBatch} />}
+          {s.deletedBefore > 0 && <ItemList importId={p.importId} classification="deleted_before" title={t('Deleted before')} count={s.deletedBefore} />}
+          {s.unsupported > 0 && <ItemList importId={p.importId} classification="unsupported" title={t('Not recognised')} count={s.unsupported} />}
+          {s.errors > 0 && <ItemList importId={p.importId} classification="error" title={t('Could not be read')} count={s.errors} />}
         </div>
 
         <div className="mx-8 mt-4 text-xs text-stone-500 dark:text-stone-400">
-          {n(s.filesScanned)} files scanned{s.archivesFound > 0 && ` in ${plural(s.archivesFound, 'ZIP archive')}`} ·{' '}
-          {n(s.ignoredFound + s.sidecarsFound)} non-media files
-          {s.hashesReused > 0 && ` · ${n(s.hashesReused)} unchanged since an earlier import`}
+          {n(s.filesScanned)}{' '}{t('files scanned')}{s.archivesFound > 0 && t(' in {archivesFound}', { archivesFound: plural(s.archivesFound, 'ZIP archive') })} ·{' '}
+          {n(s.ignoredFound + s.sidecarsFound)}{' '}{t('non-media files')}{s.hashesReused > 0 && t(' · {hashesReused} unchanged since an earlier import', { hashesReused: n(s.hashesReused) })}
         </div>
       </div>
 
       <div className="mt-2 flex items-center justify-between gap-3 border-t border-stone-100 px-8 py-5 dark:border-stone-800">
         <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
-          <ShieldCheck className="size-3.5 shrink-0" />
-          Files are copied and verified. Your sources stay untouched.
-        </div>
+          <ShieldCheck className="size-3.5 shrink-0" />{t('Files are copied and verified. Your sources stay untouched.')}</div>
         <div className="flex shrink-0 gap-2">
           <button
             onClick={() => void api.cancelImport(p.importId)}
             className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
-          >
-            Cancel
-          </button>
+          >{t('Cancel')}</button>
           <button
             data-testid="import-confirm"
             disabled={busy || mediaFound === 0}
@@ -281,7 +268,7 @@ function Ready({ p, s }: { p: ImportProgress; s: ImportSummary }) {
             }}
             className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] disabled:opacity-40 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
           >
-            {nothingNew ? 'Record sources & finish' : `Import ${plural(s.newAssets, 'new item')}`}
+            {nothingNew ? t('Record sources & finish') : t('Import {newAssets}', { newAssets: plural(s.newAssets, 'new item') })}
           </button>
         </div>
       </div>
@@ -342,7 +329,7 @@ export function ItemList(props: {
               </div>
               <div className="truncate text-stone-500 dark:text-stone-400">
                 {it.classification === 'duplicate_library' || it.classification === 'duplicate_batch'
-                  ? `Identical to ${it.matchRelativePath ?? it.matchFilename ?? 'another file in this import'}`
+                  ? t('Identical to {v0}', { v0: it.matchRelativePath ?? it.matchFilename ?? t('another file in this import') })
                   : it.error ?? it.outcome ?? ''}
                 {it.sha256 && (it.classification === 'duplicate_library' || it.classification === 'duplicate_batch') && (
                   <span className="font-mono text-[11px] text-stone-400"> · {it.sha256.slice(0, 12)}…</span>
@@ -350,7 +337,7 @@ export function ItemList(props: {
               </div>
             </div>
           ))}
-          {items && !props.onlyFailed && items.length < props.count && <div className="text-xs text-stone-400">…and {n(props.count - items.length)} more (see Imports)</div>}
+          {items && !props.onlyFailed && items.length < props.count && <div className="text-xs text-stone-400">{t('…and')}{' '}{n(props.count - items.length)}{' '}{t('more (see Imports)')}</div>}
         </div>
       )}
     </div>
@@ -362,7 +349,7 @@ function EtaLine({ p }: { p: ImportProgress }) {
     <div className="mx-8 mt-5 flex justify-between gap-4 text-xs text-stone-500 dark:text-stone-400">
       <span className="font-medium text-stone-700 dark:text-stone-300">{etaLabel(p.etaSeconds)}</span>
       <span className="shrink-0 tabular-nums">
-        {[rateLabel(p.rate, p.rateUnit), `${clockLabel(p.elapsedSeconds)} elapsed`].filter(Boolean).join(' · ')}
+        {[rateLabel(p.rate, p.rateUnit), t('{v0} elapsed', { v0: clockLabel(p.elapsedSeconds) })].filter(Boolean).join(' · ')}
       </span>
     </div>
   )
@@ -372,38 +359,33 @@ function Importing({ p }: { p: ImportProgress }) {
   const linking = p.phase === 'linking'
   return (
     <div className="pb-8">
-      <Header icon={<LoaderCircle className="size-5 animate-spin" />} title={linking ? 'Recording sources…' : 'Importing…'} subtitle={p.sourcePath} />
+      <Header icon={<LoaderCircle className="size-5 animate-spin" />} title={linking ? t('Recording sources…') : t('Importing…')} subtitle={p.sourcePath} />
       <div className="mx-8 mt-7">
         <div className="mb-2 flex items-baseline justify-between">
           <span className="font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums tracking-tight">
-            {n(p.committed)} <span className="text-base font-normal text-stone-400">of {n(p.commitTotal)}</span>
+            {n(p.committed)} <span className="text-base font-normal text-stone-400">{t('of')}{' '}{n(p.commitTotal)}</span>
           </span>
-          <span className="text-xs tabular-nums text-stone-500">{clockLabel(p.elapsedSeconds)} elapsed</span>
+          <span className="text-xs tabular-nums text-stone-500">{clockLabel(p.elapsedSeconds)}{' '}{t('elapsed')}</span>
         </div>
         <Bar value={linking ? 1 : p.bytesTotal > 0 ? p.bytesProcessed : p.committed} total={linking ? 1 : p.bytesTotal > 0 ? p.bytesTotal : p.commitTotal} />
         {!linking && (
           <div className="mt-2 flex justify-between gap-4 text-xs text-stone-500 dark:text-stone-400">
             <span className="font-medium text-stone-700 dark:text-stone-300">{etaLabel(p.etaSeconds)}</span>
             <span className="shrink-0 tabular-nums">
-              {[rateLabel(p.rate, p.rateUnit), p.bytesTotal > 0 && `${bytes(p.bytesProcessed)} of ${bytes(p.bytesTotal)}`].filter(Boolean).join(' · ')}
+              {[rateLabel(p.rate, p.rateUnit), p.bytesTotal > 0 && t('{v0} of {v1}', { v0: bytes(p.bytesProcessed), v1: bytes(p.bytesTotal) })].filter(Boolean).join(' · ')}
             </span>
           </div>
         )}
         <div className="mt-2 truncate text-xs text-stone-500 dark:text-stone-400">
-          {linking ? 'Remembering where duplicates were found' : p.currentFile ? `Copying and verifying ${basename(p.currentFile)}` : ''}
+          {linking ? t('Remembering where duplicates were found') : p.currentFile ? t('Copying and verifying {v0}', { v0: basename(p.currentFile) }) : ''}
         </div>
       </div>
-      <p className="mx-8 mt-6 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
-        Each file is copied, re-fingerprinted and only then added to the library. You can hide this window and keep browsing; thumbnails appear as they are
-        ready.
-      </p>
+      <p className="mx-8 mt-6 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Each file is copied, re-fingerprinted and only then added to the library. You can hide this window and keep browsing; thumbnails appear as they are ready.')}</p>
       <div className="mx-8 mt-5 flex justify-end">
         <button
           onClick={() => void api.cancelImport(p.importId)}
           className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
-        >
-          Stop
-        </button>
+        >{t('Stop')}</button>
       </div>
     </div>
   )
@@ -417,34 +399,29 @@ function Completed(props: { s: ImportSummary; onShowPhotos: () => void; onClose:
       <Header
         icon={<Check className="size-5" strokeWidth={2.5} />}
         tone={s.filesFailed > 0 ? 'warn' : 'success'}
-        title={s.assetsCreated > 0 ? `${plural(s.assetsCreated, 'item')} imported` : 'Nothing new to import'}
+        title={s.assetsCreated > 0 ? t('{assetsCreated} imported', { assetsCreated: plural(s.assetsCreated, 'item') }) : t('Nothing new to import')}
         subtitle={s.sourcePath}
       />
       <div className="mt-6 grid grid-cols-3 gap-4 px-8">
-        <Stat label="added to library" value={s.assetsCreated} />
-        <Stat label="exact duplicates" value={duplicates} />
-        <Stat label="not imported" value={s.unsupported + s.errors + s.filesFailed} muted />
+        <Stat label={t('added to library')} value={s.assetsCreated} />
+        <Stat label={t('exact duplicates')} value={duplicates} />
+        <Stat label={t('not imported')} value={s.unsupported + s.errors + s.filesFailed} muted />
       </div>
       {duplicates > 0 && (
         <p className="mx-8 mt-6 text-[12.5px] leading-relaxed text-stone-600 dark:text-stone-400">
-          {plural(duplicates, 'file')} matched photos already in your library byte-for-byte. Their locations were recorded; no extra copies were made.
-        </p>
+          {plural(duplicates, 'file')}{' '}{t('matched photos already in your library byte-for-byte. Their locations were recorded; no extra copies were made.')}</p>
       )}
       {s.filesFailed > 0 && (
         <div className="mx-8 mt-4 space-y-1">
-          <ItemList importId={s.importId} classification="new" title="Failed to copy" count={s.filesFailed} onlyFailed />
+          <ItemList importId={s.importId} classification="new" title={t('Failed to copy')} count={s.filesFailed} onlyFailed />
         </div>
       )}
       <div className="mx-8 mt-7 flex justify-end gap-2">
-        <button onClick={props.onClose} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">
-          Close
-        </button>
+        <button onClick={props.onClose} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">{t('Close')}</button>
         <button
           onClick={props.onShowPhotos}
           className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
-        >
-          View photos
-        </button>
+        >{t('View photos')}</button>
       </div>
     </div>
   )
@@ -456,14 +433,12 @@ function Message(props: { icon: ReactNode; title: string; body: string; onClose:
       <Header icon={props.icon} title={props.title} tone="warn" />
       <p className="mx-8 mt-3 text-[13.5px] leading-relaxed text-stone-600 dark:text-stone-400">{props.body}</p>
       <div className="mx-8 mt-7 flex justify-end">
-        <button onClick={props.onClose} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">
-          OK
-        </button>
+        <button onClick={props.onClose} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">{t('OK')}</button>
       </div>
     </div>
   )
 }
 
 function ErrorState(props: { title?: string; message: string; onClose: () => void }) {
-  return <Message icon={<CircleAlert className="size-5" />} title={props.title ?? 'Import couldn’t start'} body={props.message} onClose={props.onClose} />
+  return <Message icon={<CircleAlert className="size-5" />} title={props.title ?? t('Import couldn’t start')} body={props.message} onClose={props.onClose} />
 }

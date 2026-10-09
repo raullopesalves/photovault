@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Pause, Play, X } from 'lucide-react'
 import type { AssetSummary } from '@shared/types'
 import { mediaUrl } from '../lib/format'
+import { t } from '../lib/i18n'
 
 const SPEEDS = [3, 5, 8]
 
@@ -109,13 +110,13 @@ export function Slideshow(props: {
         )
       )}
       <div className={`absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/70 to-transparent pb-8 pt-16 text-white transition-opacity ${controls ? 'opacity-100' : 'opacity-0'}`}>
-        <button onClick={prev} className="grid size-11 place-items-center rounded-full hover:bg-white/10" aria-label="Previous">
+        <button onClick={prev} className="grid size-11 place-items-center rounded-full hover:bg-white/10" aria-label={t('Previous')}>
           <ChevronLeft className="size-6" />
         </button>
-        <button onClick={() => setPlaying((p) => !p)} className="grid size-12 place-items-center rounded-full bg-white/15 hover:bg-white/25" aria-label={playing ? 'Pause' : 'Play'}>
+        <button onClick={() => setPlaying((p) => !p)} className="grid size-12 place-items-center rounded-full bg-white/15 hover:bg-white/25" aria-label={playing ? t('Pause') : t('Play')}>
           {playing ? <Pause className="size-5" /> : <Play className="size-5 fill-current" />}
         </button>
-        <button onClick={next} className="grid size-11 place-items-center rounded-full hover:bg-white/10" aria-label="Next">
+        <button onClick={next} className="grid size-11 place-items-center rounded-full hover:bg-white/10" aria-label={t('Next')}>
           <ChevronRight className="size-6" />
         </button>
         <div className="ml-4 flex items-center gap-1 rounded-full bg-white/10 p-1 text-[12px]">
@@ -143,7 +144,7 @@ export function Slideshow(props: {
       <button
         onClick={props.onClose}
         className={`absolute right-5 top-5 grid size-10 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/60 ${controls ? 'opacity-100' : 'opacity-0'}`}
-        aria-label="Close slideshow"
+        aria-label={t('Close slideshow')}
       >
         <X className="size-5" />
       </button>

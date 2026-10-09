@@ -2,6 +2,7 @@ import { memo, useEffect, useState, type MouseEvent } from 'react'
 import { Check, EyeOff, Heart, ImageOff, Play, Repeat } from 'lucide-react'
 import type { AssetSummary } from '@shared/types'
 import { api, duration, mediaUrl, mimeLabel } from '../lib/format'
+import { t } from '../lib/i18n'
 
 export const Tile = memo(function Tile(props: {
   asset: AssetSummary | undefined
@@ -68,7 +69,7 @@ export const Tile = memo(function Tile(props: {
       </div>
       {!selected && <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 to-transparent to-40% opacity-0 transition-opacity group-hover:opacity-100" />}
       <button
-        aria-label={selected ? 'Deselect' : 'Select'}
+        aria-label={selected ? t('Deselect') : t('Select')}
         onClick={(e) => {
           e.stopPropagation()
           props.onToggle(e.shiftKey)
@@ -88,18 +89,16 @@ export const Tile = memo(function Tile(props: {
         </div>
       )}
       {asset.liveVideoId !== null && (
-        <div className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/45 px-1.5 py-0.5 text-[9.5px] font-bold tracking-wider text-white backdrop-blur-sm">
-          LIVE
-        </div>
+        <div className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/45 px-1.5 py-0.5 text-[9.5px] font-bold tracking-wider text-white backdrop-blur-sm">{t('LIVE')}</div>
       )}
       {asset.hidden && (
-        <div className="pointer-events-none absolute bottom-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-black/45 text-white backdrop-blur-sm" title="Hidden from Photos">
+        <div className="pointer-events-none absolute bottom-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-black/45 text-white backdrop-blur-sm" title={t('Hidden from Photos')}>
           <EyeOff className="size-3" />
         </div>
       )}
       <button
-        aria-label={favorite ? 'Remove from favourites' : 'Add to favourites'}
-        title={favorite ? 'Remove from favourites' : 'Add to favourites'}
+        aria-label={favorite ? t('Remove from favourites') : t('Add to favourites')}
+        title={favorite ? t('Remove from favourites') : t('Add to favourites')}
         onClick={(e) => {
           e.stopPropagation()
           const next = !favorite

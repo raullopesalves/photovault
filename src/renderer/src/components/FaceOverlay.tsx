@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEven
 import { Check, UserPlus, UserX, X } from 'lucide-react'
 import type { AssetFace, Person, PhotoEdits } from '@shared/types'
 import { api } from '../lib/format'
+import { t } from '../lib/i18n'
 
 type Box = { x: number; y: number; w: number; h: number }
 
@@ -117,7 +118,7 @@ export function FaceOverlay(props: {
           props.onAdded()
           if (f) setOpen(f.id)
         } catch (err) {
-          props.onMessage(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : 'Could not add the face')
+          props.onMessage(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : t('Could not add the face'))
         }
       }}
     >
@@ -132,10 +133,10 @@ export function FaceOverlay(props: {
                 setOpen(open === f.id ? null : f.id)
               }}
               className={`pointer-events-auto absolute inset-0 rounded-md border-2 transition ${open === f.id ? 'border-accent-400' : 'border-white/80 hover:border-white'} shadow-[0_0_0_1px_rgba(0,0,0,0.35)]`}
-              aria-label={f.personName ?? 'Unnamed face'}
+              aria-label={f.personName ?? t('Unnamed face')}
             />
             <div className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/70 px-2 py-0.5 text-[11.5px] text-white">
-              {f.personName ?? (f.personId ? 'Unnamed' : 'Who is this?')}
+              {f.personName ?? (f.personId ? t('Unnamed') : t('Who is this?'))}
             </div>
             {open === f.id && (
               <FacePopover
@@ -189,13 +190,13 @@ function FacePopover(props: { face: AssetFace; onClose: () => void; onDone: (msg
             if (e.key === 'Enter' && text.trim()) {
               if (exact) await api.moveFaces([props.face.id], { personId: exact.id })
               else await api.moveFaces([props.face.id], { newName: text.trim() })
-              props.onDone(`Tagged as ${text.trim()}`)
+              props.onDone(t('Tagged as {v0}', { v0: text.trim() }))
             }
           }}
-          placeholder={props.face.personName ? `Not ${props.face.personName}? Type a name` : 'Who is this? Type a name'}
+          placeholder={props.face.personName ? t('Not {personName}? Type a name', { personName: props.face.personName }) : t('Who is this? Type a name')}
           className="h-8 min-w-0 flex-1 rounded-md bg-white/10 px-2 text-[12.5px] outline-none placeholder:text-stone-500 focus:ring-1 focus:ring-accent-400"
         />
-        <button onClick={props.onClose} className="grid size-7 place-items-center rounded-md hover:bg-white/10" aria-label="Close">
+        <button onClick={props.onClose} className="grid size-7 place-items-center rounded-md hover:bg-white/10" aria-label={t('Close')}>
           <X className="size-3.5" />
         </button>
       </div>
@@ -205,7 +206,7 @@ function FacePopover(props: { face: AssetFace; onClose: () => void; onDone: (msg
             key={p.id}
             onClick={async () => {
               await api.moveFaces([props.face.id], { personId: p.id })
-              props.onDone(`Tagged as ${p.name}`)
+              props.onDone(t('Tagged as {name}', { name: p.name }))
             }}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] hover:bg-white/10"
           >
@@ -217,11 +218,11 @@ function FacePopover(props: { face: AssetFace; onClose: () => void; onDone: (msg
           <button
             onClick={async () => {
               await api.moveFaces([props.face.id], { newName: text.trim() })
-              props.onDone(`New person: ${text.trim()}`)
+              props.onDone(t('New person: {v0}', { v0: text.trim() }))
             }}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] text-accent-300 hover:bg-white/10"
           >
-            <UserPlus className="size-4" /> New person “{text.trim()}”
+            <UserPlus className="size-4" />{' '}{t('New person “')}{text.trim()}”
           </button>
         )}
       </div>
@@ -230,26 +231,24 @@ function FacePopover(props: { face: AssetFace; onClose: () => void; onDone: (msg
           <button
             onClick={async () => {
               await api.moveFaces([props.face.id], null)
-              props.onDone(props.face.personName ? `Not ${props.face.personName}` : 'Removed from that person')
+              props.onDone(props.face.personName ? t('Not {personName}', { personName: props.face.personName }) : t('Removed from that person'))
             }}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] hover:bg-white/10"
           >
-            <UserX className="size-4 text-stone-400" /> {props.face.personName ? `Not ${props.face.personName}` : 'Not this person'}
+            <UserX className="size-4 text-stone-400" /> {props.face.personName ? t('Not {personName}', { personName: props.face.personName }) : t('Not this person')}
           </button>
         )}
         <button
           onClick={async () => {
             await api.deleteFace(props.face.id)
-            props.onDone('Removed')
+            props.onDone(t('Removed'))
           }}
           className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] hover:bg-white/10"
         >
-          <X className="size-4 text-stone-400" /> Not a face
-        </button>
+          <X className="size-4 text-stone-400" />{' '}{t('Not a face')}</button>
         {props.face.manual && (
           <div className="flex items-center gap-1.5 px-2 pt-1 text-[11px] text-stone-500">
-            <Check className="size-3" /> Marked by you
-          </div>
+            <Check className="size-3" />{' '}{t('Marked by you')}</div>
         )}
       </div>
     </div>

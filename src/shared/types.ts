@@ -671,8 +671,11 @@ export interface BackupProgress {
 
 export type ThemePreference = 'system' | 'light' | 'dark'
 
+export type Language = 'en' | 'pt'
+
 export interface Settings {
   theme: ThemePreference
+  language: Language
 }
 
 export type LibraryChangeReason = 'import' | 'thumbnails' | 'favorite' | 'opened' | 'albums'

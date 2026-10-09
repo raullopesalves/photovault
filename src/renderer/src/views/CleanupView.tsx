@@ -6,6 +6,7 @@ import { isClutterOrigin, kindIcon, kindLabel, originIcon, originLabel } from '.
 import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog } from '../components/Dialog'
 import { NoMatches } from './PhotosView'
+import { t } from '../lib/i18n'
 
 interface Group {
   key: string
@@ -30,9 +31,9 @@ export function CleanupView(props: { version: number }) {
   const origins = facets?.origins ?? []
   // "Probably received or saved" is shown per size clue rather than as one huge group.
   const HINTS: Record<string, { title: string; note: string }> = {
-    whatsapp_size: { title: 'Probably WhatsApp', note: 'No camera data, in WhatsApp’s sizes (1600 px photos, 848×480 / 640×352 videos)' },
-    social_size: { title: 'Probably social media', note: 'No camera data and 2048 px — Facebook, Messenger and X size' },
-    none: { title: 'Probably received or saved', note: 'No camera data or recording date, other sizes' }
+    whatsapp_size: { title: t('Probably WhatsApp'), note: t('No camera data, in WhatsApp’s sizes (1600 px photos, 848×480 / 640×352 videos)') },
+    social_size: { title: t('Probably social media'), note: t('No camera data and 2048 px — Facebook, Messenger and X size') },
+    none: { title: t('Probably received or saved'), note: t('No camera data or recording date, other sizes') }
   }
   const probable: Group[] = (facets?.receivedHints ?? []).map((h) => ({
     key: `r:${h.hint}`,
@@ -62,7 +63,7 @@ export function CleanupView(props: { version: number }) {
       query: { kind: k.kind },
       count: k.count,
       hidden: k.hidden ?? 0,
-      note: k.kind === 'loop' ? 'Short videos without sound — how WhatsApp and Telegram save GIFs' : undefined
+      note: k.kind === 'loop' ? t('Short videos without sound — how WhatsApp and Telegram save GIFs') : undefined
     }))
   const yours: Group[] = origins
     .filter((o) => !isClutterOrigin(o.origin))
@@ -73,41 +74,37 @@ export function CleanupView(props: { version: number }) {
       query: { origin: o.origin },
       count: o.count,
       hidden: o.hidden ?? 0,
-      note: o.origin === 'unknown' ? 'No camera data or recognisable app pattern' : undefined
+      note: o.origin === 'unknown' ? t('No camera data or recognisable app pattern') : undefined
     }))
 
   return (
     <div className="scroll-thin h-full overflow-y-auto">
       <div className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
-        <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">Cleanup</h1>
-        <div className="mt-0.5 max-w-2xl text-xs leading-relaxed text-stone-500 dark:text-stone-400">
-          Media from chat apps, screenshots and downloads, grouped so you can review it in bulk. Hiding only removes items from the Photos timeline —
-          nothing is deleted, and hidden items stay searchable here.
-        </div>
+        <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Cleanup')}</h1>
+        <div className="mt-0.5 max-w-2xl text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Media from chat apps, screenshots and downloads, grouped so you can review it in bulk. Hiding only removes items from the Photos timeline — nothing is deleted, and hidden items stay searchable here.')}</div>
       </div>
       <div className="space-y-8 px-7 pb-12 pt-2">
         {facets && facets.unclassified > 0 && (
           <div className="flex items-center gap-2 rounded-xl bg-accent-50 px-4 py-3 text-[13px] text-accent-600 dark:bg-accent-500/10 dark:text-accent-400">
-            <LoaderCircle className="size-4 animate-spin" /> Labelling {plural(facets.unclassified, 'item')}… groups update as it goes.
-          </div>
+            <LoaderCircle className="size-4 animate-spin" />{' '}{t('Labelling')}{' '}{plural(facets.unclassified, 'item')}{t('… groups update as it goes.')}</div>
         )}
-        <Section title="Likely clutter" groups={[...clutter, ...kinds]} onOpen={setOpen} empty="No chat-app media, screenshots or downloads found." />
+        <Section title={t('Likely clutter')} groups={[...clutter, ...kinds]} onOpen={setOpen} empty={t('No chat-app media, screenshots or downloads found.')} />
         {probable.length > 0 && (
           <Section
-            title="Probably clutter — no camera data"
-            subtitle="These carry no camera information at all, which your own phone photos keep. Inferred, not certain: review before hiding."
+            title={t('Probably clutter — no camera data')}
+            subtitle={t('These carry no camera information at all, which your own phone photos keep. Inferred, not certain: review before hiding.')}
             groups={probable}
             onOpen={setOpen}
           />
         )}
         {facets && facets.hidden > 0 && (
           <Section
-            title="Hidden from Photos"
-            groups={[{ key: 'hidden', title: 'Hidden', icon: <EyeOff className="size-4" />, query: { hidden: 'only' }, count: facets.hidden, hidden: facets.hidden }]}
+            title={t('Hidden from Photos')}
+            groups={[{ key: 'hidden', title: t('Hidden'), icon: <EyeOff className="size-4" />, query: { hidden: 'only' }, count: facets.hidden, hidden: facets.hidden }]}
             onOpen={setOpen}
           />
         )}
-        <Section title="Your own photos" groups={yours} onOpen={setOpen} />
+        <Section title={t('Your own photos')} groups={yours} onOpen={setOpen} />
       </div>
     </div>
   )
@@ -157,7 +154,7 @@ function GroupCard(props: { group: Group; onOpen: () => void }) {
           <span className="ml-auto text-[13px] font-semibold tabular-nums">{n(g.count)}</span>
         </div>
         <div className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-          {g.note ?? (g.hidden > 0 && g.key !== 'hidden' ? `${n(g.hidden)} hidden from Photos` : g.key === 'hidden' ? 'Not shown in the Photos timeline' : 'All visible in Photos')}
+          {g.note ?? (g.hidden > 0 && g.key !== 'hidden' ? t('{hidden} hidden from Photos', { hidden: n(g.hidden) }) : g.key === 'hidden' ? t('Not shown in the Photos timeline') : t('All visible in Photos'))}
         </div>
       </div>
     </button>
@@ -187,25 +184,23 @@ function GroupDetail(props: { group: Group; version: number; onBack: () => void 
             <button
               onClick={props.onBack}
               className="no-drag grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-200/70 hover:text-stone-900 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-              aria-label="Back to Cleanup"
+              aria-label={t('Back to Cleanup')}
             >
               <ArrowLeft className="size-4" />
             </button>
             {g.title}
           </span>
         }
-        subtitle={counts ? `${n(counts.hidden)} of ${n(counts.total)} hidden from Photos${g.note ? ` · ${g.note}` : ''}` : g.note}
+        subtitle={counts ? t('{hidden} of {total} hidden from Photos{v2}', { hidden: n(counts.hidden), total: n(counts.total), v2: g.note ? ` · ${g.note}` : '' }) : g.note}
         actions={
           <>
             {counts && counts.hidden > 0 && (
               <button onClick={() => setConfirm('show')} className={`${btn} bg-stone-200/70 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700`}>
-                <Eye className="size-3.5" /> Show all
-              </button>
+                <Eye className="size-3.5" />{' '}{t('Show all')}</button>
             )}
             {counts && counts.total > 0 && (
               <button onClick={() => setConfirm('bin')} className={`${btn} bg-stone-200/70 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700`}>
-                <Trash2 className="size-3.5" /> Move all to Bin
-              </button>
+                <Trash2 className="size-3.5" />{' '}{t('Move all to Bin')}</button>
             )}
             {g.key !== 'hidden' && (
               <button
@@ -213,18 +208,17 @@ function GroupDetail(props: { group: Group; version: number; onBack: () => void 
                 onClick={() => setConfirm('hide')}
                 className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900`}
               >
-                <EyeOff className="size-3.5" /> Hide all from Photos
-              </button>
+                <EyeOff className="size-3.5" />{' '}{t('Hide all from Photos')}</button>
             )}
           </>
         }
-        empty={<NoMatches title="Nothing here" body="This group is empty." />}
+        empty={<NoMatches title={t('Nothing here')} body={t('This group is empty.')} />}
       />
       {confirm === 'bin' && counts && (
         <ConfirmDialog
-          title={`Move ${plural(counts.total, 'item')} to the Bin?`}
-          body="They leave every view and wait in the Bin, where you can restore them or delete them permanently. Nothing is deleted yet."
-          confirm="Move to Bin"
+          title={t('Move {total} to the Bin?', { total: plural(counts.total, 'item') })}
+          body={t('They leave every view and wait in the Bin, where you can restore them or delete them permanently. Nothing is deleted yet.')}
+          confirm={t('Move to Bin')}
           onClose={() => setConfirm(null)}
           onConfirm={async () => {
             setConfirm(null)
@@ -234,13 +228,13 @@ function GroupDetail(props: { group: Group; version: number; onBack: () => void 
       )}
       {confirm && confirm !== 'bin' && counts && (
         <ConfirmDialog
-          title={confirm === 'hide' ? `Hide ${plural(visible, 'item')} from Photos?` : `Show ${plural(counts.hidden, 'item')} in Photos again?`}
+          title={confirm === 'hide' ? t('Hide {visible} from Photos?', { visible: plural(visible, 'item') }) : t('Show {hidden} in Photos again?', { hidden: plural(counts.hidden, 'item') })}
           body={
             confirm === 'hide'
-              ? 'They disappear from the Photos timeline but stay in your library, in albums, in search and here in Cleanup. Nothing is deleted, and you can show them again at any time.'
-              : 'They will appear in the Photos timeline again.'
+              ? t('They disappear from the Photos timeline but stay in your library, in albums, in search and here in Cleanup. Nothing is deleted, and you can show them again at any time.')
+              : t('They will appear in the Photos timeline again.')
           }
-          confirm={confirm === 'hide' ? 'Hide from Photos' : 'Show in Photos'}
+          confirm={confirm === 'hide' ? t('Hide from Photos') : t('Show in Photos')}
           onClose={() => setConfirm(null)}
           onConfirm={async () => {
             const hide = confirm === 'hide'

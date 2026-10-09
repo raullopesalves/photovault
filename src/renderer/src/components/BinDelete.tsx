@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { LoaderCircle, Trash2 } from 'lucide-react'
 import type { BinDeleteProgress, BinDeleteResult } from '@shared/types'
 import { api, bytes, n, plural } from '../lib/format'
+import { t } from '../lib/i18n'
 
 /**
  * Confirmation → progress → result for permanently deleting items from the Bin.
@@ -33,51 +34,46 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
         </div>
         {phase === 'confirm' && (
           <>
-            <h2 className="text-[17px] font-semibold">Delete {plural(props.count, 'item')} permanently?</h2>
+            <h2 className="text-[17px] font-semibold">{t('Delete')}{' '}{plural(props.count, 'item')}{' '}{t('permanently?')}</h2>
             <div className="mt-2 space-y-2 text-[13.5px] leading-relaxed text-stone-600 dark:text-stone-400">
               <p>
-                {props.count === 1 ? 'Its file is' : 'Their files are'} removed from your Photo Vault library folder{props.sizeBytes ? ` (${bytes(props.sizeBytes)})` : ''}, along
-                with albums, labels and history. If the same files are imported again later, they are skipped.
-              </p>
-              <p>The folders and ZIP files you originally imported from are not touched.</p>
+                {props.count === 1 ? t('Its file is') : t('Their files are')}{' '}{t('removed from your Photo Vault library folder')}{props.sizeBytes ? ` (${bytes(props.sizeBytes)})` : ''}{t(', along with albums, labels and history. If the same files are imported again later, they are skipped.')}</p>
+              <p>{t('The folders and ZIP files you originally imported from are not touched.')}</p>
             </div>
             <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg bg-stone-50 p-3 text-[13px] dark:bg-stone-800/60">
               <input type="checkbox" checked={skipRecycleBin} onChange={(e) => setSkip(e.target.checked)} className="mt-0.5 size-4 accent-red-600" />
               <span>
-                <span className="font-medium">Skip the Windows Recycle Bin</span>
+                <span className="font-medium">{t('Skip the Windows Recycle Bin')}</span>
                 <span className="block text-xs text-stone-500 dark:text-stone-400">
-                  {skipRecycleBin ? 'Space is freed immediately. This cannot be undone.' : 'Off: files go to the Recycle Bin first, so you can still recover them until you empty it.'}
+                  {skipRecycleBin ? t('Space is freed immediately. This cannot be undone.') : t('Off: files go to the Recycle Bin first, so you can still recover them until you empty it.')}
                 </span>
               </span>
             </label>
             <div className="mt-6 flex justify-end gap-2">
-              <button onClick={() => props.onClose(false)} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">
-                Cancel
-              </button>
-              <button onClick={run} className="h-9 rounded-lg bg-red-600 px-4 text-[13.5px] font-medium text-white hover:bg-red-700">
-                Delete {plural(props.count, 'item')}
+              <button onClick={() => props.onClose(false)} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">{t('Cancel')}</button>
+              <button onClick={run} className="h-9 rounded-lg bg-red-600 px-4 text-[13.5px] font-medium text-white hover:bg-red-700">{t('Delete')}{' '}{plural(props.count, 'item')}
               </button>
             </div>
           </>
         )}
         {phase === 'running' && (
           <>
-            <h2 className="text-[17px] font-semibold">Deleting…</h2>
+            <h2 className="text-[17px] font-semibold">{t('Deleting…')}</h2>
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
               <div className="h-full rounded-full bg-red-500 transition-[width] duration-300" style={{ width: `${progress ? (progress.done / Math.max(1, progress.total)) * 100 : 0}%` }} />
             </div>
             <div className="mt-2 text-xs tabular-nums text-stone-500 dark:text-stone-400">
-              {progress ? `${n(progress.done)} of ${n(progress.total)} · ${bytes(progress.bytes)}` : 'Starting…'}
-              {!skipRecycleBin && ' · moving files to the Recycle Bin'}
+              {progress ? t('{done} of {total} · {v2}', { done: n(progress.done), total: n(progress.total), v2: bytes(progress.bytes) }) : t('Starting…')}
+              {!skipRecycleBin && t(' · moving files to the Recycle Bin')}
             </div>
           </>
         )}
         {phase === 'done' && result && (
           <>
-            <h2 className="text-[17px] font-semibold">{result.failed === 0 ? `${plural(result.deleted, 'item')} deleted` : `${n(result.deleted)} deleted, ${n(result.failed)} failed`}</h2>
+            <h2 className="text-[17px] font-semibold">{result.failed === 0 ? t('{deleted} deleted', { deleted: plural(result.deleted, 'item') }) : t('{deleted} deleted, {failed} failed', { deleted: n(result.deleted), failed: n(result.failed) })}</h2>
             <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600 dark:text-stone-400">
-              {result.deleted > 0 && (skipRecycleBin ? `${bytes(result.bytes)} freed.` : `${bytes(result.bytes)} moved to the Windows Recycle Bin — empty it there to free the space.`)}
-              {result.failed > 0 && ' Items that could not be deleted are still in the Bin.'}
+              {result.deleted > 0 && (skipRecycleBin ? t('{v0} freed.', { v0: bytes(result.bytes) }) : t('{v0} moved to the Windows Recycle Bin — empty it there to free the space.', { v0: bytes(result.bytes) }))}
+              {result.failed > 0 && t(' Items that could not be deleted are still in the Bin.')}
             </p>
             {result.errors.length > 0 && (
               <ul className="scroll-thin mt-3 max-h-32 overflow-y-auto rounded-lg bg-red-50 p-3 text-xs text-red-800 dark:bg-red-500/10 dark:text-red-300">
@@ -87,9 +83,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
               </ul>
             )}
             <div className="mt-6 flex justify-end">
-              <button onClick={() => props.onClose(true)} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">
-                Done
-              </button>
+              <button onClick={() => props.onClose(true)} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">{t('Done')}</button>
             </div>
           </>
         )}

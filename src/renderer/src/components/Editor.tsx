@@ -2,33 +2,34 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { Crop, FlipHorizontal2, LoaderCircle, RotateCcw, RotateCw, SlidersHorizontal, Sparkles, Undo2, X } from 'lucide-react'
 import type { PhotoEdits } from '@shared/types'
 import { api } from '../lib/format'
+import { t } from '../lib/i18n'
 
 type Tab = 'crop' | 'adjust' | 'filters'
 type Box = NonNullable<PhotoEdits['crop']>
 const FULL: Box = { x: 0, y: 0, w: 1, h: 1 }
 
 const FILTER_LIST: Array<{ id: PhotoEdits['filter'] | undefined; label: string }> = [
-  { id: undefined, label: 'None' },
-  { id: 'vivid', label: 'Vivid' },
-  { id: 'warm', label: 'Warm' },
-  { id: 'cool', label: 'Cool' },
-  { id: 'fade', label: 'Fade' },
-  { id: 'bw', label: 'B&W' },
-  { id: 'sepia', label: 'Sepia' }
+  { id: undefined, label: t('None') },
+  { id: 'vivid', label: t('Vivid') },
+  { id: 'warm', label: t('Warm') },
+  { id: 'cool', label: t('Cool') },
+  { id: 'fade', label: t('Fade') },
+  { id: 'bw', label: t('B&W') },
+  { id: 'sepia', label: t('Sepia') }
 ]
 const ASPECTS: Array<{ label: string; ratio: number | 'original' | null }> = [
-  { label: 'Free', ratio: null },
-  { label: 'Original', ratio: 'original' },
-  { label: 'Square', ratio: 1 },
+  { label: t('Free'), ratio: null },
+  { label: t('Original'), ratio: 'original' },
+  { label: t('Square'), ratio: 1 },
   { label: '4:5', ratio: 4 / 5 },
   { label: '3:2', ratio: 3 / 2 },
   { label: '16:9', ratio: 16 / 9 }
 ]
 const SLIDERS: Array<{ key: 'light' | 'contrast' | 'color' | 'warmth'; label: string }> = [
-  { key: 'light', label: 'Light' },
-  { key: 'contrast', label: 'Contrast' },
-  { key: 'color', label: 'Colour' },
-  { key: 'warmth', label: 'Warmth' }
+  { key: 'light', label: t('Light') },
+  { key: 'contrast', label: t('Contrast') },
+  { key: 'color', label: t('Colour') },
+  { key: 'warmth', label: t('Warmth') }
 ]
 
 /**
@@ -138,33 +139,33 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
 
       <aside className="flex w-80 shrink-0 flex-col border-l border-white/10 bg-stone-900">
         <div className="flex items-center justify-between px-5 pb-2 pt-5">
-          <div className="text-[15px] font-semibold">Edit</div>
-          <button onClick={() => props.onClose(false)} className="grid size-8 place-items-center rounded-full hover:bg-white/10" aria-label="Cancel">
+          <div className="text-[15px] font-semibold">{t('Edit')}</div>
+          <button onClick={() => props.onClose(false)} className="grid size-8 place-items-center rounded-full hover:bg-white/10" aria-label={t('Cancel')}>
             <X className="size-4" />
           </button>
         </div>
         <div className="flex gap-1 px-4">
-          {tabBtn('crop', 'Crop & rotate', <Crop className="size-4" />)}
-          {tabBtn('adjust', 'Adjust', <SlidersHorizontal className="size-4" />)}
-          {tabBtn('filters', 'Filters', <Sparkles className="size-4" />)}
+          {tabBtn('crop', t('Crop & rotate'), <Crop className="size-4" />)}
+          {tabBtn('adjust', t('Adjust'), <SlidersHorizontal className="size-4" />)}
+          {tabBtn('filters', t('Filters'), <Sparkles className="size-4" />)}
         </div>
 
         <div className="scroll-thin flex-1 overflow-y-auto px-5 py-5">
           {tab === 'crop' && (
             <div className="space-y-5">
               <div className="flex gap-2">
-                <ToolBtn onClick={() => rotate(-90)} label="Rotate left">
+                <ToolBtn onClick={() => rotate(-90)} label={t('Rotate left')}>
                   <RotateCcw className="size-4" />
                 </ToolBtn>
-                <ToolBtn onClick={() => rotate(90)} label="Rotate right">
+                <ToolBtn onClick={() => rotate(90)} label={t('Rotate right')}>
                   <RotateCw className="size-4" />
                 </ToolBtn>
-                <ToolBtn onClick={() => set({ flip: !edits.flip })} label="Flip" active={!!edits.flip}>
+                <ToolBtn onClick={() => set({ flip: !edits.flip })} label={t('Flip')} active={!!edits.flip}>
                   <FlipHorizontal2 className="size-4" />
                 </ToolBtn>
               </div>
               <div>
-                <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">Aspect ratio</div>
+                <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">{t('Aspect ratio')}</div>
                 <div className="flex flex-wrap gap-1.5">
                   {ASPECTS.map((a) => (
                     <button
@@ -181,11 +182,9 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
                   ))}
                 </div>
               </div>
-              <div className="text-xs leading-relaxed text-stone-500">Drag the corners or the frame. The parts outside are only hidden; the original stays complete.</div>
+              <div className="text-xs leading-relaxed text-stone-500">{t('Drag the corners or the frame. The parts outside are only hidden; the original stays complete.')}</div>
               {edits.crop && (
-                <button onClick={() => set({ crop: undefined })} className="text-[12.5px] font-medium text-accent-400 hover:text-accent-300">
-                  Reset crop
-                </button>
+                <button onClick={() => set({ crop: undefined })} className="text-[12.5px] font-medium text-accent-400 hover:text-accent-300">{t('Reset crop')}</button>
               )}
             </div>
           )}
@@ -208,7 +207,7 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
                   />
                 </label>
               ))}
-              <div className="text-xs text-stone-500">Double-click a slider to reset it.</div>
+              <div className="text-xs text-stone-500">{t('Double-click a slider to reset it.')}</div>
             </div>
           )}
           {tab === 'filters' && (
@@ -236,22 +235,19 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
               onClick={() => void save({ rotation: 0, edits: null })}
               className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-[12.5px] font-medium text-stone-300 hover:bg-white/10 disabled:opacity-50"
             >
-              <Undo2 className="size-3.5" /> Revert to original
-            </button>
+              <Undo2 className="size-3.5" />{' '}{t('Revert to original')}</button>
           )}
           <div className="flex gap-2">
-            <button onClick={() => props.onClose(false)} className="h-10 flex-1 rounded-lg bg-white/10 text-[13px] font-medium hover:bg-white/15">
-              Cancel
-            </button>
+            <button onClick={() => props.onClose(false)} className="h-10 flex-1 rounded-lg bg-white/10 text-[13px] font-medium hover:bg-white/15">{t('Cancel')}</button>
             <button
               disabled={!changed || busy}
               onClick={() => void save({ rotation, edits: clean(edits) })}
               className="h-10 flex-1 rounded-lg bg-white text-[13px] font-semibold text-stone-900 hover:bg-stone-200 disabled:opacity-40"
             >
-              {busy ? 'Saving…' : 'Save'}
+              {busy ? t('Saving…') : t('Save')}
             </button>
           </div>
-          <div className="text-center text-[11px] text-stone-500">Your original file is never changed.</div>
+          <div className="text-center text-[11px] text-stone-500">{t('Your original file is never changed.')}</div>
         </div>
       </aside>
     </div>

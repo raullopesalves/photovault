@@ -18,6 +18,7 @@ import { MemoriesView } from './views/MemoriesView'
 import { FavoritesView } from './views/FavoritesView'
 import { CleanupView } from './views/CleanupView'
 import { BinView, HiddenView } from './views/HiddenBinViews'
+import { t } from './lib/i18n'
 
 function applyThemeClass(theme: ThemePreference): void {
   const dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -217,8 +218,8 @@ export default function App() {
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-stone-950/40 backdrop-blur-sm animate-fade-in">
           <div className="flex flex-col items-center gap-3 rounded-3xl border-2 border-dashed border-white/60 px-16 py-12 text-white">
             <FolderInput className="size-10" strokeWidth={1.5} />
-            <div className="text-lg font-medium">Drop folders or ZIP archives to import</div>
-            <div className="text-sm text-white/70">Originals are copied — your folder is never changed</div>
+            <div className="text-lg font-medium">{t('Drop folders or ZIP archives to import')}</div>
+            <div className="text-sm text-white/70">{t('Originals are copied — your folder is never changed')}</div>
           </div>
         </div>
       )}

@@ -6,8 +6,9 @@ import type { GeometryCollection, Topology } from 'topojson-specification'
 import { Layers, MapPin, X } from 'lucide-react'
 import type { AssetQuery, MapCluster } from '@shared/types'
 import { AssetGrid } from '../components/AssetGrid'
-import { api, mediaUrl, n } from '../lib/format'
+import { api, mediaUrl, n, plural } from '../lib/format'
 import { NoMatches } from './PhotosView'
+import { t } from '../lib/i18n'
 
 type Box = [number, number, number, number]
 
@@ -139,7 +140,7 @@ export function MapView(props: { version: number }) {
       const map = mapRef.current
       pins.current.clearLayers()
       for (const c of clusters) {
-        const m = L.marker([c.lat, c.lon], { icon: pinIcon(c), title: `${c.place ? `${c.place} · ` : ''}${c.count} item${c.count === 1 ? '' : 's'}` })
+        const m = L.marker([c.lat, c.lon], { icon: pinIcon(c), title: `${c.place ? `${c.place} · ` : ''}${plural(c.count, 'item')}` })
         m.on('click', () => {
           const [s, w, nn, e] = c.bounds
           const pad = 0.0005
@@ -165,23 +166,23 @@ export function MapView(props: { version: number }) {
             onClick={() => setDetailed((d) => !d)}
             title={
               detailed
-                ? 'Showing OpenStreetMap. Click to use the offline map (nothing is sent anywhere).'
-                : 'Offline map. Click to show streets and places from OpenStreetMap (the visible area is requested from tile.openstreetmap.org).'
+                ? t('Showing OpenStreetMap. Click to use the offline map (nothing is sent anywhere).')
+                : t('Offline map. Click to show streets and places from OpenStreetMap (the visible area is requested from tile.openstreetmap.org).')
             }
             className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium shadow-md transition ${
               detailed ? 'bg-accent-500 text-white' : 'bg-white text-stone-700 hover:bg-stone-50 dark:bg-stone-800 dark:text-stone-200'
             }`}
           >
             <Layers className="size-3.5" />
-            {detailed ? 'Detailed map' : 'Offline map'}
+            {detailed ? t('Detailed map') : t('Offline map')}
           </button>
         </div>
         {located === 0 && (
           <div className="pointer-events-none absolute inset-0 z-[500] grid place-items-center">
             <div className="rounded-2xl bg-white/95 px-6 py-5 text-center shadow-xl dark:bg-stone-900/95">
               <MapPin className="mx-auto mb-2 size-6 text-stone-400" />
-              <div className="text-[14px] font-medium">No photos with a location yet</div>
-              <div className="mt-1 max-w-xs text-xs text-stone-500 dark:text-stone-400">Photos taken with location on, and Google Takeout or iCloud exports, appear here.</div>
+              <div className="text-[14px] font-medium">{t('No photos with a location yet')}</div>
+              <div className="mt-1 max-w-xs text-xs text-stone-500 dark:text-stone-400">{t('Photos taken with location on, and Google Takeout or iCloud exports, appear here.')}</div>
             </div>
           </div>
         )}
@@ -192,19 +193,18 @@ export function MapView(props: { version: number }) {
             key={JSON.stringify(panelBox)}
             version={props.version}
             query={{ ...base, bbox: panelBox }}
-            title={selected ? (selectedPlace?.split(',')[0] ?? 'This place') : 'In view'}
-            subtitle={located !== null ? `${n(located)} items have a location` : undefined}
+            title={selected ? (selectedPlace?.split(',')[0] ?? t('This place')) : t('In view')}
+            subtitle={located !== null ? t('{located} items have a location', { located: n(located) }) : undefined}
             toolbar={
               selected ? (
                 <button
                   onClick={() => setSelected(null)}
                   className="-ml-2.5 inline-flex h-8 items-center gap-1 rounded-lg px-2.5 text-[12.5px] font-medium text-stone-600 hover:bg-stone-200/60 dark:text-stone-300 dark:hover:bg-stone-800"
                 >
-                  <X className="size-3.5" /> Back to everything in view
-                </button>
+                  <X className="size-3.5" />{' '}{t('Back to everything in view')}</button>
               ) : undefined
             }
-            empty={<NoMatches title="Nothing here" body="Move or zoom the map to see the photos taken in that area." />}
+            empty={<NoMatches title={t('Nothing here')} body={t('Move or zoom the map to see the photos taken in that area.')} />}
           />
         )}
       </div>

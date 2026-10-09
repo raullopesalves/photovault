@@ -6,6 +6,7 @@ import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog, PromptDialog } from '../components/Dialog'
 import { FilterBar } from '../components/FilterBar'
 import { NoMatches } from './PhotosView'
+import { t } from '../lib/i18n'
 
 export function AlbumsView(props: { version: number }) {
   const [albums, setAlbums] = useState<AlbumSummary[] | null>(null)
@@ -30,15 +31,14 @@ export function AlbumsView(props: { version: number }) {
     <div className="scroll-thin h-full overflow-y-auto">
       <div className="drag sticky top-0 z-10 flex items-end justify-between bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">Albums</h1>
-          <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">Albums only reference photos — removing or deleting never touches your files.</div>
+          <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Albums')}</h1>
+          <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{t('Albums only reference photos — removing or deleting never touches your files.')}</div>
         </div>
         <button
           onClick={() => setCreating(true)}
           className="no-drag inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:text-stone-900"
         >
-          <Plus className="size-4" /> New album
-        </button>
+          <Plus className="size-4" />{' '}{t('New album')}</button>
       </div>
 
       <div className="px-7 pb-12">
@@ -47,17 +47,14 @@ export function AlbumsView(props: { version: number }) {
             <div className="mx-auto mb-5 grid size-16 place-items-center rounded-3xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
               <Album className="size-7" strokeWidth={1.5} />
             </div>
-            <div className="text-[17px] font-semibold">No albums yet</div>
-            <p className="mt-2 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">
-              Select photos in the timeline and choose “Add to album”, or create an empty one. Albums from a Google Takeout appear here automatically.
-            </p>
+            <div className="text-[17px] font-semibold">{t('No albums yet')}</div>
+            <p className="mt-2 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{t('Select photos in the timeline and choose “Add to album”, or create an empty one. Albums from a Google Takeout appear here automatically.')}</p>
           </div>
         )}
         {smart.length > 0 && (
           <section className="mt-4">
             <h2 className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
-              <Wand2 className="size-3.5" /> Smart albums
-            </h2>
+              <Wand2 className="size-3.5" />{' '}{t('Smart albums')}</h2>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-6">
               {smart.map((a) => (
                 <button key={a.id} onClick={() => setOpenSmart(a.id)} className="group text-left outline-none">
@@ -74,21 +71,21 @@ export function AlbumsView(props: { version: number }) {
                     </span>
                   </div>
                   <div className="mt-2 truncate text-[13.5px] font-medium">{a.name}</div>
-                  <div className="text-xs text-stone-500 dark:text-stone-400">{plural(a.count, 'item')} · updates itself</div>
+                  <div className="text-xs text-stone-500 dark:text-stone-400">{plural(a.count, 'item')}{' '}{t('· updates itself')}</div>
                 </button>
               ))}
             </div>
           </section>
         )}
-        {user.length > 0 && <AlbumSection title="My albums" albums={user} onOpen={setOpenId} />}
-        {google.length > 0 && <AlbumSection title="From Google Photos" albums={google} onOpen={setOpenId} />}
+        {user.length > 0 && <AlbumSection title={t('My albums')} albums={user} onOpen={setOpenId} />}
+        {google.length > 0 && <AlbumSection title={t('From Google Photos')} albums={google} onOpen={setOpenId} />}
       </div>
 
       {creating && (
         <PromptDialog
-          title="New album"
-          placeholder="Album name"
-          confirm="Create"
+          title={t('New album')}
+          placeholder={t('Album name')}
+          confirm={t('Create')}
           onClose={() => setCreating(false)}
           onSubmit={async (name) => {
             setCreating(false)
@@ -114,31 +111,31 @@ function SmartAlbumPage(props: { album: SmartAlbum; version: number; onBack: () 
         query={props.album.query}
         title={
           <span className="flex items-center gap-2">
-            <button onClick={props.onBack} className={`no-drag ${iconBtn}`} aria-label="All albums">
+            <button onClick={props.onBack} className={`no-drag ${iconBtn}`} aria-label={t('All albums')}>
               <ArrowLeft className="size-4" />
             </button>
             {props.album.name}
-            <span className="rounded-full bg-accent-50 px-2 py-0.5 align-middle text-[11px] font-medium text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">Smart</span>
+            <span className="rounded-full bg-accent-50 px-2 py-0.5 align-middle text-[11px] font-medium text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">{t('Smart')}</span>
           </span>
         }
         subtitle={describeQuery(props.album.query)}
         actions={
           <>
-            <button onClick={() => setRenaming(true)} className={iconBtn} aria-label="Rename" title="Rename">
+            <button onClick={() => setRenaming(true)} className={iconBtn} aria-label={t('Rename')} title={t('Rename')}>
               <Pencil className="size-4" />
             </button>
-            <button onClick={() => setDeleting(true)} className={iconBtn} aria-label="Delete smart album" title="Delete smart album (photos stay)">
+            <button onClick={() => setDeleting(true)} className={iconBtn} aria-label={t('Delete smart album')} title={t('Delete smart album (photos stay)')}>
               <Trash2 className="size-4" />
             </button>
           </>
         }
-        empty={<NoMatches title="Nothing matches yet" body="Photos that match this search will appear here automatically." />}
+        empty={<NoMatches title={t('Nothing matches yet')} body={t('Photos that match this search will appear here automatically.')} />}
       />
       {renaming && (
         <PromptDialog
-          title="Rename smart album"
+          title={t('Rename smart album')}
           initial={props.album.name}
-          confirm="Rename"
+          confirm={t('Rename')}
           onClose={() => setRenaming(false)}
           onSubmit={async (name) => {
             setRenaming(false)
@@ -148,9 +145,9 @@ function SmartAlbumPage(props: { album: SmartAlbum; version: number; onBack: () 
       )}
       {deleting && (
         <ConfirmDialog
-          title={`Delete “${props.album.name}”?`}
-          body="Only the saved search is removed. No photos are touched."
-          confirm="Delete"
+          title={t('Delete “{name}”?', { name: props.album.name })}
+          body={t('Only the saved search is removed. No photos are touched.')}
+          confirm={t('Delete')}
           destructive
           onClose={() => setDeleting(false)}
           onConfirm={async () => {
@@ -169,12 +166,12 @@ function describeQuery(q: AssetQuery): string {
   if (q.text) parts.push(`“${q.text}”`)
   if (q.favorite) parts.push('favourites')
   if (q.types?.length) parts.push(q.types.join(' or '))
-  if (q.years?.length) parts.push(q.years.map((y) => (y === 0 ? 'no date' : String(y))).join(', '))
+  if (q.years?.length) parts.push(q.years.map((y) => (y === 0 ? t('no date') : String(y))).join(', '))
   if (q.cameras?.length) parts.push(q.cameras.map((c) => c.model).join(', '))
-  if (q.origins?.length) parts.push(`from ${q.origins.join(', ')}`)
-  if (q.personId) parts.push('a person')
-  if (q.tag) parts.push(`tag ${q.tag}`)
-  return parts.length ? `Everything matching ${parts.join(' · ')}` : 'All photos'
+  if (q.origins?.length) parts.push(t('from {v0}', { v0: q.origins.join(', ') }))
+  if (q.personId) parts.push(t('a person'))
+  if (q.tag) parts.push(t('tag {tag}', { tag: q.tag }))
+  return parts.length ? t('Everything matching {v0}', { v0: parts.join(' · ') }) : t('All photos')
 }
 
 function AlbumSection(props: { title: string; albums: AlbumSummary[]; onOpen: (id: number) => void }) {
@@ -226,20 +223,18 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
         albumId={props.id}
         title={
           <span className="flex items-center gap-2">
-            <button onClick={props.onBack} className={`no-drag ${iconBtn}`} aria-label="All albums">
+            <button onClick={props.onBack} className={`no-drag ${iconBtn}`} aria-label={t('All albums')}>
               <ArrowLeft className="size-4" />
             </button>
             {album.name}
             {album.kind === 'takeout' && (
-              <span className="rounded-full bg-accent-50 px-2 py-0.5 align-middle text-[11px] font-medium text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">
-                Google Photos
-              </span>
+              <span className="rounded-full bg-accent-50 px-2 py-0.5 align-middle text-[11px] font-medium text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">{t('Google Photos')}</span>
             )}
           </span>
         }
         subtitle={
           <button onClick={() => setDescribing(true)} className="no-drag text-left hover:text-stone-800 dark:hover:text-stone-200">
-            {album.description ?? 'Add a description'}
+            {album.description ?? t('Add a description')}
           </button>
         }
         actions={
@@ -251,16 +246,16 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
                   await api.exportOriginals(ids)
                 }}
                 className={iconBtn}
-                aria-label="Export album"
-                title="Export: copy this album's original files to a folder"
+                aria-label={t('Export album')}
+                title={t('Export: copy this album\'s original files to a folder')}
               >
                 <FolderOutput className="size-4" />
               </button>
             )}
-            <button onClick={() => setRenaming(true)} className={iconBtn} aria-label="Rename album" title="Rename">
+            <button onClick={() => setRenaming(true)} className={iconBtn} aria-label={t('Rename album')} title={t('Rename')}>
               <Pencil className="size-4" />
             </button>
-            <button onClick={() => setDeleting(true)} className={iconBtn} aria-label="Delete album" title="Delete album">
+            <button onClick={() => setDeleting(true)} className={iconBtn} aria-label={t('Delete album')} title={t('Delete album')}>
               <Trash2 className="size-4" />
             </button>
           </>
@@ -268,7 +263,7 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
         toolbar={album.count > 0 ? <FilterBar query={query} onChange={(q) => setQuery({ ...q, albumId: props.id })} version={props.version} /> : undefined}
         empty={
           album.count === 0 ? (
-            <NoMatches title="This album is empty" body="Select photos in the Photos view and choose “Add to album”." />
+            <NoMatches title={t('This album is empty')} body={t('Select photos in the Photos view and choose “Add to album”.')} />
           ) : (
             <NoMatches onClear={() => setQuery({ albumId: props.id })} />
           )
@@ -276,9 +271,9 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
       />
       {renaming && (
         <PromptDialog
-          title="Rename album"
+          title={t('Rename album')}
           initial={album.name}
-          confirm="Rename"
+          confirm={t('Rename')}
           onClose={() => setRenaming(false)}
           onSubmit={async (name) => {
             setRenaming(false)
@@ -288,10 +283,10 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
       )}
       {describing && (
         <PromptDialog
-          title="Album description"
+          title={t('Album description')}
           initial={album.description ?? ''}
-          placeholder="What is this album about?"
-          confirm="Save"
+          placeholder={t('What is this album about?')}
+          confirm={t('Save')}
           onClose={() => setDescribing(false)}
           onSubmit={async (description) => {
             setDescribing(false)
@@ -301,14 +296,12 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
       )}
       {deleting && (
         <ConfirmDialog
-          title={`Delete “${album.name}”?`}
+          title={t('Delete “{name}”?', { name: album.name })}
           body={
-            <>
-              The album is removed. The {plural(album.count, 'photo')} in it stay in your library and on disk — nothing is deleted.
-              {album.kind === 'takeout' && ' Re-importing the same Takeout will recreate it.'}
+            <>{t('The album is removed. The')}{' '}{plural(album.count, 'photo')}{' '}{t('in it stay in your library and on disk — nothing is deleted.')}{album.kind === 'takeout' && t(' Re-importing the same Takeout will recreate it.')}
             </>
           }
-          confirm="Delete album"
+          confirm={t('Delete album')}
           destructive
           onClose={() => setDeleting(false)}
           onConfirm={async () => {

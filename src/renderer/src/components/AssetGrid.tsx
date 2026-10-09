@@ -9,6 +9,7 @@ import { Slideshow } from './Slideshow'
 import { DateDialog, PromptDialog, ShareDialog } from './Dialog'
 import { LocationPicker } from './LocationPicker'
 import { BinDeleteDialog } from './BinDelete'
+import { t } from '../lib/i18n'
 
 const PAGE = 240
 const ZOOM_SIZES = [116, 168, 236, 320]
@@ -277,15 +278,14 @@ export function AssetGrid(props: {
                 <button
                   onClick={() => setSlideshow(selected.size ? Math.min(...selected.values()) : 0)}
                   className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium text-stone-600 transition hover:bg-stone-200/70 dark:text-stone-300 dark:hover:bg-stone-800"
-                  title="Slideshow"
+                  title={t('Slideshow')}
                 >
-                  <Play className="size-3.5 fill-current" /> Slideshow
-                </button>
+                  <Play className="size-3.5 fill-current" />{' '}{t('Slideshow')}</button>
               )}
               {groups !== null && total > 0 && <span className="text-xs tabular-nums text-stone-500 dark:text-stone-400">{plural(total, 'item')}</span>}
               <div className="flex items-center rounded-lg bg-stone-200/60 p-0.5 dark:bg-stone-800/80">
                 <button
-                  aria-label="Smaller thumbnails"
+                  aria-label={t('Smaller thumbnails')}
                   disabled={zoom === 0}
                   onClick={() => setZoom((z) => Math.max(0, z - 1))}
                   className="grid size-7 place-items-center rounded-md text-stone-600 transition hover:bg-white disabled:opacity-30 dark:text-stone-300 dark:hover:bg-stone-700"
@@ -293,7 +293,7 @@ export function AssetGrid(props: {
                   <Minus className="size-3.5" />
                 </button>
                 <button
-                  aria-label="Larger thumbnails"
+                  aria-label={t('Larger thumbnails')}
                   disabled={zoom === ZOOM_SIZES.length - 1}
                   onClick={() => setZoom((z) => Math.min(ZOOM_SIZES.length - 1, z + 1))}
                   className="grid size-7 place-items-center rounded-md text-stone-600 transition hover:bg-white disabled:opacity-30 dark:text-stone-300 dark:hover:bg-stone-700"
@@ -327,8 +327,8 @@ export function AssetGrid(props: {
                       return (
                         <button
                           onClick={() => void selectRange(row.start, row.start + row.count - 1, all)}
-                          title={all ? 'Deselect this month' : 'Select this month'}
-                          aria-label={all ? 'Deselect this month' : 'Select this month'}
+                          title={all ? t('Deselect this month') : t('Select this month')}
+                          aria-label={all ? t('Deselect this month') : t('Select this month')}
                           className={`-ml-6 mr-1.5 mb-[3px] grid size-[18px] place-items-center rounded-full transition ${
                             all
                               ? 'bg-accent-500 text-white opacity-100'
@@ -340,13 +340,11 @@ export function AssetGrid(props: {
                       )
                     })()}
                     <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-tight text-stone-800 dark:text-stone-100">
-                      {props.query?.sort === 'added' ? `Added ${monthLabel(row.month)}` : monthLabel(row.month)}
+                      {props.query?.sort === 'added' ? t('Added {v0}', { v0: monthLabel(row.month) }) : monthLabel(row.month)}
                     </span>
                     <span className="ml-2 text-xs text-stone-400 dark:text-stone-500">{n(row.count)}</span>
                     {row.month === 'undated' && (
-                      <span className="ml-3 truncate text-xs text-stone-500 dark:text-stone-400">
-                        No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.
-                      </span>
+                      <span className="ml-3 truncate text-xs text-stone-500 dark:text-stone-400">{t('No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.')}</span>
                     )}
                   </div>
                 )
@@ -416,10 +414,10 @@ function BinSelectionBar(props: { ids: number[]; onDone: () => void }) {
     <>
       <div className="no-drag fixed bottom-6 left-[calc(50%+114px)] z-30 -translate-x-1/2 animate-rise-in">
         <div className="flex items-center gap-1 rounded-full bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur dark:bg-stone-800/95 dark:ring-1 dark:ring-white/10">
-          <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label="Clear selection">
+          <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label={t('Clear selection')}>
             <X className="size-4" />
           </button>
-          <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-white">{n(count)} selected</span>
+          <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-white">{n(count)}{' '}{t('selected')}</span>
           <div className="mx-1 h-5 w-px bg-white/15" />
           <button
             className={barBtnClass}
@@ -428,11 +426,9 @@ function BinSelectionBar(props: { ids: number[]; onDone: () => void }) {
               props.onDone()
             }}
           >
-            <RotateCcw className="size-4" /> Restore
-          </button>
+            <RotateCcw className="size-4" />{' '}{t('Restore')}</button>
           <button className={`${barBtnClass} text-red-300 hover:text-red-200`} onClick={() => setDeleting(true)}>
-            <Trash2 className="size-4" /> Delete permanently
-          </button>
+            <Trash2 className="size-4" />{' '}{t('Delete permanently')}</button>
         </div>
       </div>
       {deleting && (
@@ -505,93 +501,87 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                 onClick={async () => {
                   const u = undo
                   setUndo(null)
-                  setToast('Undone')
+                  setToast(t('Undone'))
                   await u()
                 }}
                 className="rounded-full px-3 py-1 text-accent-400 hover:bg-white/10"
-              >
-                Undo
-              </button>
+              >{t('Undo')}</button>
             )}
             {!undo && <span className="w-3" />}
           </div>
         ) : (
           <div className="relative flex items-center gap-1 rounded-full bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur dark:bg-stone-800/95 dark:ring-1 dark:ring-white/10">
-            <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label="Clear selection">
+            <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label={t('Clear selection')}>
               <X className="size-4" />
             </button>
-            <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-white">{n(count)} selected</span>
+            <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-white">{n(count)}{' '}{t('selected')}</span>
             <div className="mx-1 h-5 w-px bg-white/15" />
             <button
               className={barBtn}
               onClick={async () => {
                 await api.setFavorites(props.ids, !props.allFavorite)
-                flash(props.allFavorite ? 'Removed from favourites' : `${plural(count, 'item')} added to favourites`)
+                flash(props.allFavorite ? t('Removed from favourites') : t('{count} added to favourites', { count: plural(count, 'item') }))
               }}
             >
               {props.allFavorite ? <HeartOff className="size-4" /> : <Heart className="size-4" />}
-              {props.allFavorite ? 'Unfavourite' : 'Favourite'}
+              {props.allFavorite ? t('Unfavourite') : t('Favourite')}
             </button>
             <button className={barBtn} onClick={() => setPicker((p) => !p)}>
-              <Album className="size-4" /> Add to album
-            </button>
-            <button className={barBtn} onClick={() => setSharing(true)} title="Prepare copies to send (chat, email…)">
-              <Share2 className="size-4" /> Share
-            </button>
+              <Album className="size-4" />{' '}{t('Add to album')}</button>
+            <button className={barBtn} onClick={() => setSharing(true)} title={t('Prepare copies to send (chat, email…)')}>
+              <Share2 className="size-4" />{' '}{t('Share')}</button>
             <button
               className={barBtn}
-              title={props.allHidden ? 'Show in the Photos timeline again' : 'Remove from the Photos timeline (nothing is deleted)'}
+              title={props.allHidden ? t('Show in the Photos timeline again') : t('Remove from the Photos timeline (nothing is deleted)')}
               onClick={async () => {
                 await api.setHidden(props.ids, !props.allHidden)
-                flash(props.allHidden ? `${plural(count, 'item')} shown in Photos` : `${plural(count, 'item')} hidden from Photos`)
+                flash(props.allHidden ? t('{count} shown in Photos', { count: plural(count, 'item') }) : t('{count} hidden from Photos', { count: plural(count, 'item') }))
               }}
             >
               {props.allHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-              {props.allHidden ? 'Unhide' : 'Hide'}
+              {props.allHidden ? t('Unhide') : t('Hide')}
             </button>
             <button
               className={barBtn}
-              title="Move to the Bin — restore it from there, or delete permanently"
+              title={t('Move to the Bin — restore it from there, or delete permanently')}
               onClick={async () => {
                 const ids = props.ids
                 await api.moveToBin(ids)
-                flash(`${plural(ids.length, 'item')} moved to Bin`, async () => {
+                flash(t('{length} moved to Bin', { length: plural(ids.length, 'item') }), async () => {
                   await api.restoreFromBin(ids)
                 })
               }}
             >
-              <Trash2 className="size-4" /> Bin
-            </button>
+              <Trash2 className="size-4" />{' '}{t('Bin')}</button>
             <div className="relative" ref={moreRef}>
-              <button className={barBtn} onClick={() => setMore((m) => !m)} aria-label="More actions">
-                <MoreHorizontal className="size-4" /> More
-              </button>
+              <button className={barBtn} onClick={() => setMore((m) => !m)} aria-label={t('More actions')}>
+                <MoreHorizontal className="size-4" />{' '}{t('More')}</button>
               {more && (
                 <>
                   <div className="absolute bottom-12 right-0 z-20 w-56 rounded-xl bg-stone-900/95 p-1.5 shadow-2xl ring-1 ring-white/10 backdrop-blur dark:bg-stone-800/95">
                     {[
-                      { label: 'Set date…', icon: <CalendarClock className="size-4" />, run: () => setDating(true) },
-                      { label: 'Set location…', icon: <MapPin className="size-4" />, run: () => setPlacing(true) },
-                      { label: 'Add tags…', icon: <Tag className="size-4" />, run: () => setTagging(true) },
+                      { label: t('Set date…'), icon: <CalendarClock className="size-4" />, run: () => setDating(true) },
+                      { label: t('Set location…'), icon: <MapPin className="size-4" />, run: () => setPlacing(true) },
+                      { label: t('Add tags…'), icon: <Tag className="size-4" />, run: () => setTagging(true) },
                       {
-                        label: 'Rotate',
+                        label: t('Rotate'),
                         icon: <RotateCw className="size-4" />,
                         run: async () => {
                           await api.rotate(props.ids, 90)
-                          flash(`${plural(count, 'item')} rotated`)
+                          flash(t('{count} rotated', { count: plural(count, 'item') }))
                         }
                       },
                       {
-                        label: 'Export originals…',
+                        label: t('Export originals…'),
                         icon: <FolderOutput className="size-4" />,
                         run: async () => {
-                          const off = api.onExportProgress((p) => setToast(`Exporting ${n(p.done)} of ${n(p.total)}…`))
+                          const off = api.onExportProgress((p) => setToast(t('Exporting {done} of {total}…', { done: n(p.done), total: n(p.total) })))
                           try {
                             const r = await api.exportOriginals(props.ids)
                             if (!r) return
-                            flash(r.failed > 0 ? `Exported ${n(r.exported)} · ${n(r.failed)} failed` : `${plural(r.exported, 'file')} exported`)
+                            flash(r.failed > 0 ? t('Exported {exported} · {failed} failed', { exported: n(r.exported), failed: n(r.failed) }) : t('{exported} exported', { exported: plural(r.exported, 'file') }))
                           } catch (err) {
-                            flash(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : 'Export failed')
+                            flash(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : t('Export failed'))
                           } finally {
                             off()
                           }
@@ -617,14 +607,13 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
             {props.personId !== undefined && (
               <button
                 className={barBtn}
-                title="These photos are not of this person (they will not be added back automatically)"
+                title={t('These photos are not of this person (they will not be added back automatically)')}
                 onClick={async () => {
                   const n = await api.removeFromPerson(props.personId as number, props.ids)
-                  flash(n ? `Removed from this person` : 'Nothing to remove')
+                  flash(n ? t('Removed from this person') : t('Nothing to remove'))
                 }}
               >
-                <UserX className="size-4" /> Not this person
-              </button>
+                <UserX className="size-4" />{' '}{t('Not this person')}</button>
             )}
             {props.albumId !== undefined && (
               <>
@@ -633,21 +622,19 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                     className={barBtn}
                     onClick={async () => {
                       await api.updateAlbum(props.albumId as number, { coverAssetId: props.ids[0] as number })
-                      flash('Album cover updated')
+                      flash(t('Album cover updated'))
                     }}
                   >
-                    <ImageUp className="size-4" /> Use as cover
-                  </button>
+                    <ImageUp className="size-4" />{' '}{t('Use as cover')}</button>
                 )}
                 <button
                   className={barBtn}
                   onClick={async () => {
                     await api.removeFromAlbum(props.albumId as number, props.ids)
-                    flash(`${plural(count, 'item')} removed from album`)
+                    flash(t('{count} removed from album', { count: plural(count, 'item') }))
                   }}
                 >
-                  <ImageMinus className="size-4" /> Remove from album
-                </button>
+                  <ImageMinus className="size-4" />{' '}{t('Remove from album')}</button>
               </>
             )}
             {picker && (
@@ -661,7 +648,7 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                 onPick={async (album) => {
                   setPicker(false)
                   const added = await api.addToAlbum(album.id, props.ids)
-                  flash(added === 0 ? `Already in “${album.name}”` : `${plural(added, 'item')} added to “${album.name}”`)
+                  flash(added === 0 ? t('Already in “{name}”', { name: album.name }) : t('{added} added to “{name}”', { added: plural(added, 'item'), name: album.name }))
                 }}
               />
             )}
@@ -670,13 +657,13 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
       </div>
       {dating && (
         <DateDialog
-          title={`Set date for ${plural(count, 'item')}`}
-          label="Use this when you recognise when photos were taken. Hand-set dates are marked as set by you and are never overwritten automatically."
+          title={t('Set date for {count}', { count: plural(count, 'item') })}
+          label={t('Use this when you recognise when photos were taken. Hand-set dates are marked as set by you and are never overwritten automatically.')}
           onClose={() => setDating(false)}
           onSubmit={async (wall) => {
             setDating(false)
             await api.setDates(props.ids, wall)
-            flash(`Date set for ${plural(count, 'item')}`)
+            flash(t('Date set for {count}', { count: plural(count, 'item') }))
           }}
         />
       )}
@@ -686,51 +673,51 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
           onClose={() => setSharing(false)}
           onShare={async (opts) => {
             setSharing(false)
-            setToast(`Preparing ${plural(count, 'copy', 'copies')}…`)
+            setToast(t('Preparing {count}…', { count: plural(count, 'copy', 'copies') }))
             const r = await api.share(props.ids, opts)
-            flash(r.failed ? `${plural(r.files, 'copy', 'copies')} ready · ${n(r.failed)} failed` : `${plural(r.files, 'copy', 'copies')} ready in the folder that opened`)
+            flash(r.failed ? t('{files} ready · {failed} failed', { files: plural(r.files, 'copy', 'copies'), failed: n(r.failed) }) : t('{files} ready in the folder that opened', { files: plural(r.files, 'copy', 'copies') }))
           }}
         />
       )}
       {tagging && (
         <PromptDialog
-          title={`Add tags to ${plural(count, 'item')}`}
-          label="Separate several tags with commas. Tags are searchable."
-          placeholder="e.g. beach, family"
-          confirm="Add tags"
+          title={t('Add tags to {count}', { count: plural(count, 'item') })}
+          label={t('Separate several tags with commas. Tags are searchable.')}
+          placeholder={t('e.g. beach, family')}
+          confirm={t('Add tags')}
           onClose={() => setTagging(false)}
           onSubmit={async (value) => {
             setTagging(false)
             const tags = value.split(',').map((t) => t.trim()).filter(Boolean)
             if (!tags.length) return
             await api.setTags(props.ids, tags, [])
-            flash(`Tagged ${plural(count, 'item')}`)
+            flash(t('Tagged {count}', { count: plural(count, 'item') }))
           }}
         />
       )}
       {placing && (
         <LocationPicker
-          title={`Where were ${count === 1 ? 'this' : `these ${n(count)}`} taken?`}
+          title={count === 1 ? t('Where was this taken?') : t('Where were these {count} taken?', { count: n(count) })}
           initial={null}
           onClose={() => setPlacing(false)}
           onPick={async (loc) => {
             setPlacing(false)
             await api.setLocation(props.ids, loc)
-            flash(`Location set for ${plural(count, 'item')}`)
+            flash(t('Location set for {count}', { count: plural(count, 'item') }))
           }}
         />
       )}
       {naming && (
         <PromptDialog
-          title="New album"
-          label={`Create an album with the ${plural(count, 'selected item')}.`}
-          placeholder="Album name"
-          confirm="Create"
+          title={t('New album')}
+          label={t('Create an album with the {count}.', { count: plural(count, 'selected item') })}
+          placeholder={t('Album name')}
+          confirm={t('Create')}
           onClose={() => setNaming(false)}
           onSubmit={async (name) => {
             setNaming(false)
             const album = await api.createAlbum(name, props.ids)
-            flash(`Created “${album.name}”`)
+            flash(t('Created “{name}”', { name: album.name }))
           }}
         />
       )}
@@ -758,8 +745,7 @@ function AlbumPicker(props: { excludeId?: number; onPick: (a: AlbumSummary) => v
       className="absolute bottom-full left-1/2 mb-3 w-72 -translate-x-1/2 overflow-hidden rounded-xl bg-white p-1.5 shadow-2xl shadow-stone-950/20 ring-1 ring-stone-200 animate-rise-in dark:bg-stone-800 dark:ring-white/10"
     >
       <button onClick={props.onNew} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13.5px] font-medium text-accent-600 hover:bg-stone-100 dark:text-accent-400 dark:hover:bg-stone-700/70">
-        <Plus className="size-4" /> New album…
-      </button>
+        <Plus className="size-4" />{' '}{t('New album…')}</button>
       <div className="scroll-thin max-h-72 overflow-y-auto">
         {albums === null && <div className="skeleton m-2 h-4 w-40 rounded" />}
         {albums?.map((a) => (

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { RefreshCw, Smartphone } from 'lucide-react'
 import type { PhoneCopyProgress, PhoneDevice } from '@shared/types'
-import { api } from '../lib/format'
+import { api, n } from '../lib/format'
+import { t } from '../lib/i18n'
 
 const btn = 'h-9 rounded-lg px-4 text-[13.5px] font-medium transition'
 const secondary = `${btn} text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800`
@@ -46,7 +47,7 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
     try {
       const done = await api.copyFromPhone(chosen)
       if (done.copied + done.skipped > 0) props.onImport(done.folder)
-      else setError(done.total === 0 ? 'No photos were found on it.' : `None of the ${done.total} files could be copied.`)
+      else setError(done.total === 0 ? t('No photos were found on it.') : t('None of the {total} files could be copied.', { total: done.total }))
     } catch (err) {
       const msg = err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err)
       if (msg !== 'Cancelled') setError(msg)
@@ -67,22 +68,19 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
     <div className="no-drag fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/30 p-8 backdrop-blur-[4px] animate-fade-in dark:bg-black/50">
       <div className="w-[460px] rounded-2xl bg-white p-6 shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-[17px] font-semibold">Import from a phone or camera</h2>
+          <h2 className="text-[17px] font-semibold">{t('Import from a phone or camera')}</h2>
           {!copying && (
-            <button onClick={() => void refresh()} title="Look again" className="rounded-md p-1.5 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">
+            <button onClick={() => void refresh()} title={t('Look again')} className="rounded-md p-1.5 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">
               <RefreshCw className={`size-4 ${devices === null ? 'animate-spin' : ''}`} />
             </button>
           )}
         </div>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">
-          Connect it with a USB cable and unlock it. On an iPhone tap <b>Trust</b>; on Android choose <b>File transfer</b>. The phone is only read — nothing on it is changed
-          or deleted.
-        </p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Connect it with a USB cable and unlock it. On an iPhone tap')}{' '}<b>{t('Trust')}</b>{t('; on Android choose')}{' '}<b>{t('File transfer')}</b>{t('. The phone is only read — nothing on it is changed or deleted.')}</p>
 
         {!copying && (
           <div className="mt-4 space-y-1.5">
-            {devices === null && <p className="px-3 py-2 text-[13px] text-stone-500">Looking for devices…</p>}
-            {devices?.length === 0 && !error && <p className="px-3 py-2 text-[13px] text-stone-500">No phone or camera found.</p>}
+            {devices === null && <p className="px-3 py-2 text-[13px] text-stone-500">{t('Looking for devices…')}</p>}
+            {devices?.length === 0 && !error && <p className="px-3 py-2 text-[13px] text-stone-500">{t('No phone or camera found.')}</p>}
             {devices?.map((d) => (
               <label
                 key={d.name}
@@ -93,7 +91,7 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
                 <span className="min-w-0">
                   <span className="block truncate text-[13.5px] font-medium">{d.name}</span>
                   <span className="block truncate text-xs text-stone-500 dark:text-stone-400">
-                    {d.folders.length ? d.folders.join(' · ') : 'No photos visible — unlock it and allow access, then look again'}
+                    {d.folders.length ? d.folders.join(' · ') : t('No photos visible — unlock it and allow access, then look again')}
                   </span>
                 </span>
               </label>
@@ -108,13 +106,11 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
             </div>
             <p className="mt-2 text-[13px] tabular-nums text-stone-600 dark:text-stone-400">
               {!progress || !progress.total
-                ? 'Reading the phone…'
-                : `Copying ${progress.done.toLocaleString()} of ${progress.total.toLocaleString()} · ${mb(progress.bytes)}${progress.skipped ? ` · ${progress.skipped.toLocaleString()} already copied` : ''}`}
+                ? t('Reading the phone…')
+                : t('Copying {v0} of {v1} · {v2}{v3}', { v0: n(progress.done), v1: n(progress.total), v2: mb(progress.bytes), v3: progress.skipped ? t(' · {v0} already copied', { v0: n(progress.skipped) }) : '' })}
             </p>
             {progress?.current && <p className="mt-0.5 truncate text-xs text-stone-500">{progress.current}</p>}
-            <p className="mt-3 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
-              Keep the phone unlocked and connected. When the copy finishes the import starts and you review it as usual.
-            </p>
+            <p className="mt-3 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Keep the phone unlocked and connected. When the copy finishes the import starts and you review it as usual.')}</p>
           </div>
         )}
 
@@ -122,12 +118,10 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
 
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={close} className={secondary}>
-            {copying ? 'Stop' : 'Cancel'}
+            {copying ? t('Stop') : t('Cancel')}
           </button>
           {!copying && (
-            <button onClick={() => void start()} disabled={!device || device.folders.length === 0} className={primary}>
-              Copy and import
-            </button>
+            <button onClick={() => void start()} disabled={!device || device.folders.length === 0} className={primary}>{t('Copy and import')}</button>
           )}
         </div>
       </div>

@@ -5,6 +5,7 @@ import { api, basename, bytes, isoLocal, mediaUrl, n, plural, sortTimeLabel } fr
 import { originLabel } from '../lib/labels'
 import { ConfirmDialog } from '../components/Dialog'
 import { PageHeader } from './Placeholder'
+import { t } from '../lib/i18n'
 
 const PAGE = 50
 const NEAR_PAGE = 30
@@ -26,23 +27,23 @@ export function DuplicatesView(props: { version: number }) {
   return (
     <div className="scroll-thin h-full overflow-y-auto">
       <PageHeader
-        title="Duplicates"
-        subtitle="Exact duplicates are byte-for-byte identical — the library already keeps only one copy. Probable duplicates look the same but were re-saved, resized or compressed (e.g. sent through WhatsApp): separate files you can review. Similar photos are different shots of the same moment, such as bursts."
+        title={t('Duplicates')}
+        subtitle={t('Exact duplicates are byte-for-byte identical — the library already keeps only one copy. Probable duplicates look the same but were re-saved, resized or compressed (e.g. sent through WhatsApp): separate files you can review. Similar photos are different shots of the same moment, such as bursts.')}
       />
       <div className="mx-auto max-w-4xl px-8 pb-12">
         <div className="mb-6 grid grid-cols-3 gap-3">
-          <Card label="Exact duplicates" value={exactTotal === null ? '…' : n(exactTotal)} active={tab === 'exact'} onClick={() => setTab('exact')} />
+          <Card label={t('Exact duplicates')} value={exactTotal === null ? '…' : n(exactTotal)} active={tab === 'exact'} onClick={() => setTab('exact')} />
           <Card
-            label="Probable duplicates"
+            label={t('Probable duplicates')}
             value={near === null ? '…' : n(near.unresolvedGroups)}
-            note={near && near.hashed < near.hashable ? `Analysing ${Math.round((near.hashed / Math.max(1, near.hashable)) * 100)}%` : near && near.unresolvedGroups > 0 ? 'to review' : undefined}
+            note={near && near.hashed < near.hashable ? t('Analysing {v0}%', { v0: Math.round((near.hashed / Math.max(1, near.hashable)) * 100) }) : near && near.unresolvedGroups > 0 ? t('to review') : undefined}
             active={tab === 'probable'}
             onClick={() => setTab('probable')}
           />
           <Card
-            label="Similar photos"
+            label={t('Similar photos')}
             value={similar === null ? '…' : n(similar.unresolvedGroups)}
-            note={similar && similar.hashed < similar.hashable ? `Analysing ${Math.round((similar.hashed / Math.max(1, similar.hashable)) * 100)}%` : similar && similar.unresolvedGroups > 0 ? 'bursts to review' : undefined}
+            note={similar && similar.hashed < similar.hashable ? t('Analysing {v0}%', { v0: Math.round((similar.hashed / Math.max(1, similar.hashable)) * 100) }) : similar && similar.unresolvedGroups > 0 ? t('bursts to review') : undefined}
             active={tab === 'similar'}
             onClick={() => setTab('similar')}
           />
@@ -72,9 +73,7 @@ function ExactList(props: { version: number }) {
   return (
     <>
       {groups?.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">
-          No duplicates found yet. Import the same photos from another folder or export and they will appear here.
-        </div>
+        <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">{t('No duplicates found yet. Import the same photos from another folder or export and they will appear here.')}</div>
       )}
       <div className="space-y-3">
         {groups?.map((g) => (
@@ -90,10 +89,8 @@ function ExactList(props: { version: number }) {
             </div>
             <div className="min-w-0 flex-1">
               <div className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
-                <Copy className="size-3" /> Byte-for-byte identical
-              </div>
-              <div className="font-mono text-[11px] text-stone-500 dark:text-stone-400" title={g.sha256}>
-                SHA-256 {g.sha256.slice(0, 16)}…
+                <Copy className="size-3" />{' '}{t('Byte-for-byte identical')}</div>
+              <div className="font-mono text-[11px] text-stone-500 dark:text-stone-400" title={g.sha256}>{t('SHA-256')}{' '}{g.sha256.slice(0, 16)}…
               </div>
               <div className="mt-3 space-y-1.5">
                 {g.sources.map((s) => (
@@ -113,9 +110,7 @@ function ExactList(props: { version: number }) {
       </div>
       {groups && groups.length < total && (
         <div className="mt-6 text-center">
-          <button onClick={loadMore} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-200/60 dark:text-stone-300 dark:hover:bg-stone-800">
-            Show more
-          </button>
+          <button onClick={loadMore} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-200/60 dark:text-stone-300 dark:hover:bg-stone-800">{t('Show more')}</button>
         </div>
       )}
     </>
@@ -143,29 +138,28 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
           <div className="text-[14px] font-medium">
             {data.unresolvedGroups > 0
               ? similar
-                ? `${plural(data.unresolvedGroups, 'series', 'series')} to review · ${plural(data.extraCopies, 'extra shot')}`
-                : `${plural(data.unresolvedGroups, 'group')} to review · ${plural(data.extraCopies, 'extra copy', 'extra copies')}`
+                ? t('{unresolvedGroups} to review · {extraCopies}', { unresolvedGroups: plural(data.unresolvedGroups, 'series', 'series'), extraCopies: plural(data.extraCopies, 'extra shot') })
+                : t('{unresolvedGroups} to review · {extraCopies}', { unresolvedGroups: plural(data.unresolvedGroups, 'group'), extraCopies: plural(data.extraCopies, 'extra copy', 'extra copies') })
               : data.totalGroups > 0
                 ? similar
-                  ? 'All similar photos reviewed'
-                  : 'All probable duplicates reviewed'
+                  ? t('All similar photos reviewed')
+                  : t('All probable duplicates reviewed')
                 : analysing
                   ? similar
-                    ? 'Looking for similar photos…'
-                    : 'Looking for probable duplicates…'
+                    ? t('Looking for similar photos…')
+                    : t('Looking for probable duplicates…')
                   : similar
-                    ? 'No similar photos found'
-                    : 'No probable duplicates found'}
+                    ? t('No similar photos found')
+                    : t('No probable duplicates found')}
           </div>
           <div className="mt-0.5 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
             {analysing ? (
               <span className="inline-flex items-center gap-1.5">
-                <LoaderCircle className="size-3 animate-spin" /> Comparing visual fingerprints: {n(data.hashed)} of {n(data.hashable)} items analysed — more groups may appear.
-              </span>
+                <LoaderCircle className="size-3 animate-spin" />{' '}{t('Comparing visual fingerprints:')}{' '}{n(data.hashed)}{' '}{t('of')}{' '}{n(data.hashable)}{' '}{t('items analysed — more groups may appear.')}</span>
             ) : similar ? (
-              'Separate shots taken seconds apart that look alike — bursts and retakes. The suggested shot to keep is the sharpest. Nothing happens unless you choose.'
+              t('Separate shots taken seconds apart that look alike — bursts and retakes. The suggested shot to keep is the sharpest. Nothing happens unless you choose.')
             ) : (
-              'Matched by visual fingerprint, not bytes. The suggested copy to keep has camera data, then the highest resolution, then the largest file.'
+              t('Matched by visual fingerprint, not bytes. The suggested copy to keep has camera data, then the highest resolution, then the largest file.')
             )}
           </div>
         </div>
@@ -174,7 +168,7 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
             onClick={() => setConfirmAll(true)}
             className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:text-stone-900"
           >
-            <Sparkles className="size-4" /> Keep the best of each, hide {n(data.extraCopies)}
+            <Sparkles className="size-4" />{' '}{t('Keep the best of each, hide')}{' '}{n(data.extraCopies)}
           </button>
         )}
       </div>
@@ -189,22 +183,17 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
           <button
             onClick={() => setShown((s) => s + NEAR_PAGE)}
             className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-200/60 dark:text-stone-300 dark:hover:bg-stone-800"
-          >
-            Show more ({n(data.totalGroups - data.groups.length)} more groups)
-          </button>
+          >{t('Show more (')}{n(data.totalGroups - data.groups.length)}{' '}{t('more groups)')}</button>
         </div>
       )}
 
       {confirmAll && (
         <ConfirmDialog
-          title={`Hide ${plural(data.extraCopies, 'extra copy', 'extra copies')} from Photos?`}
+          title={t('Hide {extraCopies} from Photos?', { extraCopies: plural(data.extraCopies, 'extra copy', 'extra copies') })}
           body={
-            <>
-              In each of the {plural(data.unresolvedGroups, 'group')}, the suggested best copy stays visible and the others are hidden from the Photos timeline.
-              Nothing is deleted — hidden copies stay in the library, in Cleanup and here, and can be shown again.
-            </>
+            <>{t('In each of the')}{' '}{plural(data.unresolvedGroups, 'group')}{t(', the suggested best copy stays visible and the others are hidden from the Photos timeline. Nothing is deleted — hidden copies stay in the library, in Cleanup and here, and can be shown again.')}</>
           }
-          confirm="Hide extra copies"
+          confirm={t('Hide extra copies')}
           onClose={() => setConfirmAll(false)}
           onConfirm={async () => {
             setConfirmAll(false)
@@ -216,7 +205,7 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
       {preview !== null && (
         <div className="no-drag fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-10 animate-fade-in" onClick={() => setPreview(null)}>
           <img src={mediaUrl('preview', preview)} alt="" className="max-h-full max-w-full object-contain" />
-          <button className="absolute right-5 top-5 grid size-9 place-items-center rounded-full text-white hover:bg-white/10" aria-label="Close preview">
+          <button className="absolute right-5 top-5 grid size-9 place-items-center rounded-full text-white hover:bg-white/10" aria-label={t('Close preview')}>
             <X className="size-5" />
           </button>
         </div>
@@ -238,19 +227,17 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
         <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
           {props.similar ? (
             <>
-              <Images className="size-3" /> Same moment
-            </>
+              <Images className="size-3" />{' '}{t('Same moment')}</>
           ) : (
             <>
-              <Copy className="size-3" /> Looks the same
-            </>
+              <Copy className="size-3" />{' '}{t('Looks the same')}</>
           )}
         </span>
         <span className="text-xs text-stone-500 dark:text-stone-400">
           {props.similar
             ? `${plural(g.members.length, 'shot')} · ${g.members[0] ? sortTimeLabel(g.members[0].asset.sortTime) : ''}`
-            : `${plural(g.members.length, 'copy', 'copies')} · different files`}
-          {g.resolved ? ' · reviewed' : ''}
+            : t('{length} · different files', { length: plural(g.members.length, 'copy', 'copies') })}
+          {g.resolved ? t(' · reviewed') : ''}
         </span>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1">
@@ -263,7 +250,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                 className={`group relative block size-40 overflow-hidden rounded-lg bg-stone-200 outline-none transition dark:bg-stone-800 ${
                   selected ? 'ring-[3px] ring-accent-500' : 'ring-1 ring-stone-200 hover:ring-stone-300 dark:ring-stone-800'
                 }`}
-                title="Keep this copy"
+                title={t('Keep this copy')}
               >
                 {m.asset.thumb === 'ready' ? (
                   <img src={mediaUrl('thumb', m.asset.id, m.asset.rev)} alt="" className={`size-full object-cover ${m.asset.hidden ? 'opacity-50' : ''}`} />
@@ -274,11 +261,10 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                 )}
                 {selected && (
                   <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10.5px] font-semibold text-white">
-                    <Check className="size-3" strokeWidth={3} /> Keep
-                  </span>
+                    <Check className="size-3" strokeWidth={3} />{' '}{t('Keep')}</span>
                 )}
                 {m.asset.hidden && (
-                  <span className="absolute bottom-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-black/50 text-white" title="Hidden from Photos">
+                  <span className="absolute bottom-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-black/50 text-white" title={t('Hidden from Photos')}>
                     <EyeOff className="size-3" />
                   </span>
                 )}
@@ -290,7 +276,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                     props.onPreview(m.asset.id)
                   }}
                   className="absolute right-1.5 top-1.5 grid size-6 place-items-center rounded-full bg-black/40 text-white opacity-0 transition group-hover:opacity-100"
-                  title="View larger"
+                  title={t('View larger')}
                 >
                   <Maximize2 className="size-3" />
                 </span>
@@ -303,9 +289,9 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                   {m.asset.width && m.asset.height ? `${m.asset.width}×${m.asset.height}` : '?'} · {bytes(m.sizeBytes)}
                 </div>
                 <div className="truncate text-stone-500 dark:text-stone-400">
-                  {m.camera ?? (m.origin ? `${originLabel(m.origin)}${m.originConfidence === 'probable' ? ' (probable)' : ''}` : 'No camera data')}
+                  {m.camera ?? (m.origin ? `${originLabel(m.origin)}${m.originConfidence === 'probable' ? t(' (probable)') : ''}` : t('No camera data'))}
                 </div>
-                {m.asset.id === g.bestId && <div className="font-medium text-emerald-600 dark:text-emerald-400">Suggested: {g.bestReason}</div>}
+                {m.asset.id === g.bestId && <div className="font-medium text-emerald-600 dark:text-emerald-400">{t('Suggested:')}{' '}{g.bestReason}</div>}
               </div>
             </div>
           )
@@ -322,8 +308,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
             }}
             className="inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-40 dark:text-stone-300 dark:hover:bg-stone-800"
           >
-            <Eye className="size-3.5" /> Show all
-          </button>
+            <Eye className="size-3.5" />{' '}{t('Show all')}</button>
         )}
         <button
           disabled={busy}
@@ -333,7 +318,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
           }}
           className="inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-40 dark:text-stone-300 dark:hover:bg-stone-800"
         >
-          <X className="size-3.5" /> {props.similar ? 'Not similar' : 'Not duplicates'}
+          <X className="size-3.5" /> {props.similar ? t('Not similar') : t('Not duplicates')}
         </button>
         <button
           disabled={busy}
@@ -341,10 +326,10 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
             setBusy(true)
             await api.moveToBin(others.map((o) => o.asset.id))
           }}
-          title="Move the other copies to the Bin (restore or delete them from there)"
+          title={t('Move the other copies to the Bin (restore or delete them from there)')}
           className="inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-40 dark:text-stone-300 dark:hover:bg-stone-800"
         >
-          <Trash2 className="size-3.5" /> Bin the other{others.length === 1 ? '' : 's'}
+          <Trash2 className="size-3.5" />{' '}{t('Bin the other')}{others.length === 1 ? '' : 's'}
         </button>
         <button
           disabled={busy || others.every((o) => o.asset.hidden)}
@@ -356,7 +341,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
           }}
           className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900"
         >
-          <EyeOff className="size-3.5" /> Keep selected, hide {others.length === 1 ? 'the other' : `the other ${others.length}`}
+          <EyeOff className="size-3.5" />{' '}{t('Keep selected, hide')}{' '}{others.length === 1 ? t('the other') : t('the other {length}', { length: others.length })}
         </button>
       </div>
     </div>

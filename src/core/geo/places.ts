@@ -29,11 +29,13 @@ function index(): Map<string, number[]> {
   return grid
 }
 
-let regionNames: Intl.DisplayNames | null = null
-export function countryName(code: string): string {
+const regionNames = new Map<string, Intl.DisplayNames>()
+/** Country name from its ISO code, in English (stored place names) or another language (display). */
+export function countryName(code: string, lang = 'en'): string {
   try {
-    regionNames ??= new Intl.DisplayNames(['en'], { type: 'region' })
-    return regionNames.of(code) ?? code
+    let names = regionNames.get(lang)
+    if (!names) regionNames.set(lang, (names = new Intl.DisplayNames([lang], { type: 'region' })))
+    return names.of(code) ?? code
   } catch {
     return code
   }

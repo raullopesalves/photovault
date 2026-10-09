@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react'
+import { t } from '../lib/i18n'
 
 export function PageHeader(props: { title: string; subtitle?: string }) {
   return (
@@ -20,7 +21,7 @@ export function Placeholder(props: { title: string; body: string }) {
         </div>
         <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">{props.title}</h1>
         <p className="mt-2 text-[14px] leading-relaxed text-stone-500 dark:text-stone-400">{props.body}</p>
-        <div className="mt-4 text-xs uppercase tracking-wider text-stone-400">Coming soon</div>
+        <div className="mt-4 text-xs uppercase tracking-wider text-stone-400">{t('Coming soon')}</div>
       </div>
     </div>
   )

@@ -4,11 +4,12 @@ import { Wand2, ArrowDownUp, Calendar, Camera, Check, ChevronDown, Film, LoaderC
 import type { AssetQuery, Facets } from '@shared/types'
 import { api, n, sourceTypeLabel } from '../lib/format'
 import { kindLabel, originLabel } from '../lib/labels'
+import { t } from '../lib/i18n'
 
 type TypeValue = NonNullable<AssetQuery['types']>[number]
 type CameraId = { make: string | null; model: string }
 
-const TYPE_LABEL: Record<TypeValue, string> = { photo: 'Photos', video: 'Videos', loop: 'GIF-like loops', animated: 'Animated images', sticker: 'Stickers' }
+const TYPE_LABEL: Record<TypeValue, string> = { photo: t('Photos'), video: t('Videos'), loop: t('GIF-like loops'), animated: t('Animated images'), sticker: t('Stickers') }
 
 function cameraLabel(c: CameraId): string {
   return c.make && !c.model.toLowerCase().startsWith(c.make.toLowerCase()) ? `${c.make} ${c.model}` : c.model
@@ -87,17 +88,17 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
       key: 'smart',
       label: (
         <>
-          <Sparkles className="size-3" /> Looks like “{q.smartText}”
+          <Sparkles className="size-3" />{' '}{t('Looks like “')}{q.smartText}”
         </>
       ),
       remove: () => set({ ids: undefined, smartText: undefined, sort: q.sort === 'relevance' ? undefined : q.sort })
     })
-  if (q.favorite && !props.hideFavorite) badges.push({ key: 'fav', label: 'Favourites', remove: () => set({ favorite: undefined }) })
+  if (q.favorite && !props.hideFavorite) badges.push({ key: 'fav', label: t('Favourites'), remove: () => set({ favorite: undefined }) })
   for (const t of q.types ?? []) badges.push({ key: `t:${t}`, label: TYPE_LABEL[t], remove: () => set({ types: toggle(q.types, t) }) })
-  for (const y of q.years ?? []) badges.push({ key: `y:${y}`, label: y === 0 ? 'No date' : String(y), remove: () => set({ years: toggle(q.years, y) }) })
+  for (const y of q.years ?? []) badges.push({ key: `y:${y}`, label: y === 0 ? t('No date') : String(y), remove: () => set({ years: toggle(q.years, y) }) })
   for (const c of q.cameras ?? []) badges.push({ key: `c:${c.make}|${c.model}`, label: cameraLabel(c), remove: () => set({ cameras: toggle(q.cameras, c, sameCamera) }) })
-  for (const o of q.origins ?? []) badges.push({ key: `o:${o}`, label: `From: ${originLabel(o)}`, remove: () => set({ origins: toggle(q.origins, o) }) })
-  for (const s of q.sourceTypes ?? []) badges.push({ key: `s:${s}`, label: `Source: ${sourceTypeLabel(s)}`, remove: () => set({ sourceTypes: toggle(q.sourceTypes, s) }) })
+  for (const o of q.origins ?? []) badges.push({ key: `o:${o}`, label: t('From: {v0}', { v0: originLabel(o) }), remove: () => set({ origins: toggle(q.origins, o) }) })
+  for (const s of q.sourceTypes ?? []) badges.push({ key: `s:${s}`, label: t('Source: {v0}', { v0: sourceTypeLabel(s) }), remove: () => set({ sourceTypes: toggle(q.sourceTypes, s) }) })
 
   const clearAll = (): void => {
     setText('')
@@ -113,15 +114,15 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === 'Escape' && setText('')}
-            placeholder={smart ? 'Describe it: beach at sunset, dog, cake…' : 'Search names, cameras, albums, years'}
+            placeholder={smart ? t('Describe it: beach at sunset, dog, cake…') : t('Search names, cameras, albums, years')}
             className="min-w-0 flex-1 select-text bg-transparent text-[13px] text-stone-900 outline-none placeholder:text-stone-400 dark:text-stone-100"
           />
           {searching && <LoaderCircle className="size-3.5 shrink-0 animate-spin" />}
           {smartReady && (
             <button
               onClick={() => setSmart((s) => !s)}
-              title={smart ? 'Smart search: finds photos by what they show. Click to search names instead.' : 'Search by what photos show (on-device AI)'}
-              aria-label="Smart search"
+              title={smart ? t('Smart search: finds photos by what they show. Click to search names instead.') : t('Search by what photos show (on-device AI)')}
+              aria-label={t('Smart search')}
               aria-pressed={smart}
               className={`grid size-6 shrink-0 place-items-center rounded-md transition ${smart ? 'bg-accent-500 text-white' : 'text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}
             >
@@ -129,7 +130,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
             </button>
           )}
           {text && (
-            <button onClick={() => setText('')} aria-label="Clear search" className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200">
+            <button onClick={() => setText('')} aria-label={t('Clear search')} className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200">
               <X className="size-3.5" />
             </button>
           )}
@@ -141,29 +142,28 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
           }
           title={
             q.sort === 'relevance'
-              ? 'Best matches first. Click to order by date taken.'
+              ? t('Best matches first. Click to order by date taken.')
               : q.sort === 'added'
-                ? 'Showing the newest imports first. Click to order by date taken.'
+                ? t('Showing the newest imports first. Click to order by date taken.')
                 : q.ids
-                  ? 'Ordered by date taken. Click to show the best matches first.'
-                  : 'Ordered by date taken. Click to show the newest imports first.'
+                  ? t('Ordered by date taken. Click to show the best matches first.')
+                  : t('Ordered by date taken. Click to show the newest imports first.')
           }
           className={`${chipBase} ${q.sort === 'added' || q.sort === 'relevance' ? chipOn : chipOff}`}
         >
           <ArrowDownUp className="size-3.5" />
-          {q.sort === 'relevance' ? 'Best match' : q.sort === 'added' ? 'Recently added' : 'Date taken'}
+          {q.sort === 'relevance' ? t('Best match') : q.sort === 'added' ? t('Recently added') : t('Date taken')}
         </button>
 
         {!props.hideFavorite && (
           <button onClick={() => set({ favorite: q.favorite ? undefined : true })} className={`${chipBase} ${q.favorite ? chipOn : chipOff}`}>
-            <Heart className={`size-3.5 ${q.favorite ? 'fill-current' : ''}`} />
-            Favourites{facets ? ` ${n(facets.favorites)}` : ''}
+            <Heart className={`size-3.5 ${q.favorite ? 'fill-current' : ''}`} />{t('Favourites')}{facets ? ` ${n(facets.favorites)}` : ''}
           </button>
         )}
 
         <Menu
           icon={<Film className="size-3.5" />}
-          label="Type"
+          label={t('Type')}
           selected={q.types?.length ?? 0}
           options={typeOptions.map((o) => ({
             key: o.value,
@@ -176,11 +176,11 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
 
         <Menu
           icon={<Calendar className="size-3.5" />}
-          label="Year"
+          label={t('Year')}
           selected={q.years?.length ?? 0}
           options={(facets?.years ?? []).map((y) => ({
             key: String(y.year),
-            label: y.year === 0 ? 'No date' : String(y.year),
+            label: y.year === 0 ? t('No date') : String(y.year),
             count: y.count,
             checked: q.years?.includes(y.year) ?? false,
             onToggle: () => set({ years: toggle(q.years, y.year) })
@@ -190,7 +190,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
         {(facets?.cameras.length ?? 0) > 0 && (
           <Menu
             icon={<Camera className="size-3.5" />}
-            label="Camera"
+            label={t('Camera')}
             selected={q.cameras?.length ?? 0}
             options={(facets?.cameras ?? []).map((c) => ({
               key: `${c.make}|${c.model}`,
@@ -205,7 +205,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
         {(facets?.origins.length ?? 0) > 0 && (
           <Menu
             icon={<Smartphone className="size-3.5" />}
-            label="Origin"
+            label={t('Origin')}
             selected={q.origins?.length ?? 0}
             options={(facets?.origins ?? []).map((o) => ({
               key: o.origin,
@@ -220,7 +220,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
         {(facets?.sources.length ?? 0) > 1 && (
           <Menu
             icon={<FolderInput className="size-3.5" />}
-            label="Source"
+            label={t('Source')}
             selected={q.sourceTypes?.length ?? 0}
             options={(facets?.sources ?? []).map((s) => ({
               key: s.type,
@@ -241,7 +241,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
               className="inline-flex h-7 items-center gap-1 rounded-full bg-accent-50 pl-3 pr-1 text-[12.5px] font-medium text-accent-600 ring-1 ring-accent-100 dark:bg-accent-500/15 dark:text-accent-400 dark:ring-accent-500/20"
             >
               {b.label}
-              <button onClick={b.remove} aria-label="Remove filter" className="grid size-5 place-items-center rounded-full hover:bg-accent-100 dark:hover:bg-accent-500/25">
+              <button onClick={b.remove} aria-label={t('Remove filter')} className="grid size-5 place-items-center rounded-full hover:bg-accent-100 dark:hover:bg-accent-500/25">
                 <X className="size-3" />
               </button>
             </span>
@@ -250,27 +250,24 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
             <button
               onClick={() => setSaving(true)}
               className="ml-1 inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-[12.5px] font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10"
-              title="Save these filters as an album that fills itself"
+              title={t('Save these filters as an album that fills itself')}
             >
-              <Wand2 className="size-3.5" /> Save as smart album
-            </button>
+              <Wand2 className="size-3.5" />{' '}{t('Save as smart album')}</button>
           )}
           {badges.length > 1 && (
             <button
               onClick={clearAll}
               className="ml-1 h-7 rounded-full px-2.5 text-[12.5px] font-medium text-stone-500 hover:bg-stone-200/60 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200"
-            >
-              Clear all
-            </button>
+            >{t('Clear all')}</button>
           )}
         </div>
       )}
       {saving && (
         <PromptDialog
-          title="Save as smart album"
-          label="It shows everything matching these filters — now and whenever new photos match."
-          placeholder="Album name"
-          confirm="Save"
+          title={t('Save as smart album')}
+          label={t('It shows everything matching these filters — now and whenever new photos match.')}
+          placeholder={t('Album name')}
+          confirm={t('Save')}
           onClose={() => setSaving(false)}
           onSubmit={async (name) => {
             setSaving(false)
@@ -280,7 +277,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
           }}
         />
       )}
-      {saved && <div className="mt-2 text-[12.5px] text-emerald-600 dark:text-emerald-400">Saved “{saved}” — find it in Albums.</div>}
+      {saved && <div className="mt-2 text-[12.5px] text-emerald-600 dark:text-emerald-400">{t('Saved “')}{saved}{t('” — find it in Albums.')}</div>}
     </div>
   )
 }
@@ -324,7 +321,7 @@ function Menu(props: {
       </button>
       {open && (
         <div className="scroll-thin absolute left-0 top-full z-20 mt-1.5 max-h-80 min-w-52 overflow-y-auto rounded-xl bg-white p-1.5 shadow-xl shadow-stone-950/15 ring-1 ring-stone-200 animate-rise-in dark:bg-stone-800 dark:ring-white/10">
-          {props.options.length === 0 && <div className="px-3 py-2 text-[12.5px] text-stone-400">Nothing yet</div>}
+          {props.options.length === 0 && <div className="px-3 py-2 text-[12.5px] text-stone-400">{t('Nothing yet')}</div>}
           {props.options.map((o) => (
             <button
               key={o.key}
