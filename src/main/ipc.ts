@@ -329,6 +329,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     changed('albums')
     return n
   })
+  ipcMain.handle('smart:pets', () => controller.smart?.pets() ?? [])
   ipcMain.handle('smart:status', () => controller.smart?.get() ?? null)
   ipcMain.handle('smart:enable', (_e, on: unknown) => controller.smart?.enable(on === true))
   ipcMain.handle('smart:search', async (_e, text: unknown) => {

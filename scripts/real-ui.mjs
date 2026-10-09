@@ -172,6 +172,8 @@ try {
     await page.waitForTimeout(800)
   }
 
+
+
   if (process.argv.includes('--viewer')) {
     // Open a photo while background work is running and watch the picture for 8 s.
     await page.locator('main [role="button"], main button img').first().waitFor({ timeout: 30_000 }).catch(() => {})
@@ -279,6 +281,25 @@ try {
     await page.waitForTimeout(800)
   }
 
+  if (process.argv.includes('--pets')) {
+    // After --smart has indexed some photos: the dog and cat groups.
+    const groups = await page.evaluate(() => window.photoVault.pets())
+    console.log('pets:', groups.map((g) => `${g.kind} ${g.ids.length}`).join(', ') || 'none')
+    writeFileSync(join(shots, 'pets.json'), JSON.stringify(groups))
+    await page.locator('nav button').nth(4).click()
+    await page.waitForTimeout(3000)
+    await page.screenshot({ path: join(shots, 'pets-people.png') })
+    for (const g of groups) {
+      const card = page.locator(`main button:has-text("${g.kind === 'dog' ? 'Dogs' : 'Cats'}")`).first()
+      await card.scrollIntoViewIfNeeded()
+      if (g.kind === 'dog') await page.screenshot({ path: join(shots, 'pets-section.png') })
+      await card.click()
+      await page.waitForTimeout(3500)
+      await page.screenshot({ path: join(shots, `pets-${g.kind}.png`) })
+      await page.locator('main button:has(svg.lucide-arrow-left)').first().click()
+      await page.waitForTimeout(1500)
+    }
+  }
   await page.click('button:has-text("Date taken")')
   await page.waitForTimeout(1500)
   await page.screenshot({ path: join(shots, 'recently-added.png') })

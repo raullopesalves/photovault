@@ -64,6 +64,11 @@ export class HeavyWork {
     return this.call({ task: 'clipSearch', cacheDir, dbFile, text, limit })
   }
 
+  /** Ids classified as each target label (zero-shot over `labels`), most certain first. */
+  clipClassify(cacheDir: string, dbFile: string, labels: string[], targets: number[], minP: number): Promise<number[][]> {
+    return this.call({ task: 'clipClassify', cacheDir, dbFile, labels, targets, minP })
+  }
+
   /** Faces per image: vectors as float32 bytes, or an error for unreadable images. */
   faceScan(
     modelsDir: string,

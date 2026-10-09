@@ -166,3 +166,27 @@ describe('smart search plumbing', () => {
     expect(assetIdsInRange(lib, { ids: [] }, 0, 10)).toEqual([])
   })
 })
+
+describe('pets (zero-shot)', () => {
+  it('keeps only clear winners of the target labels', async () => {
+    const { zeroShot, CLIP_DIM } = await import('@core/ai/clip')
+    const axis = (k: number): Float32Array => {
+      const v = new Float32Array(CLIP_DIM)
+      v[k] = 1
+      return v
+    }
+    const mix = (a: number, b: number, wa: number): Float32Array => {
+      const v = new Float32Array(CLIP_DIM)
+      v[a] = wa
+      v[b] = Math.sqrt(1 - wa * wa)
+      return v
+    }
+    // Labels: 0 dog, 1 cat, 2 person. Images: clear dog, clear cat, a person, a dog/person toss-up.
+    const images = [axis(0), axis(1), axis(2), mix(0, 2, Math.SQRT1_2)]
+    const data = new Float32Array(images.length * CLIP_DIM)
+    images.forEach((v, i) => data.set(v, i * CLIP_DIM))
+    const found = zeroShot(Int32Array.from([10, 11, 12, 13]), data, [axis(0), axis(1), axis(2)], [0, 1], 0.6)
+    expect(found.get(0)?.map((r) => r.id)).toEqual([10])
+    expect(found.get(1)?.map((r) => r.id)).toEqual([11])
+  })
+})

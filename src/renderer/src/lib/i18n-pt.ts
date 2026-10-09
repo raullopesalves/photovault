@@ -1,5 +1,9 @@
 /** European Portuguese (pt-PT). Keys are the English interface text; see i18n.ts. Missing keys show in English. */
 export const PT: Record<string, string> = {
+  "Pets": "Animais",
+  "Dogs": "Cães",
+  "Cats": "Gatos",
+  "Pets: turn on smart search in Settings and your dogs and cats get their own groups here.": "Animais: ative a pesquisa inteligente nas Definições e os seus cães e gatos passam a ter grupos próprios aqui.",
   "Added {v0}": "Adicionados {v0}",
   "{count} rotated": "{count} rodados",
   "Exported {exported} · {failed} failed": "Exportados {exported} · {failed} falharam",

@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import type { SmartSearchStatus } from '@shared/types'
+import type { PetGroup, SmartSearchStatus } from '@shared/types'
 import { CLIP_MODEL } from '@core/ai/clip'
 import type { Library } from '@core/library/library'
 import { errorMessage } from '@core/util'
@@ -15,6 +15,33 @@ const BATCH = 16
  * is downloaded once into the app's data folder and every thumbnail is indexed in the background on the
  * worker thread. Vectors live in the catalogue (asset_embeddings); photos never leave the computer.
  */
+/**
+ * Labels for finding pets. Every photo goes to the label it looks most like; only clear dog and cat winners
+ * count, so people, food, toys and drawings stay out. (Which dog is which is not recognised.)
+ */
+const PET_LABELS = [
+  'a photo of a dog',
+  'a photo of a cat',
+  'a photo of a person',
+  'a photo of people',
+  'a selfie',
+  'a photo of food',
+  'a landscape photo',
+  'a photo of a city street',
+  'a screenshot',
+  'a photo of a document',
+  'a photo of a car',
+  'a photo of a building',
+  'a photo of a room',
+  'a photo of an object',
+  'a drawing',
+  'a photo of a bird',
+  'a photo of a horse',
+  'a photo of a stuffed animal toy',
+  'a meme with text',
+  'a cartoon'
+]
+
 export class SmartSearchService {
   private status: SmartSearchStatus = { enabled: false, phase: 'off', indexed: 0, total: 0, download: null, error: null }
   private running: Promise<void> | null = null
@@ -80,6 +107,27 @@ export class SmartSearchService {
   private set(patch: Partial<SmartSearchStatus>): void {
     Object.assign(this.status, patch)
     this.onStatus({ ...this.status })
+  }
+
+  /** Dogs and cats (most certain first), visible items only; empty until smart search has looked at photos. */
+  async pets(): Promise<PetGroup[]> {
+    this.refreshCounts()
+    if (!this.status.enabled || this.status.indexed === 0) return []
+    await this.heavy.clipLoad(this.modelsDir, false)
+    const [dogs = [], cats = []] = await this.heavy.clipClassify(this.modelsDir, this.library.paths.dbFile, PET_LABELS, [0, 1], 0.6)
+    const visible = (ids: number[]): number[] => {
+      const ok = new Set(
+        this.library.db
+          .all<{ id: number }>('SELECT id FROM assets WHERE id IN (SELECT value FROM json_each(?)) AND trashed_at IS NULL AND hidden = 0', [JSON.stringify(ids)])
+          .map((r) => r.id)
+      )
+      return ids.filter((id) => ok.has(id))
+    }
+    const groups: PetGroup[] = [
+      { kind: 'dog', ids: visible(dogs) },
+      { kind: 'cat', ids: visible(cats) }
+    ]
+    return groups.filter((g) => g.ids.length >= 3)
   }
 
   private refreshCounts(): void {

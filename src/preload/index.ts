@@ -81,6 +81,7 @@ const api: PhotoVaultApi = {
     ipcRenderer.on('update:status', listener)
     return () => ipcRenderer.removeListener('update:status', listener)
   },
+  pets: () => ipcRenderer.invoke('smart:pets'),
   smartSearchStatus: () => ipcRenderer.invoke('smart:status'),
   setSmartSearch: (enabled) => ipcRenderer.invoke('smart:enable', enabled),
   smartSearch: (text) => ipcRenderer.invoke('smart:search', text),

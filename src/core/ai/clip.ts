@@ -84,6 +84,41 @@ export class Clip {
 }
 
 /**
+ * Zero-shot classification: each image goes to the label it is most like (softmax over the labels, with CLIP's
+ * logit scale of 100). Returns the images whose winning label is one of `targets`, with probability >= `minP`,
+ * most certain first. Far more precise than a single-text cut-off for "is this a dog?".
+ */
+export function zeroShot(
+  ids: Int32Array,
+  data: Float32Array,
+  labels: Float32Array[],
+  targets: number[],
+  minP = 0.6
+): Map<number, Array<{ id: number; p: number }>> {
+  const out = new Map<number, Array<{ id: number; p: number }>>(targets.map((t) => [t, []]))
+  const logits = new Float64Array(labels.length)
+  for (let i = 0; i < ids.length; i++) {
+    const o = i * CLIP_DIM
+    let best = 0
+    for (let l = 0; l < labels.length; l++) {
+      const v = labels[l] as Float32Array
+      let s = 0
+      for (let k = 0; k < CLIP_DIM; k++) s += (data[o + k] as number) * (v[k] as number)
+      logits[l] = 100 * s
+      if ((logits[l] as number) > (logits[best] as number)) best = l
+    }
+    const list = out.get(best)
+    if (!list) continue
+    let sum = 0
+    for (let l = 0; l < labels.length; l++) sum += Math.exp((logits[l] as number) - (logits[best] as number))
+    const p = 1 / sum
+    if (p >= minP) list.push({ id: ids[i] as number, p })
+  }
+  for (const list of out.values()) list.sort((a, b) => b.p - a.p)
+  return out
+}
+
+/**
  * Picks the matches from cosine scores. CLIP scores are only meaningful relative to each other, so the cut-off
  * adapts to the library: clearly above the typical score (mean + 3 σ), at most `limit`, and never empty
  * when something stands out at all.

@@ -5,7 +5,7 @@ import { parentPort } from 'node:worker_threads'
 import { DatabaseSync } from 'node:sqlite'
 import { Database } from '@core/db/database'
 import { computeNearDuplicateGroups, nearDuplicateStamp } from '@core/repo/nearDuplicates'
-import { CLIP_DIM, Clip, selectMatches } from '@core/ai/clip'
+import { CLIP_DIM, Clip, selectMatches, zeroShot } from '@core/ai/clip'
 import { FaceEngine } from '@core/ai/faces'
 import { clusterFaces } from '@core/ai/people'
 import { loadClusterContext, loadClusterFaces } from '@core/repo/people'
@@ -15,6 +15,7 @@ export type WorkerTask =
   | { task: 'clipLoad'; cacheDir: string; allowDownload: boolean }
   | { task: 'clipEmbed'; cacheDir: string; paths: string[] }
   | { task: 'clipSearch'; cacheDir: string; dbFile: string; text: string; limit: number }
+  | { task: 'clipClassify'; cacheDir: string; dbFile: string; labels: string[]; targets: number[]; minP: number }
   | { task: 'faceScan'; modelsDir: string; items: Array<{ path: string; rotation: number }> }
   | { task: 'faceCluster'; dbFile: string }
   | { task: 'faceRegion'; modelsDir: string; path: string; rotation: number; box: { x: number; y: number; w: number; h: number } }
@@ -118,6 +119,14 @@ async function run(id: number, t: WorkerTask): Promise<unknown> {
         scores[i] = s
       }
       return selectMatches(v.ids, scores, t.limit)
+    }
+    case 'clipClassify': {
+      const c = clipFor(t.cacheDir)
+      const labels: Float32Array[] = []
+      for (const text of t.labels) labels.push(await c.embedText(text))
+      const v = loadVectors(t.dbFile)
+      const found = zeroShot(v.ids, v.data, labels, t.targets, t.minP)
+      return t.targets.map((k) => (found.get(k) ?? []).map((r) => r.id))
     }
   }
 }

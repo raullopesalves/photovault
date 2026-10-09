@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRightLeft, Check, Eye, Undo2, UserPlus, UserX, EyeOff, HelpCircle, LoaderCircle, Merge, Pencil, ShieldCheck, UserRound, Users, X } from 'lucide-react'
-import type { AssetQuery, PeopleStatus, PeopleSuggestion, Person, PersonMerge } from '@shared/types'
+import type { AssetQuery, PeopleStatus, PeopleSuggestion, Person, PersonMerge, PetGroup } from '@shared/types'
 import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog, PromptDialog } from '../components/Dialog'
 import { FilterBar } from '../components/FilterBar'
-import { api, bytes, n, plural } from '../lib/format'
+import { api, bytes, mediaUrl, n, plural } from '../lib/format'
 import { PageHeader } from './Placeholder'
 import { NoMatches } from './PhotosView'
 import { locale, t } from '../lib/i18n'
@@ -31,8 +31,10 @@ export function PeopleView(props: { version: number; openPersonId?: number | nul
   useEffect(() => {
     if (props.openPersonId) setPersonId(props.openPersonId)
   }, [props.openPersonId])
+  const [pet, setPet] = useState<PetGroup | null>(null)
   if (personId !== null) return <PersonPage id={personId} version={props.version} onBack={() => setPersonId(null)} onOpen={setPersonId} />
-  return <PeopleList version={props.version} onOpen={setPersonId} />
+  if (pet) return <PetPage group={pet} version={props.version} onBack={() => setPet(null)} />
+  return <PeopleList version={props.version} onOpen={setPersonId} onOpenPet={setPet} />
 }
 
 function usePeopleStatus(): PeopleStatus | null {
@@ -52,7 +54,7 @@ function statusLine(s: PeopleStatus): string | null {
   return null
 }
 
-function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
+function PeopleList(props: { version: number; onOpen: (id: number) => void; onOpenPet: (g: PetGroup) => void }) {
   const status = usePeopleStatus()
   const [people, setPeople] = useState<Person[] | null>(null)
   const [showHidden, setShowHidden] = useState(false)
@@ -69,7 +71,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
   }, [props.version, status?.people, status?.phase === 'ready', reviewing])
 
   if (!status) return <div className="h-full" />
-  if (!status.enabled) return <TurnOn />
+  if (!status.enabled) return <TurnOn version={props.version} onOpenPet={props.onOpenPet} />
 
   const visible = (people ?? []).filter((p) => !p.hidden)
   const hidden = (people ?? []).filter((p) => p.hidden)
@@ -113,6 +115,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void }) {
             <PersonCard key={p.id} person={p} onOpen={() => props.onOpen(p.id)} />
           ))}
         </div>
+        <Pets version={props.version} onOpen={props.onOpenPet} />
         {hidden.length > 0 && (
           <div className="mt-10">
             <button onClick={() => setShowHidden((v) => !v)} className="mb-4 text-[13px] font-medium text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
@@ -257,6 +260,59 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
   )
 }
 
+const PET_NAMES: Record<PetGroup['kind'], string> = { dog: t('Dogs'), cat: t('Cats') }
+
+/** Dogs and cats, found by smart search (zero-shot). Only shown when there are some. */
+function Pets(props: { version: number; onOpen: (g: PetGroup) => void }) {
+  const [groups, setGroups] = useState<PetGroup[]>([])
+  const [smartOn, setSmartOn] = useState(true)
+  useEffect(() => {
+    void api.smartSearchStatus().then((s) => setSmartOn(!!s?.enabled))
+    void api.pets().then(setGroups, () => setGroups([]))
+  }, [props.version])
+  if (!smartOn) return <p className="mt-10 text-xs text-stone-500 dark:text-stone-400">{t('Pets: turn on smart search in Settings and your dogs and cats get their own groups here.')}</p>
+  if (groups.length === 0) return null
+  return (
+    <div className="mt-10">
+      <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">{t('Pets')}</h2>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-x-4 gap-y-6">
+        {groups.map((g) => (
+          <button key={g.kind} onClick={() => props.onOpen(g)} className="group flex flex-col items-center gap-2 text-center">
+            <div className="rounded-full ring-accent-500 ring-offset-2 ring-offset-stone-50 transition group-hover:ring-2 dark:ring-offset-stone-950">
+              <img src={mediaUrl('thumb', g.ids[0] as number)} alt="" className="size-28 rounded-full bg-stone-200 object-cover dark:bg-stone-800" />
+            </div>
+            <div className="w-full truncate text-[13.5px] font-medium">{PET_NAMES[g.kind]}</div>
+            <div className="-mt-1.5 text-xs text-stone-500 dark:text-stone-400">{plural(g.ids.length, 'photo')}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PetPage(props: { group: PetGroup; version: number; onBack: () => void }) {
+  const [query, setQuery] = useState<AssetQuery>({})
+  return (
+    <div className="flex h-full flex-col">
+      <div className="px-8 pt-6">
+        <button onClick={props.onBack} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
+          <ArrowLeft className="size-4" />
+          {t('All people')}
+        </button>
+      </div>
+      <div className="min-h-0 flex-1">
+        <AssetGrid
+          version={props.version}
+          query={{ ...query, ids: props.group.ids, hidden: 'exclude' }}
+          title={<span>{PET_NAMES[props.group.kind]}</span>}
+          toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} />}
+          empty={<NoMatches />}
+        />
+      </div>
+    </div>
+  )
+}
+
 function PersonCard(props: { person: Person; onOpen: () => void }) {
   const p = props.person
   return (
@@ -270,7 +326,7 @@ function PersonCard(props: { person: Person; onOpen: () => void }) {
   )
 }
 
-function TurnOn() {
+function TurnOn(props: { version: number; onOpenPet: (g: PetGroup) => void }) {
   const status = usePeopleStatus()
   return (
     <div className="flex h-full items-center justify-center">
@@ -291,6 +347,9 @@ function TurnOn() {
         >
           <Users className="size-4" />{' '}{t('Find people in my photos')}</button>
         {status?.phase === 'error' && <div className="mt-4 text-[13px] text-red-600 dark:text-red-400">{status.error}</div>}
+        <div className="text-left">
+          <Pets version={props.version} onOpen={props.onOpenPet} />
+        </div>
       </div>
     </div>
   )

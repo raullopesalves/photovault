@@ -565,6 +565,12 @@ export interface UpdateStatus {
   canUpdate: boolean
 }
 
+export interface PetGroup {
+  kind: 'dog' | 'cat'
+  /** Most certain first. */
+  ids: number[]
+}
+
 export interface SmartSearchStatus {
   enabled: boolean
   phase: 'off' | 'loading' | 'downloading' | 'indexing' | 'ready' | 'error'
@@ -758,6 +764,8 @@ export interface PhotoVaultApi {
   setUpdateToken(token: string | null): Promise<UpdateStatus>
   installUpdate(): Promise<void>
   onUpdateStatus(cb: (s: UpdateStatus) => void): () => void
+  /** Photos of dogs and cats, found by smart search (empty while it is off). */
+  pets(): Promise<PetGroup[]>
   smartSearchStatus(): Promise<SmartSearchStatus>
   /** Turns smart search on (downloads the model once, then indexes in the background) or off. */
   setSmartSearch(enabled: boolean): Promise<void>
