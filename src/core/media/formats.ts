@@ -27,7 +27,10 @@ const PHOTO_EXT: Record<string, string> = {
   '.arw': 'image/x-sony-arw',
   '.orf': 'image/x-olympus-orf',
   '.rw2': 'image/x-panasonic-rw2',
-  '.raf': 'image/x-fuji-raf'
+  '.raf': 'image/x-fuji-raf',
+  '.pef': 'image/x-pentax-pef',
+  '.srw': 'image/x-samsung-srw',
+  '.nrw': 'image/x-nikon-nef'
 }
 
 const VIDEO_EXT: Record<string, string> = {
@@ -58,7 +61,7 @@ export function classifyByExtension(filename: string): ExtensionClass {
   return { kind: 'ignored' }
 }
 
-const TIFF_RAW_EXT = new Set(['.dng', '.cr2', '.nef', '.arw'])
+const TIFF_RAW_EXT = new Set(['.dng', '.cr2', '.nef', '.nrw', '.arw', '.pef', '.srw'])
 
 function ascii(buf: Buffer, start: number, end: number): string {
   return buf.subarray(start, end).toString('latin1')

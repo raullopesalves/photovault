@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { ffmpeg, videoFrame } from '../media/ffmpeg'
 import { applyEdits } from '../media/edits'
+import { isRawMime, rawPreviewImage } from '../media/raw'
 import type { PhotoEdits } from '@shared/types'
 import { mkdir, rename, unlink } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -104,6 +105,18 @@ export async function renderThumbnail(opts: {
       return { relativePath, ...dims, generator: 'sharp' }
     } catch (err) {
       errors.push(`sharp: ${errorMessage(err)}`)
+    }
+  }
+  if (isRawMime(opts.mime)) {
+    // Camera RAW: the camera's own full-size JPEG preview inside the file.
+    try {
+      const img = await rawPreviewImage(opts.source)
+      if (img) {
+        const dims = await writeVariant(img, size, dest, rot, edits)
+        return { relativePath, ...dims, generator: 'raw-preview' }
+      }
+    } catch (err) {
+      errors.push(`raw-preview: ${errorMessage(err)}`)
     }
   }
   if (opts.mime.startsWith('image/') && opts.variant === 'thumb') {

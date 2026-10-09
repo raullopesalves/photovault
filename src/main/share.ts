@@ -4,6 +4,7 @@ import { extname, join } from 'node:path'
 import type { ShareOptions } from '@shared/types'
 import { applyEdits, decodeOriented } from '@core/media/edits'
 import { isSharpDecodable } from '@core/media/formats'
+import { isRawMime } from '@core/media/raw'
 import type { Library } from '@core/library/library'
 import { originalPathFor } from '@core/thumbnails/thumbnails'
 import { errorMessage } from '@core/util'
@@ -43,7 +44,7 @@ export async function prepareShare(library: Library, assetIds: number[], opts: S
     )
     if (!src || !a) continue
     try {
-      if (a.media_type === 'video' || (!isSharpDecodable(src.mime) && src.mime !== 'image/heic' && src.mime !== 'image/heif')) {
+      if (a.media_type === 'video' || (!isSharpDecodable(src.mime) && !isRawMime(src.mime) && src.mime !== 'image/heic' && src.mime !== 'image/heif')) {
         await copyFile(src.absolutePath, join(folder, unique(safe(a.original_filename))))
       } else {
         const raw = await decodeOriented(src.absolutePath, src.mime, SIZES[opts.size])

@@ -1,6 +1,7 @@
 import type { PhotoEdits } from '@shared/types'
 import { isSharpDecodable } from './formats'
 import { decodeHeic } from './heic'
+import { isRawMime, rawPreviewImage } from './raw'
 import sharp, { type Sharp } from './sharp'
 
 /**
@@ -38,7 +39,11 @@ export function cleanEdits(e: unknown): PhotoEdits | null {
 export async function decodeOriented(path: string, mime: string, maxSize: number): Promise<{ data: Buffer; width: number; height: number }> {
   let img: Sharp
   if (isSharpDecodable(mime)) img = sharp(path, { failOn: 'none' }).rotate()
-  else if (mime === 'image/heic' || mime === 'image/heif') {
+  else if (isRawMime(mime)) {
+    const raw = await rawPreviewImage(path)
+    if (!raw) throw new Error('This RAW file has no preview to work from.')
+    img = raw
+  } else if (mime === 'image/heic' || mime === 'image/heif') {
     const h = await decodeHeic(path)
     img = sharp(h.rgba, { raw: { width: h.width, height: h.height, channels: 4 } })
   } else throw new Error('This format cannot be edited.')
