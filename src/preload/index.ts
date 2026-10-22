@@ -107,6 +107,7 @@ const api: PhotoVaultApi = {
   checkWatchFolders: () => ipcRenderer.invoke('watch:check'),
   mapPlaces: (view, minPopulation) => ipcRenderer.invoke('geo:places', view, minPopulation),
   mapClusters: (view, query) => ipcRenderer.invoke('library:mapClusters', view, query),
+  libraryPlaces: () => ipcRenderer.invoke('library:places'),
   rotate: (ids, degrees) => ipcRenderer.invoke('library:rotate', ids, degrees),
   exportOriginals: (ids) => ipcRenderer.invoke('library:export', ids),
   photoBook: (ids, title, layout) => ipcRenderer.invoke('library:photoBook', ids, title, layout),

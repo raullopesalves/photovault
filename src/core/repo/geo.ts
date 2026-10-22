@@ -56,3 +56,12 @@ export function locatedCount(library: Library, query?: AssetQuery): number {
   const w = assetWhere({ ...query, located: true })
   return library.db.get<{ n: number }>(`SELECT COUNT(*) AS n FROM assets a ${w.sql}`, w.params)?.n ?? 0
 }
+
+/** Every place in the library (as `assets.place` names it) with its item count, most first. */
+export function libraryPlaces(library: Library): Array<{ place: string; count: number }> {
+  return library.db.all<{ place: string; count: number }>(
+    `SELECT place, COUNT(*) AS count FROM assets
+      WHERE place IS NOT NULL AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL
+      GROUP BY place ORDER BY count DESC LIMIT 2000`
+  )
+}

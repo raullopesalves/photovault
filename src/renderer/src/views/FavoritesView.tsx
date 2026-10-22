@@ -20,7 +20,7 @@ export function FavoritesView(props: { version: number }) {
           <NoMatches onClear={() => setQuery({})} />
         ) : (
           <div className="mx-auto mt-16 max-w-sm text-center">
-            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-rose-50 text-rose-500 dark:bg-rose-500/10">
+            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-brass-soft text-brass-ink">
               <Heart className="size-6" strokeWidth={1.6} />
             </div>
             <div className="text-[16px] font-semibold">{t('No favourites yet')}</div>

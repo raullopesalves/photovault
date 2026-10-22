@@ -130,6 +130,8 @@ export interface AssetQuery {
   personId?: number
   /** Only items with this tag. */
   tag?: string
+  /** Only items in this place, as the map labels it ("Lisbon, Portugal"). */
+  place?: string
   /** Only these items (smart search results). */
   ids?: number[]
   /** Display only: the smart search that produced `ids`. */
@@ -819,6 +821,8 @@ export interface PhotoVaultApi {
   /** Towns to label on the offline map (bundled GeoNames list), biggest first. */
   mapPlaces(view: { south: number; west: number; north: number; east: number }, minPopulation: number): Promise<Array<{ name: string; lat: number; lon: number; population: number }>>
   mapClusters(view: { south: number; west: number; north: number; east: number; zoom: number }, query?: AssetQuery): Promise<MapCluster[]>
+  /** Every place in the library with its item count, most first (for search). */
+  libraryPlaces(): Promise<Array<{ place: string; count: number }>>
   /** Rotates photos by 90° steps without touching the originals. */
   rotate(ids: number[], degrees: 90 | -90 | 180): Promise<void>
   /** Asks for a folder and copies the originals there (never overwriting). Null if cancelled. */

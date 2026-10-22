@@ -31,7 +31,7 @@ export function AlbumsView(props: { version: number }) {
     <div className="scroll-page h-full overflow-y-auto">
       <div className="drag sticky top-0 z-10 flex items-end justify-between bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Albums')}</h1>
+          <h1 className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{t('Albums')}</h1>
           <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{t('Albums only reference photos — removing or deleting never touches your files.')}</div>
         </div>
         <button

@@ -1076,7 +1076,7 @@ It is trust.
 The user must be able to give Photo Vault irreplaceable personal photographs and understand exactly what the application has done with them.
 ---
 
-# 29. Implementation Status (updated 2026-10-22, version 0.12.0)
+# 29. Implementation Status (updated 2026-10-23, version 0.13.0)
 
 Milestones 0–5 are implemented, and most of Milestone 6:
 - **Import and safety:** resumable imports, library verification, catalogue snapshots and mirror backups.
@@ -1139,9 +1139,10 @@ See `DECISIONS.md` (D1–D88) for reasoning and `readme.md` for commands.
 - **Search:** full-text search via FTS5 trigrams (accent-insensitive, includes folders and albums); **smart search** with CLIP on the device, opt-in, model downloaded once, results best match first.
 - **Scale:** a 100k-item performance test (`npm run test:perf`).
 
-### In progress (0.13)
+### Added in 0.13
 
 - **Mount identity:** new logo and app icon, mat-grey and brass palette, Schibsted Grotesk and Fragment Mono bundled, and a grouped sidebar with a safety card and a Videos view (D90).
+- **Tidy up hub, one search box (Ctrl K) with people, places, things and albums, a date rail, selection as a brass mount with Undo, and Safety led by the backup state** (D91).
 
 ### Added in 0.12
 

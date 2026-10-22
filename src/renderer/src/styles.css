@@ -169,6 +169,20 @@
     transform: none;
   }
 }
+/* Menus and the search panel: a 4px drop from their control. */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-pop {
+  animation: pop var(--dur-base) var(--ease-out-soft) both;
+}
 @keyframes shimmer {
   from {
     background-position: -200% 0;
@@ -200,12 +214,33 @@
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }
+/* "Develop": a thumbnail arrives blurred and slightly enlarged, then sharpens. */
 .img-fade {
   opacity: 0;
-  transition: opacity 260ms var(--ease-out-soft);
+  filter: blur(9px) saturate(0.7);
+  transform: scale(1.06);
+  transition:
+    opacity 160ms linear,
+    filter var(--dur-develop) var(--ease-out-soft),
+    transform var(--dur-develop) var(--ease-out-soft);
 }
 .img-fade.loaded {
   opacity: 1;
+  filter: none;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .img-fade {
+    filter: none;
+    transform: none;
+    transition: opacity 120ms linear;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 120ms !important;
+    transition-duration: 120ms !important;
+  }
 }
 
 /* Map view */

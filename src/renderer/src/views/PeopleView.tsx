@@ -574,7 +574,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
     <div className="scroll-page relative h-full overflow-y-auto">
       <header className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-3 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <div className="flex min-h-[40px] items-end justify-between gap-4">
-          <h1 className="truncate font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{props.title}</h1>
+          <h1 className="truncate font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{props.title}</h1>
           <div className="no-drag flex shrink-0 items-center gap-2">
             {faces && <span className="text-xs tabular-nums text-stone-500">{plural(faces.length, 'face')}</span>}
             {props.actions}

@@ -20,7 +20,7 @@ export const Tile = memo(function Tile(props: {
   const [favOverride, setFavOverride] = useState<boolean | null>(null)
   useEffect(() => setFavOverride(null), [asset?.favorite])
 
-  if (!asset) return <div className="skeleton shrink-0 rounded-[3px]" style={{ width: size, height: size }} />
+  if (!asset) return <div className="skeleton shrink-0 rounded-[2px]" style={{ width: size, height: size }} />
 
   const showImg = asset.thumb === 'ready' && !broken
   const favorite = favOverride ?? asset.favorite
@@ -41,12 +41,16 @@ export const Tile = memo(function Tile(props: {
           props.onToggle(e.shiftKey)
         }
       }}
-      className={`group relative shrink-0 cursor-default overflow-hidden rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-accent-500 ${
-        selected ? 'bg-accent-100 dark:bg-accent-500/20' : 'bg-stone-200 dark:bg-stone-800'
+      className={`group relative shrink-0 cursor-default overflow-hidden rounded-[2px] outline-none transition-colors duration-[var(--dur-gentle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-ink ${
+        selected ? 'bg-brass' : 'bg-shelf'
       }`}
       style={{ width: size, height: size }}
     >
-      <div className={`size-full transition-transform duration-200 ease-[var(--ease-out-soft)] ${selected ? 'scale-[0.86] overflow-hidden rounded-[3px]' : ''}`}>
+      <div
+        className={`size-full overflow-hidden transition-[transform,box-shadow] duration-[var(--dur-gentle)] ${
+          selected ? 'scale-[0.84] rounded-[1px] shadow-[0_0_0_4px_var(--mat)] ease-[var(--ease-mount)]' : 'ease-[var(--ease-out-soft)]'
+        }`}
+      >
         {showImg ? (
           <img
             src={mediaUrl('thumb', asset.id, asset.rev)}
@@ -56,7 +60,7 @@ export const Tile = memo(function Tile(props: {
             loading="lazy"
             onLoad={() => setLoaded(true)}
             onError={() => setBroken(true)}
-            className={`img-fade size-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] ${selected ? '' : 'group-hover:scale-[1.03]'} ${loaded ? 'loaded' : ''}`}
+            className={`img-fade size-full object-cover ${loaded ? 'loaded' : ''}`}
           />
         ) : asset.thumb === 'pending' ? (
           <div className="skeleton size-full" />
@@ -76,20 +80,20 @@ export const Tile = memo(function Tile(props: {
         }}
         className={`absolute left-1.5 top-1.5 grid size-[22px] place-items-center rounded-full transition ${
           selected
-            ? 'bg-accent-500 text-on-accent opacity-100 ring-2 ring-white dark:ring-stone-900'
+            ? 'bg-brass text-on-accent opacity-100 ring-2 ring-[var(--mat)]'
             : `border-2 border-white/90 bg-black/10 text-transparent hover:bg-white/30 ${props.selecting ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`
         }`}
       >
         <Check className="size-3.5" strokeWidth={3} />
       </button>
       {(asset.mediaType === 'video' || asset.kind === 'animated') && (
-        <div className="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/45 px-1.5 py-0.5 text-[10.5px] font-medium text-white backdrop-blur-sm">
+        <div className="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-1 rounded-[4px] bg-black/50 px-1.5 py-0.5 font-mono text-[10.5px] text-white backdrop-blur-sm">
           {asset.kind === 'loop' || asset.kind === 'animated' ? <Repeat className="size-2.5" /> : <Play className="size-2.5 fill-white" />}
           {asset.kind === 'animated' ? 'GIF' : duration(asset.durationMs)}
         </div>
       )}
       {asset.liveVideoId !== null && (
-        <div className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/45 px-1.5 py-0.5 text-[9.5px] font-bold tracking-wider text-white backdrop-blur-sm">{t('LIVE')}</div>
+        <div className="pointer-events-none absolute right-1.5 top-1.5 rounded-[4px] bg-black/50 px-1.5 py-0.5 text-[9.5px] font-[650] tracking-[0.06em] text-white backdrop-blur-sm">{t('LIVE')}</div>
       )}
       {asset.hidden && (
         <div className="pointer-events-none absolute bottom-1.5 right-1.5 grid size-5 place-items-center rounded-full bg-black/45 text-white backdrop-blur-sm" title={t('Hidden from Photos')}>
@@ -109,7 +113,7 @@ export const Tile = memo(function Tile(props: {
           favorite ? 'opacity-100' : props.selecting ? 'hidden' : 'opacity-0 hover:bg-black/20 group-hover:opacity-100'
         }`}
       >
-        <Heart className={`size-[15px] drop-shadow ${favorite ? 'fill-white text-white' : 'text-white'}`} strokeWidth={2.25} />
+        <Heart className={`size-[15px] drop-shadow ${favorite ? 'fill-accent-400 text-accent-400' : 'text-white'}`} strokeWidth={2.25} />
       </button>
     </div>
   )

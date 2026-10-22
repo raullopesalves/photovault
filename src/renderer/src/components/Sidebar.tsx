@@ -2,8 +2,6 @@ import type { ReactNode } from 'react'
 import {
   Album,
   BrushCleaning,
-  Copy,
-  EyeOff,
   Heart,
   Images,
   LoaderCircle,
@@ -43,7 +41,8 @@ export type View =
 
 const icon = (I: typeof Images): ReactNode => <I className="size-[17px]" strokeWidth={1.75} />
 
-/** Ten places in three groups. Imports open from the Import button, Storage from the safety card, Settings from the footer. */
+/** Ten places in three groups. Duplicates and Hidden open from Tidy up, imports from the Import button, Safety from the
+ * status card, Settings from the footer. */
 const SECTIONS: Array<{ label?: string; items: Array<{ id: View; label: string; icon: ReactNode }> }> = [
   {
     items: [
@@ -66,8 +65,6 @@ const SECTIONS: Array<{ label?: string; items: Array<{ id: View; label: string; 
     label: t('Look after'),
     items: [
       { id: 'cleanup', label: t('Tidy up'), icon: icon(BrushCleaning) },
-      { id: 'duplicates', label: t('Duplicates'), icon: icon(Copy) },
-      { id: 'hidden', label: t('Hidden'), icon: icon(EyeOff) },
       { id: 'bin', label: t('Bin'), icon: icon(Trash2) }
     ]
   }
@@ -110,7 +107,9 @@ export function Sidebar(props: {
       : progress?.phase === 'importing' && progress.bytesTotal > 0
         ? progress.bytesProcessed / progress.bytesTotal
         : null
-  const counts: Partial<Record<View, number>> = { screenshots: library.screenshotCount, hidden: library.hiddenCount, bin: library.binCount }
+  const counts: Partial<Record<View, number>> = { screenshots: library.screenshotCount, bin: library.binCount }
+  // Views opened from Tidy up keep it highlighted, so the way back is visible.
+  const current: View = props.view === 'duplicates' || props.view === 'hidden' ? 'cleanup' : props.view
 
   return (
     <aside className="drag flex w-[232px] shrink-0 flex-col gap-[18px] border-r border-line bg-shelf px-3 pb-3">
@@ -125,7 +124,7 @@ export function Sidebar(props: {
           <div key={i} className="flex flex-col gap-px">
             {s.label && <div className="px-2.5 pb-1.5 text-[11px] font-[650] uppercase leading-[14px] tracking-[0.07em] text-ink-muted">{s.label}</div>}
             {s.items.map((item) => {
-              const active = props.view === item.id
+              const active = current === item.id
               const count = counts[item.id]
               return (
                 <button

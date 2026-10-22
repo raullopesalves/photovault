@@ -12,8 +12,8 @@ const NEAR_PAGE = 30
 
 type Tab = 'exact' | 'probable' | 'similar'
 
-export function DuplicatesView(props: { version: number }) {
-  const [tab, setTab] = useState<Tab>('exact')
+export function DuplicatesView(props: { version: number; initialTab?: Tab }) {
+  const [tab, setTab] = useState<Tab>(props.initialTab ?? 'exact')
   const [exactTotal, setExactTotal] = useState<number | null>(null)
   const [near, setNear] = useState<NearDuplicates | null>(null)
   const [similar, setSimilar] = useState<NearDuplicates | null>(null)

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { PromptDialog } from './Dialog'
-import { Wand2, ArrowDownUp, Calendar, Camera, Check, ChevronDown, Film, LoaderCircle, Sparkles, FolderInput, Heart, Search, Smartphone, X } from 'lucide-react'
+import { Album, Wand2, ArrowDownUp, Calendar, Camera, Check, ChevronDown, Film, Sparkles, FolderInput, Heart, Map as MapIcon, Smartphone, Users, X } from 'lucide-react'
+import { SearchBox, type SearchLabels } from './SearchBox'
 import type { AssetQuery, Facets } from '@shared/types'
 import { api, n, sourceTypeLabel } from '../lib/format'
 import { kindLabel, originLabel } from '../lib/labels'
@@ -29,45 +30,12 @@ function toggle<T>(list: T[] | undefined, value: T, eq: (a: T, b: T) => boolean 
  */
 export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) => void; version: number; hideFavorite?: boolean; hideOrigin?: boolean }) {
   const [facets, setFacets] = useState<Facets | null>(null)
-  const [text, setText] = useState(props.query.text ?? props.query.smartText ?? '')
-  const [smart, setSmart] = useState(props.query.smartText !== undefined)
-  const [smartReady, setSmartReady] = useState(false)
-  const [searching, setSearching] = useState(false)
+  const [labels, setLabels] = useState<SearchLabels>({})
   const q = props.query
 
   useEffect(() => {
     void api.facets().then(setFacets)
-    void api.smartSearchStatus().then((s) => setSmartReady(!!s && s.enabled && s.indexed > 0))
   }, [props.version])
-
-  // Keep the field in sync when the query is cleared from outside (badges, "Clear all").
-  useEffect(() => {
-    const current = q.text ?? q.smartText ?? ''
-    if (current !== text.trim()) setText(current)
-  }, [q.text, q.smartText])
-
-  // Debounce typing so every keystroke doesn't re-query the library.
-  useEffect(() => {
-    const value = text.trim()
-    const t = setTimeout(
-      () => {
-        if (!smart) {
-          if ((q.text ?? '') !== value || q.smartText !== undefined)
-            props.onChange({ ...q, text: value || undefined, ids: undefined, smartText: undefined, sort: q.sort === 'relevance' ? undefined : q.sort })
-          return
-        }
-        if ((q.smartText ?? '') === value && q.text === undefined) return
-        if (!value) return props.onChange({ ...q, text: undefined, ids: undefined, smartText: undefined, sort: q.sort === 'relevance' ? undefined : q.sort })
-        setSearching(true)
-        void api
-          .smartSearch(value)
-          .then((ids) => props.onChange({ ...q, text: undefined, ids, smartText: value, sort: q.sort === 'taken' ? 'taken' : 'relevance' }))
-          .finally(() => setSearching(false))
-      },
-      smart ? 450 : 220
-    )
-    return () => clearTimeout(t)
-  }, [text, smart])
 
   const set = (patch: Partial<AssetQuery>): void => props.onChange({ ...q, ...patch })
   const [saving, setSaving] = useState(false)
@@ -93,6 +61,9 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
       ),
       remove: () => set({ ids: undefined, smartText: undefined, sort: q.sort === 'relevance' ? undefined : q.sort })
     })
+  if (typeof q.personId === 'number') badges.push({ key: 'person', label: <><Users className="size-3" />{' '}{labels.person || t('Person')}</>, remove: () => set({ personId: undefined }) })
+  if (q.place) badges.push({ key: 'place', label: <><MapIcon className="size-3" />{' '}{q.place}</>, remove: () => set({ place: undefined }) })
+  if (typeof q.albumId === 'number') badges.push({ key: 'album', label: <><Album className="size-3" />{' '}{labels.album || t('Album')}</>, remove: () => set({ albumId: undefined }) })
   if (q.favorite && !props.hideFavorite) badges.push({ key: 'fav', label: t('Favourites'), remove: () => set({ favorite: undefined }) })
   for (const t of q.types ?? []) badges.push({ key: `t:${t}`, label: TYPE_LABEL[t], remove: () => set({ types: toggle(q.types, t) }) })
   for (const y of q.years ?? []) badges.push({ key: `y:${y}`, label: y === 0 ? t('No date') : String(y), remove: () => set({ years: toggle(q.years, y) }) })
@@ -101,40 +72,27 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
   for (const s of q.sourceTypes ?? []) badges.push({ key: `s:${s}`, label: t('Source: {v0}', { v0: sourceTypeLabel(s) }), remove: () => set({ sourceTypes: toggle(q.sourceTypes, s) }) })
 
   const clearAll = (): void => {
-    setText('')
-    set({ text: undefined, ids: undefined, smartText: undefined, sort: q.sort === 'relevance' ? undefined : q.sort, favorite: undefined, types: undefined, years: undefined, cameras: undefined, origins: undefined, sourceTypes: undefined })
+    set({
+      text: undefined,
+      ids: undefined,
+      smartText: undefined,
+      sort: q.sort === 'relevance' ? undefined : q.sort,
+      personId: undefined,
+      place: undefined,
+      albumId: undefined,
+      favorite: undefined,
+      types: undefined,
+      years: undefined,
+      cameras: undefined,
+      origins: undefined,
+      sourceTypes: undefined
+    })
   }
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2">
-        <label className="flex h-8 w-72 items-center gap-2 rounded-lg bg-stone-200/60 px-2.5 text-stone-500 ring-accent-500 focus-within:bg-white focus-within:ring-2 dark:bg-stone-800/80 dark:focus-within:bg-stone-900">
-          <Search className="size-3.5 shrink-0" />
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Escape' && setText('')}
-            placeholder={smart ? t('Describe it: beach at sunset, dog, cake…') : t('Search names, cameras, albums, years')}
-            className="min-w-0 flex-1 select-text bg-transparent text-[13px] text-stone-900 outline-none placeholder:text-stone-400 dark:text-stone-100"
-          />
-          {searching && <LoaderCircle className="size-3.5 shrink-0 animate-spin" />}
-          {smartReady && (
-            <button
-              onClick={() => setSmart((s) => !s)}
-              title={smart ? t('Smart search: finds photos by what they show. Click to search names instead.') : t('Search by what photos show (on-device AI)')}
-              aria-label={t('Smart search')}
-              aria-pressed={smart}
-              className={`grid size-6 shrink-0 place-items-center rounded-md transition ${smart ? 'bg-accent-500 text-on-accent' : 'text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}
-            >
-              <Sparkles className="size-3.5" />
-            </button>
-          )}
-          {text && (
-            <button onClick={() => setText('')} aria-label={t('Clear search')} className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200">
-              <X className="size-3.5" />
-            </button>
-          )}
-        </label>
+        <SearchBox query={q} onChange={props.onChange} onLabels={(l) => setLabels((old) => ({ ...old, ...l }))} version={props.version} />
 
         <button
           onClick={() =>

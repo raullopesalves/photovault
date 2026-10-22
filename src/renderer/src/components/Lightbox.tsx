@@ -196,7 +196,7 @@ export function Lightbox(props: {
 
   return (
     // no-drag: the sidebar underneath is a window-drag region, which would otherwise swallow clicks on the left arrow.
-    <div className="no-drag fixed inset-0 z-40 flex bg-stone-950 text-stone-100 animate-fade-in">
+    <div className="no-drag fixed inset-0 z-40 flex bg-[#0b0c0b] text-stone-100 animate-fade-in">
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="drag absolute inset-x-0 top-0 z-10 flex h-14 items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-4 pr-40">
           <button onClick={props.onClose} className="no-drag grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label={t('Close')}>
@@ -288,7 +288,7 @@ export function Lightbox(props: {
               {detail?.trashed ? <RotateCcw className="size-[18px]" /> : <Trash2 className="size-[18px]" />}
             </button>
             <button onClick={toggleFavorite} className="grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label={t('Favorite')}>
-              <Heart className={`size-[18px] ${detail?.favorite ? 'fill-rose-500 text-rose-500' : ''}`} />
+              <Heart className={`size-[18px] ${detail?.favorite ? 'fill-accent-400 text-accent-400' : ''}`} />
             </button>
             <button
               onClick={() => setShowInfo((s) => !s)}

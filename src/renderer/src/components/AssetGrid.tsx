@@ -4,6 +4,7 @@ import { Album, CalendarClock, Check, Eye, EyeOff, Heart, HeartOff, ImageMinus, 
 import type { AlbumSummary, AssetQuery, AssetSummary, TimelineGroup } from '@shared/types'
 import { api, monthLabel, n, plural } from '../lib/format'
 import { Tile } from './Tile'
+import { DateRail, RAIL_W } from './DateRail'
 import { Lightbox } from './Lightbox'
 import { Slideshow } from './Slideshow'
 import { DateDialog, PrintDialog, PromptDialog, ShareDialog } from './Dialog'
@@ -13,7 +14,7 @@ import { t } from '../lib/i18n'
 
 const PAGE = 240
 const ZOOM_SIZES = [116, 168, 236, 320]
-const GAP = 4
+const GAP = 2 // prints laid edge to edge, as on a contact sheet
 const PAD_X = 28
 const MONTH_H = 60
 
@@ -148,7 +149,9 @@ export function AssetGrid(props: {
   }, [zoom])
 
   const target = ZOOM_SIZES[zoom] as number
-  const inner = Math.max(0, width - PAD_X * 2)
+  // The date rail takes the right gutter when the timeline is in date order and spans more than a couple of months.
+  const showRail = (groups?.length ?? 0) > 2 && props.query?.sort !== 'added' && props.query?.sort !== 'relevance'
+  const inner = Math.max(0, width - PAD_X - (showRail ? RAIL_W + 16 : PAD_X))
   const cols = Math.max(2, Math.floor((inner + GAP) / (target + GAP)))
   const tile = inner > 0 ? (inner - GAP * (cols - 1)) / cols : target
   const total = useMemo(() => (groups ?? []).reduce((s, d) => s + d.count, 0), [groups])
@@ -175,6 +178,55 @@ export function AssetGrid(props: {
   useEffect(() => {
     virtualizer.measure()
   }, [tile, rows, headerH, virtualizer])
+
+  // Where each row starts below the header, for the date rail's jumps and its "you are here" marker.
+  const rowOffsets = useMemo(() => {
+    const out: number[] = []
+    let y = 0
+    for (const r of rows) {
+      out.push(y)
+      y += r.kind === 'header' ? MONTH_H : tile + GAP
+    }
+    return out
+  }, [rows, tile])
+  const [currentMonth, setCurrentMonth] = useState<string | null>(null)
+  useEffect(() => {
+    const el = scrollEl
+    if (!el || !showRail) return
+    let frame = 0
+    const update = (): void => {
+      frame = 0
+      const y = el.scrollTop + 1
+      let lo = 0
+      let hi = rowOffsets.length - 1
+      while (lo < hi) {
+        const mid = (lo + hi + 1) >> 1
+        if ((rowOffsets[mid] as number) <= y) lo = mid
+        else hi = mid - 1
+      }
+      for (let i = lo; i >= 0; i--) {
+        const r = rows[i]
+        if (r?.kind === 'header') return setCurrentMonth(r.month)
+      }
+      setCurrentMonth(groups?.[0]?.month ?? null)
+    }
+    const onScroll = (): void => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    el.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [scrollEl, rowOffsets, rows, showRail, groups])
+  const jumpToMonth = useCallback(
+    (month: string) => {
+      const i = rows.findIndex((r) => r.kind === 'header' && r.month === month)
+      if (i >= 0) scrollEl?.scrollTo({ top: rowOffsets[i] ?? 0 })
+    },
+    [rows, rowOffsets, scrollEl]
+  )
 
   const items = virtualizer.getVirtualItems()
   let firstIdx = Number.POSITIVE_INFINITY
@@ -269,8 +321,8 @@ export function AssetGrid(props: {
         >
           <div className="flex min-h-[40px] items-end justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="truncate font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{props.title}</h1>
-              {props.subtitle && <div className="mt-0.5 truncate text-xs text-stone-500 dark:text-stone-400">{props.subtitle}</div>}
+              <h1 className="truncate font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{props.title}</h1>
+              {props.subtitle && <div className="mt-0.5 truncate text-[12.5px] leading-[18px] text-ink-muted">{props.subtitle}</div>}
             </div>
             <div className="no-drag flex shrink-0 items-center gap-3">
               {props.actions}
@@ -339,10 +391,10 @@ export function AssetGrid(props: {
                         </button>
                       )
                     })()}
-                    <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-tight text-stone-800 dark:text-stone-100">
+                    <span className="font-[family-name:var(--font-display)] text-[19px] font-[650] leading-6 tracking-[-0.01em] text-ink">
                       {props.query?.sort === 'added' ? t('Added {v0}', { v0: monthLabel(row.month) }) : monthLabel(row.month)}
                     </span>
-                    <span className="ml-2 text-xs text-stone-400 dark:text-stone-500">{n(row.count)}</span>
+                    <span className="ml-2.5 font-mono text-[13px] tabular-nums text-ink-muted">{n(row.count)}</span>
                     {row.month === 'undated' && (
                       <span className="ml-3 truncate text-xs text-stone-500 dark:text-stone-400">{t('No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.')}</span>
                     )}
@@ -372,6 +424,12 @@ export function AssetGrid(props: {
           </div>
         )}
       </div>
+
+      {showRail && !showEmpty && groups && (
+        <div className="absolute bottom-3 right-3" style={{ top: headerH + 8 }}>
+          <DateRail groups={groups} current={currentMonth} onJump={jumpToMonth} />
+        </div>
+      )}
 
       {selecting && props.mode === 'bin' && <BinSelectionBar ids={[...selected.keys()]} onDone={clearSelection} />}
       {selecting && props.mode !== 'bin' && (
@@ -405,7 +463,7 @@ export function AssetGrid(props: {
 }
 
 const barBtnClass =
-  'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-[13px] font-medium text-white/90 transition hover:bg-white/15 hover:text-white disabled:opacity-40'
+  'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-[13px] font-medium text-white/90 transition hover:bg-white/15 hover:text-white disabled:opacity-40'
 
 function BinSelectionBar(props: { ids: number[]; onDone: () => void }) {
   const [deleting, setDeleting] = useState(false)
@@ -489,13 +547,13 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
   }
 
   const barBtn =
-    'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-[13px] font-medium text-white/90 transition hover:bg-white/15 hover:text-white disabled:opacity-40'
+    'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-[13px] font-medium text-white/90 transition hover:bg-white/15 hover:text-white disabled:opacity-40'
 
   return (
     <>
       <div className="no-drag fixed bottom-6 left-[calc(50%+114px)] z-30 -translate-x-1/2 animate-rise-in">
         {toast ? (
-          <div className="flex items-center gap-3 rounded-full bg-stone-900/95 py-2 pl-5 pr-2 text-[13px] font-medium text-white shadow-2xl backdrop-blur dark:bg-stone-800/95">
+          <div className="flex items-center gap-3 rounded-[14px] bg-stone-900/95 py-2 pl-5 pr-2 text-[13px] font-medium text-white shadow-2xl backdrop-blur dark:bg-stone-800/95">
             {toast}
             {undo && (
               <button
@@ -511,7 +569,7 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
             {!undo && <span className="w-3" />}
           </div>
         ) : (
-          <div className="relative flex items-center gap-1 rounded-full bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur dark:bg-stone-800/95 dark:ring-1 dark:ring-white/10">
+          <div className="relative flex items-center gap-1 rounded-[14px] bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur dark:bg-stone-800/95 dark:ring-1 dark:ring-white/10">
             <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label={t('Clear selection')}>
               <X className="size-4" />
             </button>
@@ -520,8 +578,12 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
             <button
               className={barBtn}
               onClick={async () => {
-                await api.setFavorites(props.ids, !props.allFavorite)
-                flash(props.allFavorite ? t('Removed from favourites') : t('{count} added to favourites', { count: plural(count, 'item') }))
+                const ids = props.ids
+                const fav = !props.allFavorite
+                await api.setFavorites(ids, fav)
+                flash(fav ? t('{count} added to favourites', { count: plural(count, 'item') }) : t('Removed from favourites'), async () => {
+                  await api.setFavorites(ids, !fav)
+                })
               }}
             >
               {props.allFavorite ? <HeartOff className="size-4" /> : <Heart className="size-4" />}
@@ -535,8 +597,12 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
               className={barBtn}
               title={props.allHidden ? t('Show in the Photos timeline again') : t('Remove from the Photos timeline (nothing is deleted)')}
               onClick={async () => {
-                await api.setHidden(props.ids, !props.allHidden)
-                flash(props.allHidden ? t('{count} shown in Photos', { count: plural(count, 'item') }) : t('{count} hidden from Photos', { count: plural(count, 'item') }))
+                const ids = props.ids
+                const hide = !props.allHidden
+                await api.setHidden(ids, hide)
+                flash(hide ? t('{count} hidden from Photos', { count: plural(count, 'item') }) : t('{count} shown in Photos', { count: plural(count, 'item') }), async () => {
+                  await api.setHidden(ids, !hide)
+                })
               }}
             >
               {props.allHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}

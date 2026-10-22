@@ -459,3 +459,11 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 - **Fonts:** Schibsted Grotesk (variable) and Fragment Mono, both OFL, bundled through `@fontsource` so the app stays offline. Vite must not inline font files (`assetsInlineLimit`): the renderer CSP blocks `data:` fonts.
 - **Sidebar:** fourteen flat items became groups: Photos, Memories, People, Places (was Map), Albums · Collections: Favourites, Screenshots, Videos (new view) · Look after: Tidy up (was Cleanup), Duplicates, Hidden, Bin. Past imports open from the Import menu; Storage (now titled Safety) opens from a safety card that says in words whether every item has a backup copy; Settings is an icon beside Import. Duplicates and Hidden fold into Tidy up when that hub is rebuilt.
 
+**D91. Mount, the rest of the first pass (0.13).**
+- **Tidy up is the hub.** Cards with one big number each, biggest first: likely clutter, probably clutter (no camera data), look-alikes (probable duplicates and similar photos open the Duplicates view on that tab) and Hidden. Duplicates and Hidden left the sidebar; Tidy up stays highlighted while they are open.
+- **One search box** (`SearchBox.tsx`, Ctrl K). Typing still filters by name, camera and date as you type; a panel adds People, Places (new `AssetQuery.place`, from `assets.place`), Things (smart search, when set up) and Albums, with arrow keys and Enter. The sparkle toggle is gone.
+- **Date rail** (`DateRail.tsx`) on the timeline when it is in date order: years sized by their share (3.5 % floor), a tick per month, a brass marker that follows scrolling; drag, click or arrow keys to jump.
+- **Selection is a mount**: the photo shrinks to 0.84 into a mat gap inside a brass edge (`ease-mount`). Favourite and Hide act at once with Undo, like the Bin. Thumbnails "develop" from a blur. Tiles sit 2 px apart and no longer zoom on hover.
+- **Safety** leads with the backup state in a sentence; with no backup at all the backup panel's own warning comes first instead.
+- **Classifier (v5):** photos 3,000 px or larger with no camera data are no longer called "probably received". On a real library 99 % of the 16,190 were chat or saved sizes (1600, 2048, 1080×1920, Android media-id names); the 88 camera-sized ones matched the owner's own camera sizes.
+

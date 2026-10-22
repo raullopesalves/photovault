@@ -1,7 +1,7 @@
 import type { AssetKind, AssetOrigin } from '@shared/types'
 
 /** Bump when rules change: assets classified with an older version are re-classified in the background. */
-export const CLASSIFY_VERSION = 4
+export const CLASSIFY_VERSION = 5
 
 export interface ClassifyInput {
   mediaType: 'photo' | 'video'
@@ -157,8 +157,11 @@ export function classifyAsset(input: ClassifyInput): Classification {
 
   // Nothing direct, but the photo carries no capture metadata at all. Photos straight from a phone
   // camera keep theirs (even through Google Photos downloads); messaging apps and "save image" strip it.
-  // This is an inference, so it is labelled 'probable' and its evidence says so.
-  if (!origin && input.metadataStripped) {
+  // This is an inference, so it is labelled 'probable' and its evidence says so. Camera-sized photos
+  // (3,000 px or more on the long side) are left unlabelled: chat apps and social sites never send that
+  // large, so these are far more likely the owner's own photos that lost their metadata in an edit or export.
+  const cameraSized = input.mediaType === 'photo' && Math.max(input.width ?? 0, input.height ?? 0) >= 3000
+  if (!origin && input.metadataStripped && !cameraSized) {
     origin = 'received'
     originConfidence = 'probable'
     const w = input.width ?? 0

@@ -15,7 +15,7 @@ import { facets, setHiddenByQuery } from '@core/repo/filters'
 import { setManualDates } from '@core/dating/dating'
 import { dismissNearDuplicates, hideAllNearDuplicateExtras, nearDuplicates } from '@core/repo/nearDuplicates'
 import { similarPhotos } from '@core/repo/similar'
-import { mapClusters } from '@core/repo/geo'
+import { libraryPlaces, mapClusters } from '@core/repo/geo'
 import { memories } from '@core/repo/memories'
 import { fillPlaces } from '@core/geo/fillPlaces'
 import { placesInBox } from '@core/geo/places'
@@ -69,6 +69,7 @@ function query(v: unknown): AssetQuery | undefined {
   if (typeof q.albumId === 'number') out.albumId = int(q.albumId, 'album', 1)
   if (typeof q.personId === 'number') out.personId = int(q.personId, 'person', 1)
   if (typeof q.tag === 'string' && q.tag.trim()) out.tag = q.tag.trim().slice(0, 60)
+  if (typeof q.place === 'string' && q.place.trim()) out.place = q.place.slice(0, 200)
   if (typeof q.origin === 'string' && /^[a-z_]{1,24}$/.test(q.origin)) out.origin = q.origin as AssetQuery['origin']
   if (typeof q.kind === 'string' && /^[a-z_]{1,24}$/.test(q.kind)) out.kind = q.kind as AssetQuery['kind']
   if (q.originHint === 'whatsapp_size' || q.originHint === 'social_size' || q.originHint === 'none') out.originHint = q.originHint
@@ -447,6 +448,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     const view = { south: num(o.south, 'south'), west: num(o.west, 'west'), north: num(o.north, 'north'), east: num(o.east, 'east'), zoom: num(o.zoom, 'zoom') }
     return mapClusters(lib(), view, query(q))
   })
+  ipcMain.handle('library:places', () => libraryPlaces(lib()))
   ipcMain.handle('library:similarPhotos', (_e, offset: unknown, limit: unknown) => similarPhotos(lib(), int(offset, 'offset'), int(limit, 'limit', 1)))
   ipcMain.handle('library:dismissNearDuplicates', (_e, ids: unknown) => {
     dismissNearDuplicates(lib(), idList(ids))

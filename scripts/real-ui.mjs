@@ -263,6 +263,45 @@ try {
     await page.screenshot({ path: join(shots, 'screens-photos-search.png') })
   }
 
+  if (process.argv.includes('--redesign')) {
+    // The Mount redesign: date rail, one search box, mount selection, Tidy up, Safety, viewer.
+    const shot = (name) => page.screenshot({ path: join(shots, `mount-${name}.png`) })
+    await shot('photos-rail')
+    const rail = page.locator('[aria-label="Jump to a date"]')
+    const box = await rail.boundingBox()
+    if (box) {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height * 0.45)
+      await page.mouse.down()
+      await page.mouse.up()
+      await page.waitForTimeout(1500)
+      await shot('photos-jumped')
+    }
+    await page.keyboard.press('Control+K')
+    await page.keyboard.type('lis')
+    await page.waitForTimeout(800)
+    await shot('search-panel')
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+    const tiles = page.locator('main [aria-label="Select"]')
+    for (const i of [1, 2, 4]) await tiles.nth(i).click({ force: true })
+    await page.waitForTimeout(600)
+    await shot('selection')
+    await page.keyboard.press('Escape')
+    await page.click('nav >> text=Tidy up')
+    await page.waitForTimeout(2500)
+    await shot('tidy-up')
+    await page.locator('aside button:has-text("backup")').first().click()
+    await page.waitForTimeout(1500)
+    await shot('safety')
+    await page.click('nav >> text=Photos')
+    await page.waitForTimeout(1500)
+    await page.locator('main img').nth(5).click()
+    await page.waitForTimeout(2000)
+    await shot('viewer')
+    await page.keyboard.press('Escape')
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()
@@ -530,7 +569,9 @@ try {
       await page.waitForTimeout(10_000)
     }
   }
-  await page.click('nav >> text=Duplicates')
+  await page.click('nav >> text=Tidy up')
+  await page.waitForTimeout(1500)
+  await page.click('main button:has-text("Similar photos")')
   await page.waitForTimeout(1000)
   await page.click('button:has-text("Similar photos")')
   await page.waitForTimeout(2500)

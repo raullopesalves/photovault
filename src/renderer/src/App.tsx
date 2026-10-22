@@ -16,7 +16,7 @@ import { MapView } from './views/MapView'
 import { PeopleView } from './views/PeopleView'
 import { MemoriesView } from './views/MemoriesView'
 import { FavoritesView } from './views/FavoritesView'
-import { CleanupView } from './views/CleanupView'
+import { CleanupView, type TidyTarget } from './views/CleanupView'
 import { ScreenshotsView } from './views/ScreenshotsView'
 import { VideosView } from './views/VideosView'
 import { BinView, HiddenView } from './views/HiddenBinViews'
@@ -34,6 +34,7 @@ export default function App() {
   const [view, setView] = useState<View>('photos')
   const [theme, setTheme] = useState<ThemePreference>('system')
   const [showScreenshots, setShowScreenshots] = useState(false)
+  const [duplicatesTab, setDuplicatesTab] = useState<'exact' | 'probable' | 'similar'>('exact')
   const [progress, setProgress] = useState<ImportProgress | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [version, setVersion] = useState(0)
@@ -189,7 +190,7 @@ export default function App() {
         {view === 'imports' && (
           <ImportsView version={version} onImport={(kind) => void startImport(kind)} onResume={(id) => void resumeImport(id)} busy={importRunning} />
         )}
-        {view === 'duplicates' && <DuplicatesView version={version} />}
+        {view === 'duplicates' && <DuplicatesView key={duplicatesTab} version={version} initialTab={duplicatesTab} />}
         {view === 'storage' && <StorageView library={library} version={version} />}
         {view === 'settings' && (
           <SettingsView
@@ -207,7 +208,14 @@ export default function App() {
         {view === 'memories' && <MemoriesView version={version} />}
         {view === 'videos' && <VideosView version={version} showScreenshots={showScreenshots} />}
         {view === 'screenshots' && <ScreenshotsView version={version} showInPhotos={showScreenshots} onShowInPhotos={(s) => void changeShowScreenshots(s)} />}
-        {view === 'cleanup' && <CleanupView version={version} showScreenshots={showScreenshots} />}
+        {view === 'cleanup' && <CleanupView
+            version={version}
+            showScreenshots={showScreenshots}
+            onOpenView={(target: TidyTarget) => {
+              if (target.view === 'duplicates') setDuplicatesTab(target.tab)
+              setView(target.view)
+            }}
+          />}
         {view === 'hidden' && <HiddenView version={version} library={library} />}
         {view === 'bin' && <BinView version={version} library={library} />}
       </main>

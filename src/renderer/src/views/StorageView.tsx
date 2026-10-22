@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CircleAlert, FolderOpen, HardDrive, LoaderCircle, ShieldCheck } from 'lucide-react'
+import { CircleAlert, FolderOpen, HardDrive, LoaderCircle, ShieldAlert, ShieldCheck } from 'lucide-react'
 import type { LibraryInfo, VerifyIssue, VerifyProgress } from '@shared/types'
 import { api, bytes, etaLabel, isoLocal, n, plural } from '../lib/format'
 import { PageHeader } from './Placeholder'
@@ -11,6 +11,11 @@ export function StorageView({ library, version }: { library: LibraryInfo; versio
     <div className="scroll-page h-full overflow-y-auto">
       <PageHeader title={t('Safety')} subtitle={t('Where your originals live, their backup copies, and checks that every file is still intact.')} />
       <div className="mx-auto max-w-4xl space-y-4 px-8 pb-12">
+        <SafetyStatement library={library} />
+        <div id="backups" className="scroll-mt-20">
+          <BackupPanel version={version} />
+        </div>
+
         <div className="flex items-center gap-5 rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
           <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">
             <HardDrive className="size-6" strokeWidth={1.6} />
@@ -32,12 +37,35 @@ export function StorageView({ library, version }: { library: LibraryInfo; versio
             <FolderOpen className="size-4" />{' '}{t('Open')}</button>
         </div>
 
-        <BackupPanel version={version} />
-
         <VerifyCard />
 
       </div>
     </div>
+  )
+}
+
+/**
+ * The one question Safety answers first: does every item have a second copy? With no backup at all, the backup
+ * panel's own warning says it (with the button to fix it), so this shows only once a backup exists.
+ */
+function SafetyStatement({ library }: { library: LibraryInfo }) {
+  const { assetCount, unprotectedCount } = library
+  if (assetCount === 0 || unprotectedCount >= assetCount) return null
+  const safe = unprotectedCount === 0
+  return (
+    <section className={`flex items-center gap-4 rounded-[14px] px-5 py-4 ${safe ? 'bg-safe-soft' : 'bg-brass-soft'}`}>
+      <div className={`grid size-11 shrink-0 place-items-center rounded-lg bg-card ${safe ? 'text-safe' : 'text-brass-ink'}`}>
+        {safe ? <ShieldCheck className="size-[22px]" strokeWidth={1.75} /> : <ShieldAlert className="size-[22px]" strokeWidth={1.75} />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-[family-name:var(--font-display)] text-[19px] font-[650] leading-6 tracking-[-0.01em] text-ink">
+          {safe ? t('Every item has a backup copy') : t('{count} items have only one copy', { count: n(unprotectedCount) })}
+        </div>
+        <div className="mt-0.5 text-[14px] leading-5 text-ink">
+          {safe ? t('Plug your backup drives in now and then, and they are brought up to date.') : t('Plug in your backup drive and they are copied straight away.')}
+        </div>
+      </div>
+    </section>
   )
 }
 

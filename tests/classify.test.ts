@@ -66,6 +66,9 @@ describe('classifyAsset rules', () => {
     expect(wa.originEvidence.join(' ')).toMatch(/WhatsApp resizes/)
     expect(classifyAsset({ ...base, metadataStripped: true, width: 1536, height: 2048 })).toMatchObject({ origin: 'received', originHint: 'social_size' })
     expect(classifyAsset({ ...base, metadataStripped: true, width: 1080, height: 1920 })).toMatchObject({ origin: 'received', originHint: null })
+    // Camera-sized photos with no metadata are probably the owner's own, edited or exported: no guess.
+    expect(classifyAsset({ ...base, metadataStripped: true, width: 3840, height: 5120 }).origin).toBeNull()
+    expect(classifyAsset({ ...base, metadataStripped: true, width: 1476, height: 3280 }).origin).toBeNull()
     // Direct evidence always wins over the inference, and videos are never inferred.
     expect(classifyAsset({ ...base, metadataStripped: true, filenames: ['Screenshot_20240101-101010.png'] })).toMatchObject({ origin: 'screenshot', originConfidence: 'certain' })
     expect(classifyAsset({ ...base, metadataStripped: false, width: 1600, height: 1200 }).origin).toBeNull()

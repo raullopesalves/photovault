@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ArrowLeft, Eye, EyeOff, LoaderCircle, Trash2 } from 'lucide-react'
-import type { AssetKind, AssetQuery, AssetSummary, Facets } from '@shared/types'
+import { ArrowLeft, Copy, Eye, EyeOff, Images, LoaderCircle, Trash2 } from 'lucide-react'
+import type { AssetKind, AssetQuery, AssetSummary, Facets, NearDuplicates } from '@shared/types'
 import { api, mediaUrl, n, plural } from '../lib/format'
 import { isClutterOrigin, kindIcon, kindLabel, originIcon, originLabel } from '../lib/labels'
 import { AssetGrid } from '../components/AssetGrid'
@@ -12,22 +12,38 @@ interface Group {
   key: string
   title: string
   icon: ReactNode
-  query: AssetQuery
+  /** The items, for the previews and the detail grid. */
+  query?: AssetQuery
+  /** Previews by id, for groups that are not a query (duplicates). */
+  previewIds?: number[]
   count: number
+  /** What the count counts, after the number: "extra copies". */
+  unit?: string
   hidden: number
   note?: string
+  /** Opens another view instead of the group's own grid. */
+  target?: TidyTarget
 }
 
-export function CleanupView(props: { version: number; showScreenshots: boolean }) {
+export type TidyTarget = { view: 'duplicates'; tab: 'probable' | 'similar' } | { view: 'hidden' }
+
+/** Tidy up: everything worth reviewing together, as cards with one number each, biggest first. */
+export function CleanupView(props: { version: number; showScreenshots: boolean; onOpenView: (target: TidyTarget) => void }) {
   const [facets, setFacets] = useState<Facets | null>(null)
+  const [near, setNear] = useState<NearDuplicates | null>(null)
+  const [similar, setSimilar] = useState<NearDuplicates | null>(null)
   const [open, setOpen] = useState<Group | null>(null)
 
   useEffect(() => {
     void api.facets().then(setFacets)
+    void api.nearDuplicates(0, 1).then(setNear)
+    void api.similarPhotos(0, 1).then(setSimilar)
   }, [props.version])
 
-  if (open) return <GroupDetail group={open} version={props.version} onBack={() => setOpen(null)} />
+  if (open?.query) return <GroupDetail group={{ ...open, query: open.query }} version={props.version} onBack={() => setOpen(null)} />
 
+  const openGroup = (g: Group): void => (g.target ? props.onOpenView(g.target) : setOpen(g))
+  const bySize = (a: Group, b: Group): number => b.count - a.count
   const origins = facets?.origins ?? []
   // "Probably received or saved" is shown per size clue rather than as one huge group.
   const HINTS: Record<string, { title: string; note: string }> = {
@@ -35,15 +51,17 @@ export function CleanupView(props: { version: number; showScreenshots: boolean }
     social_size: { title: t('Probably social media'), note: t('No camera data and 2048 px — Facebook, Messenger and X size') },
     none: { title: t('Probably received or saved'), note: t('No camera data or recording date, other sizes') }
   }
-  const probable: Group[] = (facets?.receivedHints ?? []).map((h) => ({
-    key: `r:${h.hint}`,
-    title: HINTS[h.hint]?.title ?? h.hint,
-    icon: originIcon('received', 'size-4'),
-    query: { origin: 'received', originHint: h.hint },
-    count: h.count,
-    hidden: h.hidden ?? 0,
-    note: HINTS[h.hint]?.note
-  }))
+  const probable: Group[] = (facets?.receivedHints ?? [])
+    .map((h) => ({
+      key: `r:${h.hint}`,
+      title: HINTS[h.hint]?.title ?? h.hint,
+      icon: originIcon('received', 'size-4'),
+      query: { origin: 'received' as const, originHint: h.hint },
+      count: h.count,
+      hidden: h.hidden ?? 0,
+      note: HINTS[h.hint]?.note
+    }))
+    .sort(bySize)
   const clutter: Group[] = origins
     .filter((o) => isClutterOrigin(o.origin) && o.origin !== 'received')
     .map((o) => ({
@@ -66,6 +84,31 @@ export function CleanupView(props: { version: number; showScreenshots: boolean }
       hidden: k.hidden ?? 0,
       note: k.kind === 'loop' ? t('Short videos without sound — how WhatsApp and Telegram save GIFs') : undefined
     }))
+  const lookalikes: Group[] = []
+  if (near && near.unresolvedGroups > 0)
+    lookalikes.push({
+      key: 'near',
+      title: t('Probable duplicates'),
+      icon: <Copy className="size-4" />,
+      previewIds: near.groups[0]?.members.map((m) => m.asset.id),
+      count: near.extraCopies,
+      unit: t('extra copies'),
+      hidden: 0,
+      note: t('In {groups} groups of the same photo re-saved, resized or compressed. The best copy of each is suggested.', { groups: n(near.unresolvedGroups) }),
+      target: { view: 'duplicates', tab: 'probable' }
+    })
+  if (similar && similar.unresolvedGroups > 0)
+    lookalikes.push({
+      key: 'similar',
+      title: t('Similar photos'),
+      icon: <Images className="size-4" />,
+      previewIds: similar.groups[0]?.members.map((m) => m.asset.id),
+      count: similar.extraCopies,
+      unit: t('extra shots'),
+      hidden: 0,
+      note: t('In {groups} series of near-identical shots, such as bursts. The sharpest is suggested.', { groups: n(similar.unresolvedGroups) }),
+      target: { view: 'duplicates', tab: 'similar' }
+    })
   const yours: Group[] = origins
     .filter((o) => !isClutterOrigin(o.origin))
     .map((o) => ({
@@ -77,36 +120,54 @@ export function CleanupView(props: { version: number; showScreenshots: boolean }
       hidden: o.hidden ?? 0,
       note: o.origin === 'unknown' ? t('No camera data or recognisable app pattern') : undefined
     }))
+  const hiddenCount = facets?.hidden ?? 0
 
   return (
     <div className="scroll-page h-full overflow-y-auto">
-      <div className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
-        <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Tidy up')}</h1>
-        <div className="mt-0.5 max-w-2xl text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Media from chat apps, screenshots and downloads, grouped so you can review it in bulk. Hiding only removes items from the Photos timeline — nothing is deleted, and hidden items stay searchable here.')}</div>
-      </div>
-      <div className="space-y-8 px-7 pb-12 pt-2">
+      <ViewHeader title={t('Tidy up')} subtitle={t('Groups worth reviewing together, biggest first. Hiding only takes items out of Photos, and nothing is deleted until you empty the Bin.')} />
+      <div className="space-y-12 px-6 pb-12 pt-2">
         {facets && facets.unclassified > 0 && (
-          <div className="flex items-center gap-2 rounded-xl bg-accent-50 px-4 py-3 text-[13px] text-accent-600 dark:bg-accent-500/10 dark:text-accent-400">
+          <div className="flex items-center gap-2 rounded-[14px] bg-brass-soft px-4 py-3 text-[13px] text-brass-ink">
             <LoaderCircle className="size-4 animate-spin" />{' '}{t('Labelling')}{' '}{plural(facets.unclassified, 'item')}{t('… groups update as it goes.')}</div>
         )}
-        <Section title={t('Likely clutter')} groups={[...clutter, ...kinds]} onOpen={setOpen} empty={t('No chat-app media, screenshots or downloads found.')} />
+        <Section title={t('Likely clutter')} groups={[...clutter, ...kinds].sort(bySize)} onOpen={openGroup} empty={t('No chat-app media, screenshots or downloads found.')} />
         {probable.length > 0 && (
           <Section
             title={t('Probably clutter — no camera data')}
             subtitle={t('These carry no camera information at all, which your own phone photos keep. Inferred, not certain: review before hiding.')}
             groups={probable}
-            onOpen={setOpen}
+            onOpen={openGroup}
           />
         )}
-        {facets && facets.hidden > 0 && (
-          <Section
-            title={t('Hidden from Photos')}
-            groups={[{ key: 'hidden', title: t('Hidden'), icon: <EyeOff className="size-4" />, query: { hidden: 'only' }, count: facets.hidden, hidden: facets.hidden }]}
-            onOpen={setOpen}
-          />
-        )}
-        <Section title={t('Your own photos')} groups={yours} onOpen={setOpen} />
+        {lookalikes.length > 0 && <Section title={t('Look-alikes')} groups={lookalikes} onOpen={openGroup} />}
+        <Section
+          title={t('Kept aside')}
+          groups={[
+            {
+              key: 'hidden',
+              title: t('Hidden'),
+              icon: <EyeOff className="size-4" />,
+              query: { hidden: 'only' },
+              count: hiddenCount,
+              hidden: hiddenCount,
+              note: t('Out of the Photos timeline, still in albums and search.'),
+              target: { view: 'hidden' }
+            }
+          ]}
+          onOpen={openGroup}
+        />
+        <Section title={t('Your own photos')} groups={yours} onOpen={openGroup} />
       </div>
+    </div>
+  )
+}
+
+/** The sticky title row of full-page views: title-1 with a small subtitle. */
+export function ViewHeader(props: { title: ReactNode; subtitle?: ReactNode }) {
+  return (
+    <div className="drag sticky top-0 z-10 bg-mat/85 px-6 pb-4 pr-40 pt-4 backdrop-blur-xl">
+      <h1 className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{props.title}</h1>
+      {props.subtitle && <div className="mt-0.5 max-w-2xl text-[12.5px] leading-[18px] text-ink-muted">{props.subtitle}</div>}
     </div>
   )
 }
@@ -115,12 +176,12 @@ function Section(props: { title: string; subtitle?: string; groups: Group[]; onO
   if (props.groups.length === 0 && !props.empty) return null
   return (
     <section>
-      <h2 className={`${props.subtitle ? 'mb-1' : 'mb-3'} text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400`}>{props.title}</h2>
-      {props.subtitle && <p className="mb-3 max-w-2xl text-xs leading-relaxed text-stone-500 dark:text-stone-400">{props.subtitle}</p>}
+      <h2 className={`${props.subtitle ? 'mb-1' : 'mb-3'} font-[family-name:var(--font-display)] text-[19px] font-[650] leading-6 tracking-[-0.01em]`}>{props.title}</h2>
+      {props.subtitle && <p className="mb-3 max-w-2xl text-[12.5px] leading-[18px] text-ink-muted">{props.subtitle}</p>}
       {props.groups.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-stone-300 px-5 py-6 text-[13px] text-stone-500 dark:border-stone-700 dark:text-stone-400">{props.empty}</div>
+        <div className="rounded-[14px] border border-dashed border-line px-5 py-6 text-[13px] text-ink-muted">{props.empty}</div>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-4">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] items-start gap-4">
           {props.groups.map((g) => (
             <GroupCard key={g.key} group={g} onOpen={() => props.onOpen(g)} />
           ))}
@@ -134,35 +195,42 @@ function GroupCard(props: { group: Group; onOpen: () => void }) {
   const g = props.group
   const [preview, setPreview] = useState<AssetSummary[]>([])
   useEffect(() => {
-    void api.assetsPage(0, 4, g.query).then(setPreview)
+    const q = g.query ?? (g.previewIds?.length ? { ids: g.previewIds } : null)
+    if (q && g.count > 0) void api.assetsPage(0, 4, q).then(setPreview)
+    else setPreview([])
   }, [g.key, g.count])
+  const status = g.note ?? (g.hidden > 0 ? t('{hidden} hidden from Photos', { hidden: n(g.hidden) }) : t('All visible in Photos'))
   return (
-    <button onClick={props.onOpen} className="group overflow-hidden rounded-xl bg-white text-left shadow-sm shadow-stone-900/5 transition hover:shadow-md dark:bg-stone-900">
-      <div className="grid aspect-[2/1] grid-cols-4 gap-px bg-stone-100 dark:bg-stone-800">
+    <button
+      onClick={props.onOpen}
+      className="group flex flex-col overflow-hidden rounded-[14px] border border-line bg-card text-left transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-ink"
+    >
+      <div className="grid aspect-[5/2] w-full grid-cols-4 gap-0.5 bg-line">
         {Array.from({ length: 4 }, (_, i) => {
           const a = preview[i]
           return (
-            <div key={i} className="overflow-hidden bg-stone-200 dark:bg-stone-800">
-              {a && a.thumb === 'ready' && <img src={mediaUrl('thumb', a.id, a.rev)} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+            <div key={i} className="relative min-h-0 overflow-hidden bg-shelf">
+              {a && a.thumb === 'ready' && <img src={mediaUrl('thumb', a.id, a.rev)} alt="" className="absolute inset-0 size-full object-cover" />}
             </div>
           )
         })}
       </div>
-      <div className="p-3.5">
-        <div className="flex items-center gap-2 text-[14px] font-medium">
-          <span className="text-accent-600 dark:text-accent-400">{g.icon}</span>
+      <div className="flex flex-col gap-1 px-4 pb-4 pt-3.5">
+        <div className="flex items-center gap-2 font-[family-name:var(--font-display)] text-[15px] font-[650] leading-5">
+          <span className="text-brass-ink">{g.icon}</span>
           {g.title}
-          <span className="ml-auto text-[13px] font-semibold tabular-nums">{n(g.count)}</span>
         </div>
-        <div className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-          {g.note ?? (g.hidden > 0 && g.key !== 'hidden' ? t('{hidden} hidden from Photos', { hidden: n(g.hidden) }) : g.key === 'hidden' ? t('Not shown in the Photos timeline') : t('All visible in Photos'))}
+        <div className="mt-1.5 font-mono text-[28px] leading-8 tracking-[-0.02em] tabular-nums">
+          {n(g.count)}
+          {g.unit && <span className="ml-1.5 font-sans text-[12.5px] tracking-normal text-ink-muted">{g.unit}</span>}
         </div>
+        <div className="text-[12.5px] leading-[18px] text-ink-muted">{status}</div>
       </div>
     </button>
   )
 }
 
-function GroupDetail(props: { group: Group; version: number; onBack: () => void }) {
+function GroupDetail(props: { group: Group & { query: AssetQuery }; version: number; onBack: () => void }) {
   const g = props.group
   const [confirm, setConfirm] = useState<'hide' | 'show' | 'bin' | null>(null)
   const [counts, setCounts] = useState<{ total: number; hidden: number } | null>(null)

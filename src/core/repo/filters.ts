@@ -31,6 +31,10 @@ export function assetWhere(q: AssetQuery | undefined): WhereClause {
     parts.push('a.id IN (SELECT t.asset_id FROM asset_tags t WHERE t.tag = ?)')
     params.push(q.tag)
   }
+  if (typeof q.place === 'string') {
+    parts.push('a.place = ?')
+    params.push(q.place)
+  }
   if (typeof q.personId === 'number') {
     // IN, not a correlated EXISTS: SQLite would otherwise re-read this person's faces for every photo.
     parts.push('a.id IN (SELECT f.asset_id FROM faces f WHERE f.person_id = ?)')
