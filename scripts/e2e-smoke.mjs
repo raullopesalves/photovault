@@ -97,12 +97,26 @@ await page.click('text=Create a library')
 await page.waitForSelector('text=Start your archive')
 await page.screenshot({ path: join(shots, '02-empty-library.png') })
 
+// Places that left the sidebar: past imports open from the Import menu, Duplicates and Hidden from Tidy up,
+// Safety from the status card.
+async function openImports() {
+  await page.click('aside button[aria-haspopup="menu"]')
+  await page.click('text=Past imports')
+}
+async function openFromTidyUp(card) {
+  await page.click('nav >> text=Tidy up')
+  await page.getByRole('button', { name: new RegExp(`^${card}`) }).click()
+}
+async function openSafety() {
+  await page.click('aside button[aria-label^="Safety"]')
+}
+
 async function importFolder(folder, label, kind = 'folder') {
   const paths = Array.isArray(folder) ? folder : [folder]
   await app.evaluate(async ({ dialog }, list) => {
     dialog.showOpenDialog = async () => ({ canceled: false, filePaths: list })
   }, paths)
-  await page.click('aside >> text=Import photos')
+  await page.click('aside button[aria-haspopup="menu"]')
   await page.click(kind === 'zip' ? 'text=ZIP archives…' : 'text=Folder…')
   await page.waitForSelector('text=/Import ready|Already in your library/', { timeout: 60000 })
   await page.screenshot({ path: join(shots, `${label}-summary.png`) })
@@ -249,7 +263,8 @@ await page.waitForTimeout(500)
 await page.screenshot({ path: join(shots, '13-album-detail.png') })
 
 await page.click('nav >> text=Photos')
-await page.fill('input[placeholder^="Search"]', 'PXL')
+await page.fill('input[role="combobox"]', 'PXL')
+await page.keyboard.press('Escape')
 await page.waitForSelector('text=/^\\d+ items?$/')
 await page.waitForTimeout(800)
 await page.screenshot({ path: join(shots, '14-search.png') })
@@ -303,8 +318,7 @@ for (let i = 0; i < 150; i++) {
   if (nd.hashable > 0 && nd.hashed >= nd.hashable && nd.totalGroups > 0) break
   await page.waitForTimeout(200)
 }
-await page.click('nav >> text=Duplicates')
-await page.click('button:has-text("Probable duplicates")')
+await openFromTidyUp('Probable duplicates')
 await page.waitForSelector('text=Looks the same')
 await page.waitForTimeout(600)
 await page.screenshot({ path: join(shots, '16b-probable-duplicates.png') })
@@ -313,7 +327,7 @@ console.log('probable duplicates:', { groups: near.totalGroups, members: near.gr
 await page.click('button:has-text("Keep selected, hide the other")')
 await page.waitForSelector('text=/reviewed/')
 const nearAfter = await page.evaluate(() => window.photoVault.nearDuplicates(0, 5))
-await page.click('nav >> text=Cleanup')
+await page.click('nav >> text=Tidy up')
 await page.waitForSelector('main >> text=WhatsApp', { timeout: 30000 })
 await page.waitForSelector('main >> text=GIF-like loops', { timeout: 30000 })
 await page.waitForTimeout(1000)
@@ -334,8 +348,8 @@ console.log('cleanup:', { visibleBefore, visibleAfter, loopOrigin: waAsset?.orig
 
 // --- Multi-select filters with badges, and the hover favourite -----------------------
 await page.click('nav >> text=Photos')
-await page.click('button:has-text("Year")')
-const yearItems = page.locator('[role="menuitemcheckbox"]')
+await page.click('button:has-text("Filters")')
+const yearItems = page.locator('[role="dialog"] section:has-text("Year") [role="menuitemcheckbox"]')
 await yearItems.nth(0).click()
 await yearItems.nth(1).click()
 await page.keyboard.press('Escape')
@@ -381,6 +395,9 @@ console.log('hover favourite:', { favBefore, favAfter })
 // --- Bulk selection: shift-click range, whole month, Ctrl+A ------------------------------
 await page.click('nav >> text=Photos')
 await page.waitForTimeout(500)
+// The hover step scrolled the grid; start from the top so the first tile is not under the sticky header.
+await page.locator('main .scroll-page').first().evaluate((el) => el.scrollTo(0, 0))
+await page.waitForTimeout(300)
 const tiles = page.locator('main [aria-pressed]')
 await page.locator('main [aria-label="Select"]').nth(0).click({ force: true })
 await tiles.nth(3).click({ modifiers: ['Shift'] })
@@ -400,6 +417,8 @@ const visibleTotal = await page.evaluate(async () => (await window.photoVault.ti
 console.log('selection:', { monthSelected, allSelected, visibleTotal })
 
 // --- Bin: move, undo toast, restore, delete permanently -----------------------------------
+await page.locator('main .scroll-page').first().evaluate((el) => el.scrollTo(0, 0))
+await page.waitForTimeout(300)
 await page.locator('main [aria-label="Select"]').nth(0).click({ force: true })
 await page.locator('main [aria-label="Select"]').nth(1).click({ force: true })
 await page.click('button:has-text("Bin") >> nth=-1')
@@ -423,13 +442,13 @@ await page.waitForTimeout(500)
 const afterDelete = await page.evaluate(() => window.photoVault.getState())
 console.log('bin:', { binAfterMove: afterBin.library.binCount, binAfterDelete: afterDelete.library.binCount, deleted: afterDelete.library.deletedCount, assets: afterDelete.library.assetCount })
 
-await page.click('nav >> text=Hidden')
+await openFromTidyUp('Hidden')
 await page.waitForTimeout(500)
 await page.screenshot({ path: join(shots, '25-hidden.png') })
 const hiddenItems = await page.evaluate(async () => (await window.photoVault.timeline({ hidden: 'only' })).reduce((s, g) => s + g.count, 0))
 console.log('hidden view items:', hiddenItems, 'library says', afterDelete.library.hiddenCount)
 
-await page.click('nav >> text=Storage')
+await openSafety()
 // --- Backup to a second location ------------------------------------------------------------
 const backupDir = join(root, 'Backup drive')
 mkdirSync(backupDir)
@@ -446,16 +465,15 @@ await page.click('text=Verify library')
 await page.waitForSelector('text=/verified intact/', { timeout: 60000 })
 await page.screenshot({ path: join(shots, '10-verify.png') })
 
-await page.click('nav >> text=Duplicates')
+await openFromTidyUp('Probable duplicates')
 await page.waitForTimeout(500)
 await page.screenshot({ path: join(shots, '08-duplicates.png') })
-await page.click('nav >> text=Imports')
+await openImports()
 await page.waitForTimeout(400)
 await page.screenshot({ path: join(shots, '09-imports.png') })
 
 // --- 0.7: similar photos, recently added, rotate, export, map, watched folder, smart search -------
-await page.click('nav >> text=Duplicates')
-await page.click('button:has-text("Similar photos")')
+await openFromTidyUp('Similar photos')
 await page.waitForTimeout(600)
 await page.screenshot({ path: join(shots, '27-similar.png') })
 
@@ -491,7 +509,7 @@ const exported = readdirSync(exportDir).length
 await page.waitForTimeout(1300)
 await page.screenshot({ path: join(shots, '29-rotated.png') })
 
-await page.click('nav >> text=Map')
+await page.click('nav >> text=Places')
 await page.waitForSelector('.pv-pin', { timeout: 15000 })
 await page.waitForTimeout(800)
 const pins = await page.locator('.pv-pin').count()
@@ -508,7 +526,7 @@ execFileSync(require('ffmpeg-static'), ['-hide_banner', '-loglevel', 'error', '-
 await app.evaluate(async ({ dialog }, dir) => {
   dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [dir] })
 }, watchDir)
-await page.click('nav >> text=Imports')
+await openImports()
 await page.click('button:has-text("Watch a folder")')
 await page.waitForSelector(`text=${watchDir}`)
 await page.click('button:has-text("Check now")')
@@ -588,7 +606,8 @@ const slideshowShown = await page.locator('[aria-label="Close slideshow"]').coun
 await page.keyboard.press('Escape')
 await page.waitForTimeout(600)
 
-await page.fill('input[placeholder^="Search names"]', 'OLDCAM')
+await page.fill('input[role="combobox"]', 'OLDCAM')
+await page.keyboard.press('Escape')
 await page.waitForTimeout(1500)
 await page.locator('main img, main [role="button"]').first().click()
 let fallbackVideo = null
@@ -601,7 +620,7 @@ for (let i = 0; i < 90 && !fallbackVideo; i++) {
 }
 await page.screenshot({ path: join(shots, '35-converted-video.png') })
 await page.keyboard.press('Escape')
-await page.fill('input[placeholder^="Search names"]', '')
+await page.fill('input[role="combobox"]', '')
 await page.waitForTimeout(500)
 console.log('0.9 ui:', { slideshowShown, fallbackVideo })
 

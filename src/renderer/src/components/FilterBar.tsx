@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { PromptDialog } from './Dialog'
-import { Album, Wand2, ArrowDownUp, Calendar, Camera, Check, ChevronDown, Film, Sparkles, FolderInput, Heart, Map as MapIcon, Smartphone, Users, X } from 'lucide-react'
+import { Album, Wand2, ArrowDownUp, Calendar, Camera, Check, ChevronDown, Film, Sparkles, FolderInput, Heart, Map as MapIcon, Play, SlidersHorizontal, Smartphone, Users, X } from 'lucide-react'
 import { SearchBox, type SearchLabels } from './SearchBox'
 import type { AssetQuery, Facets } from '@shared/types'
 import { api, n, sourceTypeLabel } from '../lib/format'
@@ -119,76 +119,90 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
           </button>
         )}
 
-        <Menu
-          icon={<Film className="size-3.5" />}
-          label={t('Type')}
-          selected={q.types?.length ?? 0}
-          options={typeOptions.map((o) => ({
-            key: o.value,
-            label: o.value === 'photo' || o.value === 'video' ? TYPE_LABEL[o.value] : kindLabel(o.value, true),
-            count: o.count,
-            checked: q.types?.includes(o.value) ?? false,
-            onToggle: () => set({ types: toggle(q.types, o.value) })
-          }))}
+        {!q.types?.length || (q.types.length === 1 && q.types[0] === 'video') ? (
+          <button onClick={() => set({ types: q.types?.includes('video') ? undefined : ['video'] })} className={`${chipBase} ${q.types?.includes('video') ? chipOn : chipOff}`}>
+            <Play className={`size-3.5 ${q.types?.includes('video') ? 'fill-current' : ''}`} />
+            {t('Videos')}
+            {facets ? <span className="font-mono text-[12px] opacity-75">{n(facets.videos)}</span> : null}
+          </button>
+        ) : null}
+
+        <FiltersMenu
+          sections={[
+            {
+              key: 'type',
+              icon: <Film className="size-3.5" />,
+              label: t('Type'),
+              options: typeOptions.map((o) => ({
+                key: o.value,
+                label: o.value === 'photo' || o.value === 'video' ? TYPE_LABEL[o.value] : kindLabel(o.value, true),
+                count: o.count,
+                checked: q.types?.includes(o.value) ?? false,
+                onToggle: () => set({ types: toggle(q.types, o.value) })
+              }))
+            },
+            {
+              key: 'year',
+              icon: <Calendar className="size-3.5" />,
+              label: t('Year'),
+              options: (facets?.years ?? []).map((y) => ({
+                key: String(y.year),
+                label: y.year === 0 ? t('No date') : String(y.year),
+                count: y.count,
+                checked: q.years?.includes(y.year) ?? false,
+                onToggle: () => set({ years: toggle(q.years, y.year) })
+              }))
+            },
+            ...((facets?.cameras.length ?? 0) > 0
+              ? [
+                  {
+                    key: 'camera',
+                    icon: <Camera className="size-3.5" />,
+                    label: t('Camera'),
+                    options: (facets?.cameras ?? []).map((c) => ({
+                      key: `${c.make}|${c.model}`,
+                      label: cameraLabel(c),
+                      count: c.count,
+                      checked: q.cameras?.some((x) => sameCamera(x, c)) ?? false,
+                      onToggle: () => set({ cameras: toggle(q.cameras, { make: c.make, model: c.model }, sameCamera) })
+                    }))
+                  }
+                ]
+              : []),
+            ...(!props.hideOrigin && (facets?.origins.length ?? 0) > 0
+              ? [
+                  {
+                    key: 'origin',
+                    icon: <Smartphone className="size-3.5" />,
+                    label: t('Origin'),
+                    options: (facets?.origins ?? []).map((o) => ({
+                      key: o.origin,
+                      label: originLabel(o.origin),
+                      count: o.count,
+                      checked: q.origins?.includes(o.origin) ?? false,
+                      onToggle: () => set({ origins: toggle(q.origins, o.origin) })
+                    }))
+                  }
+                ]
+              : []),
+            ...((facets?.sources.length ?? 0) > 1
+              ? [
+                  {
+                    key: 'source',
+                    icon: <FolderInput className="size-3.5" />,
+                    label: t('Source'),
+                    options: (facets?.sources ?? []).map((src) => ({
+                      key: src.type,
+                      label: sourceTypeLabel(src.type),
+                      count: src.count,
+                      checked: q.sourceTypes?.includes(src.type) ?? false,
+                      onToggle: () => set({ sourceTypes: toggle(q.sourceTypes, src.type) })
+                    }))
+                  }
+                ]
+              : [])
+          ]}
         />
-
-        <Menu
-          icon={<Calendar className="size-3.5" />}
-          label={t('Year')}
-          selected={q.years?.length ?? 0}
-          options={(facets?.years ?? []).map((y) => ({
-            key: String(y.year),
-            label: y.year === 0 ? t('No date') : String(y.year),
-            count: y.count,
-            checked: q.years?.includes(y.year) ?? false,
-            onToggle: () => set({ years: toggle(q.years, y.year) })
-          }))}
-        />
-
-        {(facets?.cameras.length ?? 0) > 0 && (
-          <Menu
-            icon={<Camera className="size-3.5" />}
-            label={t('Camera')}
-            selected={q.cameras?.length ?? 0}
-            options={(facets?.cameras ?? []).map((c) => ({
-              key: `${c.make}|${c.model}`,
-              label: cameraLabel(c),
-              count: c.count,
-              checked: q.cameras?.some((x) => sameCamera(x, c)) ?? false,
-              onToggle: () => set({ cameras: toggle(q.cameras, { make: c.make, model: c.model }, sameCamera) })
-            }))}
-          />
-        )}
-
-        {!props.hideOrigin && (facets?.origins.length ?? 0) > 0 && (
-          <Menu
-            icon={<Smartphone className="size-3.5" />}
-            label={t('Origin')}
-            selected={q.origins?.length ?? 0}
-            options={(facets?.origins ?? []).map((o) => ({
-              key: o.origin,
-              label: originLabel(o.origin),
-              count: o.count,
-              checked: q.origins?.includes(o.origin) ?? false,
-              onToggle: () => set({ origins: toggle(q.origins, o.origin) })
-            }))}
-          />
-        )}
-
-        {(facets?.sources.length ?? 0) > 1 && (
-          <Menu
-            icon={<FolderInput className="size-3.5" />}
-            label={t('Source')}
-            selected={q.sourceTypes?.length ?? 0}
-            options={(facets?.sources ?? []).map((s) => ({
-              key: s.type,
-              label: sourceTypeLabel(s.type),
-              count: s.count,
-              checked: q.sourceTypes?.includes(s.type) ?? false,
-              onToggle: () => set({ sourceTypes: toggle(q.sourceTypes, s.type) })
-            }))}
-          />
-        )}
       </div>
 
       {badges.length > 0 && (
@@ -244,13 +258,16 @@ const chipBase = 'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[1
 const chipOff = 'bg-stone-200/60 text-stone-700 hover:bg-stone-200 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:bg-stone-800'
 const chipOn = 'bg-stone-900 text-white dark:bg-white dark:text-stone-900'
 
-/** A dropdown of checkboxes. Stays open while ticking several values; closes on outside click or Escape. */
-function Menu(props: {
-  icon: ReactNode
+interface Option {
+  key: string
   label: string
-  selected: number
-  options: Array<{ key: string; label: string; count?: number; checked: boolean; onToggle: () => void }>
-}) {
+  count?: number
+  checked: boolean
+  onToggle: () => void
+}
+
+/** One "Filters" chip for every filter: a panel with each filter's values side by side, ticked values counted on the chip. */
+function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; label: string; options: Option[] }> }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -268,39 +285,50 @@ function Menu(props: {
       window.removeEventListener('keydown', esc)
     }
   }, [open])
-  const active = props.selected > 0
+  const selected = props.sections.reduce((sum, sec) => sum + sec.options.filter((o) => o.checked).length, 0)
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className={`${chipBase} ${active ? chipOn : chipOff}`} aria-expanded={open}>
-        {props.icon}
-        {props.label}
-        {active && <span className="grid h-4 min-w-4 place-items-center rounded-full bg-white/25 px-1 text-[10.5px] tabular-nums dark:bg-stone-900/20">{props.selected}</span>}
+      <button onClick={() => setOpen((o) => !o)} className={`${chipBase} ${selected ? chipOn : chipOff}`} aria-expanded={open} aria-haspopup="dialog">
+        <SlidersHorizontal className="size-3.5" />
+        {t('Filters')}
+        {selected > 0 && <span className="grid h-4 min-w-4 place-items-center rounded-full bg-white/25 px-1 font-mono text-[10.5px] tabular-nums dark:bg-stone-900/20">{selected}</span>}
         <ChevronDown className={`size-3.5 opacity-60 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="scroll-thin absolute left-0 top-full z-20 mt-1.5 max-h-80 min-w-52 overflow-y-auto rounded-xl bg-white p-1.5 shadow-xl shadow-stone-950/15 ring-1 ring-stone-200 animate-rise-in dark:bg-stone-800 dark:ring-white/10">
-          {props.options.length === 0 && <div className="px-3 py-2 text-[12.5px] text-stone-400">{t('Nothing yet')}</div>}
-          {props.options.map((o) => (
-            <button
-              key={o.key}
-              role="menuitemcheckbox"
-              aria-checked={o.checked}
-              onClick={o.onToggle}
-              className="flex w-full items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-left text-[13px] text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-700/70"
-            >
-              <span
-                className={`grid size-4 shrink-0 place-items-center rounded border transition ${
-                  o.checked ? 'border-accent-500 bg-accent-500 text-on-accent' : 'border-stone-300 bg-white dark:border-stone-600 dark:bg-stone-900'
-                }`}
-              >
-                {o.checked && <Check className="size-3" strokeWidth={3} />}
-              </span>
-              <span className="flex-1">{o.label}</span>
-              {o.count !== undefined && <span className="text-[12px] tabular-nums text-stone-400">{n(o.count)}</span>}
-            </button>
+        <div
+          role="dialog"
+          aria-label={t('Filters')}
+          className="absolute right-0 top-full z-20 mt-1.5 grid w-[612px] grid-cols-3 gap-x-1 gap-y-3 rounded-[14px] border border-line bg-card p-2 shadow-[0_6px_20px_rgba(26,30,27,0.12)] animate-pop"
+        >
+          {props.sections.map((sec) => (
+            <section key={sec.key} className="flex min-w-0 flex-col">
+              <div className="flex items-center gap-1.5 px-2.5 pb-1.5 pt-1.5 text-[11px] font-[650] uppercase leading-[14px] tracking-[0.07em] text-ink-muted">
+                {sec.icon}
+                {sec.label}
+              </div>
+              <div className="scroll-thin max-h-56 overflow-y-auto">
+                {sec.options.length === 0 && <div className="px-2.5 py-1.5 text-[12.5px] text-ink-muted">{t('Nothing yet')}</div>}
+                {sec.options.map((o) => (
+                  <button
+                    key={o.key}
+                    role="menuitemcheckbox"
+                    aria-checked={o.checked}
+                    onClick={o.onToggle}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-ink hover:bg-shelf"
+                  >
+                    <span className={`grid size-4 shrink-0 place-items-center rounded border transition ${o.checked ? 'border-brass bg-brass text-on-accent' : 'border-line-strong bg-card'}`}>
+                      {o.checked && <Check className="size-3" strokeWidth={3} />}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">{o.label}</span>
+                    {o.count !== undefined && <span className="font-mono text-[12px] tabular-nums text-ink-muted">{n(o.count)}</span>}
+                  </button>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}
     </div>
   )
 }
+

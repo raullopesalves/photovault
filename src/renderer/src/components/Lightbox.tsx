@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { Album, Sparkles, Users, Calendar, Camera, Eye, EyeOff, RotateCcw, RotateCw, Smartphone, Trash2, Check, ChevronLeft, ChevronRight, Copy, Download, ExternalLink, SlidersHorizontal, UserPlus, Tag, Share2, Files, FolderOpen, Heart, Info, Link2, MapPin, Fingerprint, HardDrive, History, Minus, Plus, X } from 'lucide-react'
 import type { AlbumSummary, AssetDetail, AssetSummary } from '@shared/types'
 import { kindLabel, originLabel } from '../lib/labels'
@@ -10,6 +10,8 @@ import { api, basename, bytes, isoLocal, mediaUrl, mimeLabel, offsetLabel, plura
 import { t } from '../lib/i18n'
 
 export function Lightbox(props: {
+  /** The tile the viewer was opened from: the photo grows out of it. */
+  from?: DOMRect | null
   index: number
   total: number
   getSummary: (index: number) => AssetSummary | undefined
@@ -58,8 +60,36 @@ export function Lightbox(props: {
   const zoom = useZoom()
 
   useEffect(() => {
-    props.ensure(index - 2, index + 2)
+    props.ensure(index - FILMSTRIP_SIDE, index + FILMSTRIP_SIDE)
   })
+
+  // Open: the thumbnail flies from its tile to where the photo will sit (dur-gentle, ease-standard), then gets out of
+  // the way of the full image. Skipped when Windows asks for reduced motion.
+  const [flight, setFlight] = useState<{ src: string; rect: { left: number; top: number; width: number; height: number }; moving: boolean } | null>(null)
+  useLayoutEffect(() => {
+    const from = props.from
+    const stage = zoom.containerRef.current
+    if (!from || !stage || !summary || summary.thumb !== 'ready') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const box = stage.getBoundingClientRect()
+    // The stage's padding: p-6 pt-14.
+    const area = { left: box.left + 24, top: box.top + 56, width: box.width - 48, height: box.height - 80 }
+    const turned = summary.rotation === 90 || summary.rotation === 270
+    const w0 = (turned ? summary.height : summary.width) ?? 1
+    const h0 = (turned ? summary.width : summary.height) ?? 1
+    const scale = Math.min(area.width / w0, area.height / h0)
+    const to = { width: w0 * scale, height: h0 * scale, left: 0, top: 0 }
+    to.left = area.left + (area.width - to.width) / 2
+    to.top = area.top + (area.height - to.height) / 2
+    const src = mediaUrl('thumb', summary.id, summary.rev)
+    setFlight({ src, rect: { left: from.left, top: from.top, width: from.width, height: from.height }, moving: false })
+    const frame = requestAnimationFrame(() => setFlight({ src, rect: to, moving: true }))
+    const done = setTimeout(() => setFlight(null), 380)
+    return () => {
+      cancelAnimationFrame(frame)
+      clearTimeout(done)
+    }
+  }, [])
 
   // The photo on screen. It changes only when the user moves to another photo — never because the library
   // reported a change (background scans do that several times a second) or because the list was re-ordered.
@@ -361,6 +391,8 @@ export function Lightbox(props: {
           )}
         </div>
 
+        <Filmstrip index={index} total={total} getSummary={props.getSummary} onPick={(i) => props.onIndex(i)} />
+
         {index > 0 && (
           <button
             onClick={() => go(-1)}
@@ -455,8 +487,21 @@ export function Lightbox(props: {
         </div>
       )}
 
+      {flight && (
+        <img
+          src={flight.src}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none fixed z-50 rounded-[2px] object-cover"
+          style={{
+            ...flight.rect,
+            transition: flight.moving ? 'left var(--dur-gentle) var(--ease-standard), top var(--dur-gentle) var(--ease-standard), width var(--dur-gentle) var(--ease-standard), height var(--dur-gentle) var(--ease-standard)' : 'none'
+          }}
+        />
+      )}
+
       {showInfo && (
-        <aside className="scroll-page w-[360px] shrink-0 overflow-y-auto border-l border-white/10 bg-stone-900 px-6 pb-8 pt-16 animate-fade-in">
+        <aside className="scroll-page w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.08] bg-[#151715] px-6 pb-8 pt-16 animate-fade-in">
           {detail ? <InfoPanel d={detail} onChanged={() => void api.asset(detail.id).then(setDetail)} /> : <div className="skeleton h-6 w-40 rounded" />}
         </aside>
       )}
@@ -1112,6 +1157,39 @@ function InfoPanel({ d, onChanged }: { d: AssetDetail; onChanged: () => void }) 
           <div className="mt-3 text-xs leading-relaxed text-stone-400">{t('These files are byte-for-byte identical. Photo Vault keeps one copy in the library and remembers every place it was found.')}</div>
         )}
       </Section>
+    </div>
+  )
+}
+
+const FILMSTRIP_SIDE = 7
+
+/** Neighbouring photos under the viewer; the current one sits in a brass mount. */
+function Filmstrip(props: { index: number; total: number; getSummary: (index: number) => AssetSummary | undefined; onPick: (index: number) => void }) {
+  if (props.total < 2) return null
+  const from = Math.max(0, props.index - FILMSTRIP_SIDE)
+  const to = Math.min(props.total - 1, props.index + FILMSTRIP_SIDE)
+  const items: number[] = []
+  for (let i = from; i <= to; i++) items.push(i)
+  return (
+    <div className="flex h-[68px] shrink-0 items-center justify-center gap-[3px] pb-3" role="listbox" aria-label={t('Nearby photos')}>
+      {items.map((i) => {
+        const a = props.getSummary(i)
+        const current = i === props.index
+        return (
+          <button
+            key={i}
+            role="option"
+            aria-selected={current}
+            aria-label={t('Photo {n}', { n: i + 1 })}
+            onClick={() => props.onPick(i)}
+            className={`size-12 shrink-0 overflow-hidden rounded-[2px] transition-[opacity,transform] duration-[var(--dur-quick)] ${
+              current ? 'bg-accent-400 p-[3px] opacity-100' : 'bg-white/5 opacity-55 hover:opacity-100'
+            }`}
+          >
+            {a && a.thumb === 'ready' && <img src={mediaUrl('thumb', a.id, a.rev)} alt="" draggable={false} className="size-full rounded-[1px] object-cover" />}
+          </button>
+        )
+      })}
     </div>
   )
 }

@@ -77,7 +77,7 @@ function ExactList(props: { version: number }) {
       )}
       <div className="space-y-3">
         {groups?.map((g) => (
-          <div key={g.asset.id} className="flex gap-5 rounded-xl bg-white p-4 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+          <div key={g.asset.id} className="flex gap-5 rounded-[14px] border border-line bg-card p-4">
             <div className="size-28 shrink-0 overflow-hidden rounded-lg bg-stone-200 dark:bg-stone-800">
               {g.asset.thumb === 'ready' ? (
                 <img src={mediaUrl('thumb', g.asset.id, g.asset.rev)} alt="" className="size-full object-cover" />
@@ -133,7 +133,7 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
 
   return (
     <>
-      <div className="mb-5 flex flex-wrap items-center gap-4 rounded-xl bg-white px-5 py-4 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+      <div className="mb-5 flex flex-wrap items-center gap-4 rounded-[14px] border border-line bg-card px-5 py-4">
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium">
             {data.unresolvedGroups > 0
@@ -222,7 +222,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
   const anyHidden = g.members.some((m) => m.asset.hidden)
 
   return (
-    <div className={`rounded-xl bg-white p-4 shadow-sm shadow-stone-900/5 dark:bg-stone-900 ${g.resolved ? 'opacity-75' : ''}`}>
+    <div className={`rounded-[14px] border border-line bg-card p-4 ${g.resolved ? 'opacity-75' : ''}`}>
       <div className="mb-3 flex items-center gap-2">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
           {props.similar ? (
@@ -354,9 +354,9 @@ function Card(props: { label: string; value: string; note?: string; active?: boo
     <button
       disabled={!clickable}
       onClick={props.onClick}
-      className={`rounded-xl p-4 text-left transition ${
+      className={`rounded-[14px] p-4 text-left transition ${
         props.active
-          ? 'bg-white shadow-sm shadow-stone-900/5 ring-2 ring-accent-500 dark:bg-stone-900'
+          ? 'border border-line bg-card ring-2 ring-accent-500'
           : clickable
             ? 'bg-white/60 hover:bg-white dark:bg-stone-900/60 dark:hover:bg-stone-900'
             : 'bg-stone-100 dark:bg-stone-900/50'

@@ -83,7 +83,7 @@ function MemoryCard(props: { memory: Memory; onOpen: () => void }) {
   const m = props.memory
   const [first, ...rest] = m.coverIds
   return (
-    <button onClick={props.onOpen} className="group overflow-hidden rounded-2xl bg-white text-left shadow-sm shadow-stone-900/5 transition hover:shadow-md dark:bg-stone-900">
+    <button onClick={props.onOpen} className="group overflow-hidden rounded-[14px] border border-line bg-card text-left transition hover:border-line-strong">
       <div className="grid aspect-[4/3] grid-cols-3 grid-rows-2 gap-0.5 overflow-hidden bg-stone-200 dark:bg-stone-800">
         {first !== undefined && (
           <img src={mediaUrl('thumb', first)} alt="" className="col-span-2 row-span-2 size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />

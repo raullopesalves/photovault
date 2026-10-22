@@ -418,7 +418,7 @@ function CaptionsGroup() {
 
 function Group(props: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+    <section className="rounded-[14px] border border-line bg-card p-5">
       <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">{props.title}</h2>
       {props.children}
     </section>

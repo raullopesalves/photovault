@@ -54,7 +54,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
                 tabIndex={0}
                 onClick={() => setSelected(s)}
                 onKeyDown={(e) => e.key === 'Enter' && setSelected(s)}
-                className="flex w-full cursor-default items-center gap-5 rounded-xl bg-white px-5 py-4 text-left shadow-sm shadow-stone-900/5 transition hover:shadow-md dark:bg-stone-900 dark:hover:bg-stone-800/80"
+                className="flex w-full cursor-default items-center gap-5 rounded-[14px] border border-line bg-card px-5 py-4 text-left transition hover:border-line-strong dark:hover:bg-stone-800/80"
               >
                 <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
                   {archive ? <FileArchive className="size-5" strokeWidth={1.6} /> : <FolderInput className="size-5" strokeWidth={1.6} />}
@@ -117,7 +117,7 @@ function WatchFolders(props: { version: number }) {
   }
 
   return (
-    <div className="mb-6 rounded-xl bg-white px-5 py-4 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+    <div className="mb-6 rounded-[14px] border border-line bg-card px-5 py-4">
       <div className="flex items-center gap-3">
         <FolderSync className="size-5 shrink-0 text-stone-400" strokeWidth={1.6} />
         <div className="min-w-0 flex-1">
@@ -226,7 +226,7 @@ function ImportDetail({ s, onBack }: { s: ImportSummary; onBack: () => void }) {
         <button onClick={onBack} className="no-drag mb-4 inline-flex items-center gap-1.5 text-[13px] text-stone-500 transition hover:text-stone-900 dark:hover:text-stone-100">
           <ArrowLeft className="size-4" />{' '}{t('Imports')}</button>
         <h1 className="font-[family-name:var(--font-display)] text-[26px] font-semibold tracking-tight">{sourcesLabel(s.sources)}</h1>
-        <div className="mt-6 overflow-hidden rounded-xl bg-white shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+        <div className="mt-6 overflow-hidden rounded-[14px] border border-line bg-card">
           {rows.map(([k, v]) => (
             <div key={k} className="flex gap-4 border-b border-stone-100 px-5 py-2.5 text-[13px] last:border-0 dark:border-stone-800">
               <div className="w-48 shrink-0 text-stone-500 dark:text-stone-400">{k}</div>

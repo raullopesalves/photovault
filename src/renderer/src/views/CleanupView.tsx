@@ -85,7 +85,7 @@ export function CleanupView(props: { version: number; showScreenshots: boolean; 
       note: k.kind === 'loop' ? t('Short videos without sound — how WhatsApp and Telegram save GIFs') : undefined
     }))
   const lookalikes: Group[] = []
-  if (near && near.unresolvedGroups > 0)
+  if (near)
     lookalikes.push({
       key: 'near',
       title: t('Probable duplicates'),
@@ -94,10 +94,13 @@ export function CleanupView(props: { version: number; showScreenshots: boolean; 
       count: near.extraCopies,
       unit: t('extra copies'),
       hidden: 0,
-      note: t('In {groups} groups of the same photo re-saved, resized or compressed. The best copy of each is suggested.', { groups: n(near.unresolvedGroups) }),
+      note:
+        near.unresolvedGroups > 0
+          ? t('In {groups} groups of the same photo re-saved, resized or compressed. The best copy of each is suggested.', { groups: n(near.unresolvedGroups) })
+          : t('Nothing to review. Exact duplicates and reviewed groups are listed here.'),
       target: { view: 'duplicates', tab: 'probable' }
     })
-  if (similar && similar.unresolvedGroups > 0)
+  if (similar)
     lookalikes.push({
       key: 'similar',
       title: t('Similar photos'),
@@ -106,7 +109,10 @@ export function CleanupView(props: { version: number; showScreenshots: boolean; 
       count: similar.extraCopies,
       unit: t('extra shots'),
       hidden: 0,
-      note: t('In {groups} series of near-identical shots, such as bursts. The sharpest is suggested.', { groups: n(similar.unresolvedGroups) }),
+      note:
+        similar.unresolvedGroups > 0
+          ? t('In {groups} series of near-identical shots, such as bursts. The sharpest is suggested.', { groups: n(similar.unresolvedGroups) })
+          : t('Nothing to review.'),
       target: { view: 'duplicates', tab: 'similar' }
     })
   const yours: Group[] = origins
@@ -139,7 +145,7 @@ export function CleanupView(props: { version: number; showScreenshots: boolean; 
             onOpen={openGroup}
           />
         )}
-        {lookalikes.length > 0 && <Section title={t('Look-alikes')} groups={lookalikes} onOpen={openGroup} />}
+        <Section title={t('Look-alikes')} groups={lookalikes} onOpen={openGroup} />
         <Section
           title={t('Kept aside')}
           groups={[

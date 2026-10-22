@@ -16,7 +16,7 @@ export function StorageView({ library, version }: { library: LibraryInfo; versio
           <BackupPanel version={version} />
         </div>
 
-        <div className="flex items-center gap-5 rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+        <div className="flex items-center gap-5 rounded-[14px] border border-line bg-card p-5">
           <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">
             <HardDrive className="size-6" strokeWidth={1.6} />
           </div>
@@ -88,7 +88,7 @@ function VerifyCard() {
   const pct = v && v.bytesTotal > 0 ? Math.min(100, (v.bytesChecked / v.bytesTotal) * 100) : v && v.filesTotal > 0 ? (v.filesChecked / v.filesTotal) * 100 : 0
 
   return (
-    <div className="rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+    <div className="rounded-[14px] border border-line bg-card p-5">
       <div className="flex items-start gap-4">
         <div
           className={`grid size-10 shrink-0 place-items-center rounded-xl ${

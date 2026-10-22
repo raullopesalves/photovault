@@ -42,13 +42,11 @@ export function BackupPanel(props: { version: number }) {
   return (
     <div className="space-y-4">
       <div
-        className={`flex items-start gap-4 rounded-xl p-5 shadow-sm shadow-stone-900/5 ${
-          fully ? 'bg-emerald-50 dark:bg-emerald-500/10' : 'bg-amber-50 dark:bg-amber-500/10'
-        }`}
+        className={`flex items-start gap-4 rounded-[14px] p-5 ${fully ? 'bg-safe-soft' : 'bg-brass-soft'}`}
       >
         <div
           className={`grid size-11 shrink-0 place-items-center rounded-xl ${
-            fully ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+            fully ? 'bg-card text-safe' : 'bg-card text-brass-ink'
           }`}
         >
           {fully ? <ShieldCheck className="size-6" /> : <CircleAlert className="size-6" />}
@@ -84,7 +82,7 @@ export function BackupPanel(props: { version: number }) {
         const running = progress && progress.targetId === tg.id ? progress : null
         const pct = status.totalFiles > 0 ? (tg.filesBackedUp / status.totalFiles) * 100 : 0
         return (
-          <div key={tg.id} className="rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+          <div key={tg.id} className="rounded-[14px] border border-line bg-card p-5">
             <div className="flex items-start gap-4">
               <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">
                 {running ? <LoaderCircle className="size-5 animate-spin" /> : <HardDriveDownload className="size-5" />}
@@ -163,7 +161,7 @@ export function BackupPanel(props: { version: number }) {
       })}
 
       {status.targets.length > 0 && (
-        <div className="rounded-xl bg-white px-5 py-4 text-xs leading-relaxed text-stone-500 shadow-sm shadow-stone-900/5 dark:bg-stone-900 dark:text-stone-400">
+        <div className="rounded-[14px] border border-line bg-card px-5 py-4 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
           <span className="font-medium text-stone-700 dark:text-stone-300">{t('Keep a copy away from home.')}</span>{' '}{t('A fire or theft takes a backup drive that sits next to the computer too. With two drives, keep one elsewhere (work, family) and swap them every month or so — each is brought up to date the moment it is plugged in.')}{' '}{status.targets.length === 1 && t('Add a second drive here to start rotating.')}
           <div className="mt-2">{t('Checks: your library\'s files are re-read and compared with their fingerprints automatically every month')}{status.lastLibraryCheck ? t(' (last complete check {v0})', { v0: ago(status.lastLibraryCheck) }) : t(' (first check soon)')}{t('; connected backup drives are verified on the same schedule.')}</div>
         </div>
@@ -212,7 +210,7 @@ function SnapshotsCard(props: { version: number }) {
   useEffect(refresh, [props.version])
   const latest = snaps?.[0]
   return (
-    <div className="flex items-start gap-4 rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+    <div className="flex items-start gap-4 rounded-[14px] border border-line bg-card p-5">
       <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300">
         <DbIcon className="size-5" />
       </div>

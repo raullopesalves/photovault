@@ -85,7 +85,7 @@ function EmptyLibrary(props: { onImport: (kind: ImportKind) => void }) {
             { icon: <Fingerprint className="size-4" />, title: t('Exact duplicates'), body: t('SHA-256 recognises identical files, whatever their name.') },
             { icon: <CopyIcon className="size-4" />, title: t('Full provenance'), body: t('Every place a photo was found is remembered.') }
           ].map((f) => (
-            <div key={f.title} className="rounded-xl bg-white/70 p-3.5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+            <div key={f.title} className="rounded-[14px] border border-line bg-card p-3.5">
               <div className="mb-2 text-accent-600 dark:text-accent-400">{f.icon}</div>
               <div className="text-[13px] font-medium">{f.title}</div>
               <div className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{f.body}</div>

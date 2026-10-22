@@ -467,3 +467,11 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 - **Safety** leads with the backup state in a sentence; with no backup at all the backup panel's own warning comes first instead.
 - **Classifier (v5):** photos 3,000 px or larger with no camera data are no longer called "probably received". On a real library 99 % of the 16,190 were chat or saved sizes (1600, 2048, 1080×1920, Android media-id names); the 88 camera-sized ones matched the owner's own camera sizes.
 
+**D92. Mount, the remaining pieces.**
+- **Filters chip:** Type, Year, Camera, Origin and Source moved from five menus into one "Filters" chip whose panel shows them three across; Videos got its own quick chip. The toolbar fits on one row again.
+- **Viewer:** a filmstrip of the 15 nearest items (the current one mounted in brass); the photo grows from the tile it was opened from (`dur-gentle`, `ease-standard`; skipped under reduced motion; closing does not fly back yet); the details panel sits on a darkroom-raised ground.
+- **Older pages:** cards are `bg-card` with a `line` border instead of white with a shadow (shadows stay on dialogs and menus), and Tailwind's red, emerald and amber are remapped to Mount's risk, safe and brass, so every status note across the app uses one palette.
+- **Selection bar** sits on `ink`/`on-ink`, so it inverts in dark theme as designed.
+- **Look-alikes** stay in Tidy up after everything is reviewed, so the Duplicates page (exact duplicates, reviewed groups) is always reachable.
+- **Tests:** the end-to-end smoke test follows the new navigation (Import menu, Tidy up cards, Places, the safety card, the search box, the Filters panel) and passes; it is not run in CI.
+

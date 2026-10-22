@@ -82,7 +82,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void; onOp
       <PageHeader title={t('People')} subtitle={t('Photos grouped by the faces in them. Name someone to find them by name in search; merge duplicates; fix mistakes from a person\'s page.')} />
       <div className="mx-auto max-w-5xl px-8 pb-12">
         {line && (
-          <div className={`mb-6 flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-[13px] shadow-sm shadow-stone-900/5 dark:bg-stone-900 ${status.phase === 'error' ? 'text-red-600 dark:text-red-400' : ''}`}>
+          <div className={`mb-6 flex items-center gap-2 rounded-[14px] border border-line bg-card px-4 py-3 text-[13px] ${status.phase === 'error' ? 'text-red-600 dark:text-red-400' : ''}`}>
             {status.phase !== 'error' && <LoaderCircle className="size-3.5 shrink-0 animate-spin" />}
             {line}
             {status.phase === 'error' && (
@@ -91,7 +91,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void; onOp
           </div>
         )}
         {suggestions.length > 0 && (
-          <div className="mb-6 flex items-center gap-4 rounded-xl bg-white px-4 py-3 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
+          <div className="mb-6 flex items-center gap-4 rounded-[14px] border border-line bg-card px-4 py-3">
             <div className="flex -space-x-3">
               <Face person={suggestions[0]!.a} size={40} />
               <Face person={suggestions[0]!.b} size={40} />

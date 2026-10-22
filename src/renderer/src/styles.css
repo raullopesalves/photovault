@@ -32,6 +32,42 @@
   --color-accent-600: #7a5612;
   --color-on-accent: #1a1e1b;
 
+  /* Status colours follow Mount too: red is risk (#b23a24 / #f0826b), emerald is safe (#2d7350 / #6cc795), amber is
+     brass, so every warning, error and "verified" note across the app speaks the same palette. */
+  --color-red-50: #f7e0da;
+  --color-red-100: #f2cfc6;
+  --color-red-200: #f4b4a6;
+  --color-red-300: #f29a86;
+  --color-red-400: #f0826b;
+  --color-red-500: #d4553b;
+  --color-red-600: #b23a24;
+  --color-red-700: #93301d;
+  --color-red-800: #6e2516;
+  --color-red-900: #4a1a10;
+  --color-red-950: #3d1d16;
+  --color-emerald-50: #ddeee3;
+  --color-emerald-100: #c9e5d3;
+  --color-emerald-200: #a7d8b9;
+  --color-emerald-300: #86cfa6;
+  --color-emerald-400: #6cc795;
+  --color-emerald-500: #3f9a69;
+  --color-emerald-600: #2d7350;
+  --color-emerald-700: #245e41;
+  --color-emerald-800: #1c4a33;
+  --color-emerald-900: #163a28;
+  --color-emerald-950: #16301f;
+  --color-amber-50: #f8eedb;
+  --color-amber-100: #f3e7cc;
+  --color-amber-200: #ead7a8;
+  --color-amber-300: #e3b968;
+  --color-amber-400: #d8a94f;
+  --color-amber-500: #ad7e25;
+  --color-amber-600: #8f6619;
+  --color-amber-700: #7a5612;
+  --color-amber-800: #5e420e;
+  --color-amber-900: #46310b;
+  --color-amber-950: #2e2007;
+
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);

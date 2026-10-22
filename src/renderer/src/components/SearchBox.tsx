@@ -170,7 +170,7 @@ export function SearchBox(props: { query: AssetQuery; onChange: (q: AssetQuery) 
 
   const showPanel = open && rows.length > 1
   return (
-    <div ref={box} className="relative w-[320px] max-w-full">
+    <div ref={box} className="relative w-[340px] max-w-full">
       <label
         className={`flex h-9 items-center gap-2 rounded-lg border px-3 text-ink-muted transition-[background-color,border-color,box-shadow] duration-[var(--dur-quick)] ${
           showPanel ? 'border-line-strong bg-card shadow-[0_6px_20px_rgba(26,30,27,0.10)]' : 'border-transparent bg-shelf focus-within:border-line-strong focus-within:bg-card'
@@ -214,7 +214,7 @@ export function SearchBox(props: { query: AssetQuery; onChange: (q: AssetQuery) 
         <div
           id="search-results"
           role="listbox"
-          className="absolute inset-x-0 top-full z-30 mt-1.5 rounded-[14px] border border-line bg-card p-1.5 shadow-[0_6px_20px_rgba(26,30,27,0.12)] animate-pop"
+          className="absolute left-0 top-full z-30 mt-1.5 w-[420px] max-w-[calc(100vw-300px)] rounded-[14px] border border-line bg-card p-1.5 shadow-[0_6px_20px_rgba(26,30,27,0.12)] animate-pop"
         >
           {rows.map((r, i) => (
             <div key={r.key}>

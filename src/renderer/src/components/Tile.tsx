@@ -10,7 +10,8 @@ export const Tile = memo(function Tile(props: {
   selected: boolean
   /** True while any tile is selected: a click then toggles selection instead of opening. */
   selecting: boolean
-  onOpen: () => void
+  /** `from`: the tile on screen, for the viewer's open animation. */
+  onOpen: (from?: DOMRect) => void
   onToggle: (shift: boolean) => void
 }) {
   const { asset, size, selected } = props
@@ -26,7 +27,7 @@ export const Tile = memo(function Tile(props: {
   const favorite = favOverride ?? asset.favorite
   const onClick = (e: MouseEvent): void => {
     if (props.selecting || e.shiftKey || e.ctrlKey || e.metaKey) props.onToggle(e.shiftKey)
-    else props.onOpen()
+    else props.onOpen(e.currentTarget.getBoundingClientRect())
   }
   return (
     <div
@@ -35,7 +36,7 @@ export const Tile = memo(function Tile(props: {
       aria-pressed={selected}
       onClick={onClick}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') props.onOpen()
+        if (e.key === 'Enter') props.onOpen(e.currentTarget.getBoundingClientRect())
         if (e.key === ' ') {
           e.preventDefault()
           props.onToggle(e.shiftKey)

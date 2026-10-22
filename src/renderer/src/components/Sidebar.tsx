@@ -206,6 +206,7 @@ function SafetyStatus(props: { library: LibraryInfo; active: boolean; onClick: (
     <button
       onClick={props.onClick}
       aria-current={props.active ? 'page' : undefined}
+      aria-label={`${t('Safety')}: ${title}. ${detail}`}
       className={`flex w-full items-start gap-2.5 rounded-[14px] border bg-card px-3 py-2.5 text-left transition-colors ${props.active ? 'border-brass' : 'border-line hover:border-line-strong'}`}
     >
       <span className={`grid size-7 shrink-0 place-items-center rounded-lg ${safe ? 'bg-safe-soft text-safe' : 'bg-brass-soft text-brass-ink'}`}>

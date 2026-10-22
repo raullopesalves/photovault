@@ -102,6 +102,7 @@ export function AssetGrid(props: {
   const [width, setWidth] = useState(0)
   const [headerH, setHeaderH] = useState(64)
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openFrom, setOpenFrom] = useState<DOMRect | null>(null)
   const [slideshow, setSlideshow] = useState<number | null>(null)
   const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null)
   const [headerEl, setHeaderEl] = useState<HTMLElement | null>(null)
@@ -413,7 +414,10 @@ export function AssetGrid(props: {
                         size={tile}
                         selected={asset ? selected.has(asset.id) : false}
                         selecting={selecting}
-                        onOpen={() => setOpenIndex(index)}
+                        onOpen={(from) => {
+                          setOpenFrom(from ?? null)
+                          setOpenIndex(index)
+                        }}
                         onToggle={(shift) => toggle(index, shift)}
                       />
                     )
@@ -445,6 +449,7 @@ export function AssetGrid(props: {
 
       {openIndex !== null && (
         <Lightbox
+          from={openFrom}
           key="lightbox"
           index={openIndex}
           total={total}
@@ -471,12 +476,12 @@ function BinSelectionBar(props: { ids: number[]; onDone: () => void }) {
   return (
     <>
       <div className="no-drag fixed bottom-6 left-[calc(50%+114px)] z-30 -translate-x-1/2 animate-rise-in">
-        <div className="flex items-center gap-1 rounded-full bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur dark:bg-stone-800/95 dark:ring-1 dark:ring-white/10">
-          <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label={t('Clear selection')}>
+        <div className="flex items-center gap-1 rounded-full bg-ink/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur  dark:ring-1">
+          <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-on-ink/70 hover:bg-on-ink/15 hover:text-on-ink" aria-label={t('Clear selection')}>
             <X className="size-4" />
           </button>
-          <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-white">{n(count)}{' '}{t('selected')}</span>
-          <div className="mx-1 h-5 w-px bg-white/15" />
+          <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-on-ink">{n(count)}{' '}{t('selected')}</span>
+          <div className="mx-1 h-5 w-px bg-on-ink/15" />
           <button
             className={barBtnClass}
             onClick={async () => {
@@ -547,13 +552,13 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
   }
 
   const barBtn =
-    'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-[13px] font-medium text-white/90 transition hover:bg-white/15 hover:text-white disabled:opacity-40'
+    'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-[13px] font-medium text-on-ink/90 transition hover:bg-on-ink/15 hover:text-on-ink disabled:opacity-40'
 
   return (
     <>
       <div className="no-drag fixed bottom-6 left-[calc(50%+114px)] z-30 -translate-x-1/2 animate-rise-in">
         {toast ? (
-          <div className="flex items-center gap-3 rounded-[14px] bg-stone-900/95 py-2 pl-5 pr-2 text-[13px] font-medium text-white shadow-2xl backdrop-blur dark:bg-stone-800/95">
+          <div className="flex items-center gap-3 rounded-[14px] bg-ink/95 py-2 pl-5 pr-2 text-[13px] font-medium text-on-ink shadow-2xl backdrop-blur ">
             {toast}
             {undo && (
               <button
@@ -563,18 +568,18 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                   setToast(t('Undone'))
                   await u()
                 }}
-                className="rounded-full px-3 py-1 text-accent-400 hover:bg-white/10"
+                className="rounded-full px-3 py-1 text-accent-400 hover:bg-on-ink/10 dark:text-accent-600"
               >{t('Undo')}</button>
             )}
             {!undo && <span className="w-3" />}
           </div>
         ) : (
-          <div className="relative flex items-center gap-1 rounded-[14px] bg-stone-900/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur dark:bg-stone-800/95 dark:ring-1 dark:ring-white/10">
-            <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-white/70 hover:bg-white/15 hover:text-white" aria-label={t('Clear selection')}>
+          <div className="relative flex items-center gap-1 rounded-[14px] bg-ink/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur  dark:ring-1">
+            <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-on-ink/70 hover:bg-on-ink/15 hover:text-on-ink" aria-label={t('Clear selection')}>
               <X className="size-4" />
             </button>
-            <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-white">{n(count)}{' '}{t('selected')}</span>
-            <div className="mx-1 h-5 w-px bg-white/15" />
+            <span className="whitespace-nowrap px-2 text-[13px] font-semibold tabular-nums text-on-ink">{n(count)}{' '}{t('selected')}</span>
+            <div className="mx-1 h-5 w-px bg-on-ink/15" />
             <button
               className={barBtn}
               onClick={async () => {
@@ -625,7 +630,7 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                 <MoreHorizontal className="size-4" />{' '}{t('More')}</button>
               {more && (
                 <>
-                  <div className="absolute bottom-12 right-0 z-20 w-56 rounded-xl bg-stone-900/95 p-1.5 shadow-2xl ring-1 ring-white/10 backdrop-blur dark:bg-stone-800/95">
+                  <div className="absolute bottom-12 right-0 z-20 w-56 rounded-xl bg-ink/95 p-1.5 shadow-2xl ring-1 ring-on-ink/10 backdrop-blur ">
                     {[
                       { label: t('Set date…'), icon: <CalendarClock className="size-4" />, run: () => setDating(true) },
                       { label: t('Set location…'), icon: <MapPin className="size-4" />, run: () => setPlacing(true) },
@@ -662,9 +667,9 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                           setMore(false)
                           void a.run()
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] text-white/90 hover:bg-white/10"
+                        className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] text-on-ink/90 hover:bg-on-ink/10"
                       >
-                        <span className="text-white/60">{a.icon}</span>
+                        <span className="text-on-ink/60">{a.icon}</span>
                         {a.label}
                       </button>
                     ))}
