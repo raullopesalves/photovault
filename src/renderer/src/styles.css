@@ -45,6 +45,26 @@
   scrollbar-color: rgb(120 113 108 / 0.35) transparent;
 }
 
+/* Full-height scrollers: on Windows the window's minimise / maximise / close buttons sit over the top-right
+   44 px (titleBarOverlay), so the track starts below them. Webkit pseudo-elements, because the standard
+   scrollbar-* properties above cannot offset the track (and switch these off when present). */
+.scroll-page::-webkit-scrollbar {
+  width: 10px;
+}
+.scroll-page::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 44px;
+}
+.scroll-page::-webkit-scrollbar-thumb {
+  background: rgb(120 113 108 / 0.35);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+.scroll-page::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(120 113 108 / 0.55);
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

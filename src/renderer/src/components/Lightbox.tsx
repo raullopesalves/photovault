@@ -28,7 +28,10 @@ export function Lightbox(props: {
       return false
     }
   })
-  const [fullLoaded, setFullLoaded] = useState(false)
+  // Which full-size image has finished loading. Comparing it with the one on screen (rather than resetting a
+  // flag in an effect) avoids a race: an image already in the cache can report "loaded" before such an effect
+  // runs, which then hid it behind the blurred thumbnail for good.
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
   const [playingLive, setPlayingLive] = useState(false)
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -78,7 +81,6 @@ export function Lightbox(props: {
   // New photo: start fresh.
   useEffect(() => {
     setShowOriginal(false)
-    setFullLoaded(false)
     setDetail(null)
     if (assetId === null) return
     let alive = true
@@ -189,8 +191,8 @@ export function Lightbox(props: {
       : mediaUrl(detail.fullView === 'original' ? 'original' : detail.fullView === 'preview' ? 'preview' : 'thumb', detail.id, detail.rev)
     : null
 
-  // A different rendition (e.g. after rotating) loads behind the blurred thumbnail again.
-  useEffect(() => setFullLoaded(false), [full])
+  // A different rendition (e.g. after rotating) has a different URL, so it loads behind the blurred thumbnail again.
+  const fullLoaded = full !== null && loadedSrc === full
 
   return (
     // no-drag: the sidebar underneath is a window-drag region, which would otherwise swallow clicks on the left arrow.
@@ -351,7 +353,7 @@ export function Lightbox(props: {
                 src={full}
                 alt={detail?.originalFilename ?? ''}
                 draggable={false}
-                onLoad={() => setFullLoaded(true)}
+                onLoad={() => setLoadedSrc(full)}
                 style={{ transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.scale})`, transition: zoom.dragging || zoom.wheeling ? 'none' : 'transform 160ms ease-out, opacity 300ms' }}
                 className={`relative max-h-full max-w-full select-none object-contain will-change-transform ${fullLoaded ? 'opacity-100' : 'opacity-0'}`}
               />
@@ -454,7 +456,7 @@ export function Lightbox(props: {
       )}
 
       {showInfo && (
-        <aside className="scroll-thin w-[360px] shrink-0 overflow-y-auto border-l border-white/10 bg-stone-900 px-6 pb-8 pt-16 animate-fade-in">
+        <aside className="scroll-page w-[360px] shrink-0 overflow-y-auto border-l border-white/10 bg-stone-900 px-6 pb-8 pt-16 animate-fade-in">
           {detail ? <InfoPanel d={detail} onChanged={() => void api.asset(detail.id).then(setDetail)} /> : <div className="skeleton h-6 w-40 rounded" />}
         </aside>
       )}

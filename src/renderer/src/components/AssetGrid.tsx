@@ -262,7 +262,7 @@ export function AssetGrid(props: {
 
   return (
     <div className="relative h-full">
-      <div ref={setScrollEl} className="scroll-thin h-full overflow-y-auto">
+      <div ref={setScrollEl} className="scroll-page h-full overflow-y-auto">
         <header
           ref={setHeaderEl}
           className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-3 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75"

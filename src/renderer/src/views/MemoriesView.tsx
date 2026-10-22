@@ -44,7 +44,7 @@ export function MemoriesView(props: { version: number }) {
   }
 
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <PageHeader title={t('Memories')} subtitle={t('Found in your own photos: the same day in earlier years, trips away from home, and days you took a lot of pictures.')} />
       <div className="mx-auto max-w-5xl space-y-10 px-8 pb-12">
         {list === null && <div className="skeleton h-48 rounded-2xl" />}

@@ -78,7 +78,7 @@ export function CleanupView(props: { version: number }) {
     }))
 
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <div className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Cleanup')}</h1>
         <div className="mt-0.5 max-w-2xl text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Media from chat apps, screenshots and downloads, grouped so you can review it in bulk. Hiding only removes items from the Photos timeline — nothing is deleted, and hidden items stay searchable here.')}</div>

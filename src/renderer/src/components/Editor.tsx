@@ -150,7 +150,7 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
           {tabBtn('filters', t('Filters'), <Sparkles className="size-4" />)}
         </div>
 
-        <div className="scroll-thin flex-1 overflow-y-auto px-5 py-5">
+        <div className="scroll-page flex-1 overflow-y-auto px-5 py-5">
           {tab === 'crop' && (
             <div className="space-y-5">
               <div className="flex gap-2">

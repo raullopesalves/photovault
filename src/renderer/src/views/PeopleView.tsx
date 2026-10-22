@@ -78,7 +78,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void; onOp
   const line = statusLine(status)
 
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <PageHeader title={t('People')} subtitle={t('Photos grouped by the faces in them. Name someone to find them by name in search; merge duplicates; fix mistakes from a person\'s page.')} />
       <div className="mx-auto max-w-5xl px-8 pb-12">
         {line && (
@@ -571,7 +571,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
   const name = props.person.name ?? t('this person')
 
   return (
-    <div className="scroll-thin relative h-full overflow-y-auto">
+    <div className="scroll-page relative h-full overflow-y-auto">
       <header className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-3 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <div className="flex min-h-[40px] items-end justify-between gap-4">
           <h1 className="truncate font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{props.title}</h1>

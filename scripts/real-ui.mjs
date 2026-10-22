@@ -221,6 +221,22 @@ try {
     await page.waitForTimeout(1000)
   }
 
+  if (process.argv.includes('--reopen')) {
+    // The same photo opened and closed several times: the full image must be shown every time.
+    for (let i = 1; i <= 5; i++) {
+      await page.locator('main img').nth(3).click()
+      await page.waitForTimeout(1500)
+      const shown = await page.evaluate(() => [...document.querySelectorAll('img')].some((im) => im.className.includes('will-change-transform') && im.className.includes('opacity-100') && im.complete))
+      console.log(`reopen ${i}: full image shown = ${shown}`)
+      if (!shown) await page.screenshot({ path: join(shots, `reopen-${i}.png`) })
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(700)
+    }
+    await page.mouse.wheel(0, 3000)
+    await page.waitForTimeout(800)
+    await page.screenshot({ path: join(shots, 'scrollbar.png'), clip: { x: 1240, y: 0, width: 200, height: 160 } })
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()

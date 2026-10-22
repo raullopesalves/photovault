@@ -30,7 +30,7 @@ export function SettingsView(props: {
     { id: 'dark', label: t('Dark'), icon: <Moon className="size-4" /> }
   ]
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <PageHeader title={t('Settings')} />
       <div className="mx-auto max-w-4xl space-y-6 px-8 pb-12">
         <Group title={t('Appearance')}>

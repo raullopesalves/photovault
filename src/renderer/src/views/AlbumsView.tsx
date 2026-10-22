@@ -28,7 +28,7 @@ export function AlbumsView(props: { version: number }) {
   const google = (albums ?? []).filter((a) => a.kind === 'takeout')
 
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <div className="drag sticky top-0 z-10 flex items-end justify-between bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Albums')}</h1>

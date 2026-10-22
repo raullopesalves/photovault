@@ -25,7 +25,7 @@ export function DuplicatesView(props: { version: number }) {
   }, [props.version])
 
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <PageHeader
         title={t('Duplicates')}
         subtitle={t('Exact duplicates are byte-for-byte identical — the library already keeps only one copy. Probable duplicates look the same but were re-saved, resized or compressed (e.g. sent through WhatsApp): separate files you can review. Similar photos are different shots of the same moment, such as bursts.')}

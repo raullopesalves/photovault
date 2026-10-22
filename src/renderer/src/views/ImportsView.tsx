@@ -28,7 +28,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
   if (selected) return <ImportDetail s={selected} onBack={() => setSelected(null)} />
 
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <PageHeader title={t('Imports')} subtitle={t('Every import is logged: what was found, what was copied and what was recognised as a duplicate.')} />
       <div className="mx-auto max-w-4xl px-8 pb-12">
         <WatchFolders version={props.version} />
@@ -220,7 +220,7 @@ function ImportDetail({ s, onBack }: { s: ImportSummary; onBack: () => void }) {
     [t('Not imported'), t('{unsupported} unrecognised, {errors} unreadable, {filesFailed} failed to copy', { unsupported: n(s.unsupported), errors: n(s.errors), filesFailed: n(s.filesFailed) })]
   ]
   return (
-    <div className="scroll-thin h-full overflow-y-auto">
+    <div className="scroll-page h-full overflow-y-auto">
       <div className="drag h-11" />
       <div className="mx-auto max-w-3xl px-8 pb-12">
         <button onClick={onBack} className="no-drag mb-4 inline-flex items-center gap-1.5 text-[13px] text-stone-500 transition hover:text-stone-900 dark:hover:text-stone-100">
