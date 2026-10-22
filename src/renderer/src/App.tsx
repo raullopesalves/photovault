@@ -17,6 +17,7 @@ import { PeopleView } from './views/PeopleView'
 import { MemoriesView } from './views/MemoriesView'
 import { FavoritesView } from './views/FavoritesView'
 import { CleanupView } from './views/CleanupView'
+import { ScreenshotsView } from './views/ScreenshotsView'
 import { BinView, HiddenView } from './views/HiddenBinViews'
 import { t } from './lib/i18n'
 
@@ -31,6 +32,7 @@ export default function App() {
   const [state, setState] = useState<AppState | null>(null)
   const [view, setView] = useState<View>('photos')
   const [theme, setTheme] = useState<ThemePreference>('system')
+  const [showScreenshots, setShowScreenshots] = useState(false)
   const [progress, setProgress] = useState<ImportProgress | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [version, setVersion] = useState(0)
@@ -42,7 +44,10 @@ export default function App() {
 
   useEffect(() => {
     void refreshState()
-    void api.getSettings().then((s) => setTheme(s.theme))
+    void api.getSettings().then((s) => {
+      setTheme(s.theme)
+      setShowScreenshots(s.showScreenshots)
+    })
     void api.currentImport().then((p) => {
       if (p) {
         setProgress(p)
@@ -77,6 +82,11 @@ export default function App() {
   const changeTheme = async (t: ThemePreference): Promise<void> => {
     setTheme(t)
     await api.setSettings({ theme: t })
+  }
+
+  const changeShowScreenshots = async (show: boolean): Promise<void> => {
+    setShowScreenshots(show)
+    await api.setSettings({ showScreenshots: show })
   }
 
   const errorText = (err: unknown): string =>
@@ -166,7 +176,15 @@ export default function App() {
         onImport={(kind) => void startImport(kind)}
       />
       <main className="relative min-w-0 flex-1">
-        {view === 'photos' && <PhotosView version={version} library={library} onImport={(kind) => void startImport(kind)} />}
+        {view === 'photos' && (
+          <PhotosView
+            version={version}
+            library={library}
+            showScreenshots={showScreenshots}
+            onImport={(kind) => void startImport(kind)}
+            onShowScreenshots={() => setView('screenshots')}
+          />
+        )}
         {view === 'imports' && (
           <ImportsView version={version} onImport={(kind) => void startImport(kind)} onResume={(id) => void resumeImport(id)} busy={importRunning} />
         )}
@@ -186,6 +204,7 @@ export default function App() {
         {view === 'map' && <MapView version={version} />}
         {view === 'people' && <PeopleView version={version} />}
         {view === 'memories' && <MemoriesView version={version} />}
+        {view === 'screenshots' && <ScreenshotsView version={version} showInPhotos={showScreenshots} onShowInPhotos={(s) => void changeShowScreenshots(s)} />}
         {view === 'cleanup' && <CleanupView version={version} />}
         {view === 'hidden' && <HiddenView version={version} library={library} />}
         {view === 'bin' && <BinView version={version} library={library} />}

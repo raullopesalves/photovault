@@ -27,7 +27,7 @@ function toggle<T>(list: T[] | undefined, value: T, eq: (a: T, b: T) => boolean 
  * Search field + multi-select filter menus, with the active filters shown as removable badges underneath.
  * Within one menu any ticked value matches (OR); different menus combine (AND).
  */
-export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) => void; version: number; hideFavorite?: boolean }) {
+export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) => void; version: number; hideFavorite?: boolean; hideOrigin?: boolean }) {
   const [facets, setFacets] = useState<Facets | null>(null)
   const [text, setText] = useState(props.query.text ?? props.query.smartText ?? '')
   const [smart, setSmart] = useState(props.query.smartText !== undefined)
@@ -202,7 +202,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
           />
         )}
 
-        {(facets?.origins.length ?? 0) > 0 && (
+        {!props.hideOrigin && (facets?.origins.length ?? 0) > 0 && (
           <Menu
             icon={<Smartphone className="size-3.5" />}
             label={t('Origin')}

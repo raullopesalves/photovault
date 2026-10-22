@@ -237,6 +237,32 @@ try {
     await page.screenshot({ path: join(shots, 'scrollbar.png'), clip: { x: 1240, y: 0, width: 200, height: 160 } })
   }
 
+  if (process.argv.includes('--screenshots')) {
+    // Screenshots stay out of Photos by default; their view can bring them back. Counts come from the grid itself.
+    const total = async () => page.evaluate(async () => (await window.photoVault.timeline({ hidden: 'exclude' })).reduce((s, g) => s + g.count, 0))
+    console.log('library items (not hidden):', await total())
+    await page.screenshot({ path: join(shots, 'screens-photos-default.png') })
+    console.log('photos subtitle:', await page.locator('main h1 + div').first().textContent().catch(() => null))
+    await page.click('nav >> text=Screenshots')
+    await page.waitForTimeout(2500)
+    await page.screenshot({ path: join(shots, 'screens-view.png') })
+    await page.click('main button:has-text("Show in Photos too")')
+    await page.waitForTimeout(800)
+    console.log('setting after toggle:', (await page.evaluate(() => window.photoVault.getSettings())).showScreenshots)
+    await page.click('nav >> text=Photos')
+    await page.waitForTimeout(2500)
+    await page.screenshot({ path: join(shots, 'screens-photos-shown.png') })
+    await page.click('nav >> text=Screenshots')
+    await page.waitForTimeout(1000)
+    await page.click('main button:has-text("Keep out of Photos")')
+    await page.waitForTimeout(800)
+    await page.click('nav >> text=Photos')
+    await page.waitForTimeout(1000)
+    await page.locator('main input').first().fill('screenshot')
+    await page.waitForTimeout(2500)
+    await page.screenshot({ path: join(shots, 'screens-photos-search.png') })
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()

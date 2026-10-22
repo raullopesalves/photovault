@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
-import { Album, BrushCleaning, Map as MapIcon, Sparkles, Users, Copy, EyeOff, FolderInput, HardDrive, Heart, Images, LoaderCircle, Plus, Settings, Trash2 } from 'lucide-react'
+import { Album, BrushCleaning, Map as MapIcon, Sparkles, Users, Copy, EyeOff, FolderInput, HardDrive, Heart, Images, LoaderCircle, MonitorSmartphone, Plus, Settings, Trash2 } from 'lucide-react'
 import type { ImportProgress, LibraryInfo } from '@shared/types'
 import { etaLabel, n } from '../lib/format'
 import { ImportMenu, type ImportKind } from './ImportMenu'
 import { t } from '../lib/i18n'
 
-export type View = 'photos' | 'memories' | 'favorites' | 'albums' | 'people' | 'map' | 'cleanup' | 'imports' | 'duplicates' | 'hidden' | 'bin' | 'storage' | 'settings'
+export type View = 'photos' | 'memories' | 'favorites' | 'albums' | 'people' | 'map' | 'screenshots' | 'cleanup' | 'imports' | 'duplicates' | 'hidden' | 'bin' | 'storage' | 'settings'
 
 const NAV: Array<{ id: View; label: string; icon: ReactNode; soon?: boolean }> = [
   { id: 'photos', label: t('Photos'), icon: <Images className="size-[18px]" strokeWidth={1.75} /> },
@@ -14,6 +14,7 @@ const NAV: Array<{ id: View; label: string; icon: ReactNode; soon?: boolean }> =
   { id: 'albums', label: t('Albums'), icon: <Album className="size-[18px]" strokeWidth={1.75} /> },
   { id: 'people', label: t('People'), icon: <Users className="size-[18px]" strokeWidth={1.75} /> },
   { id: 'map', label: t('Map'), icon: <MapIcon className="size-[18px]" strokeWidth={1.75} /> },
+  { id: 'screenshots', label: t('Screenshots'), icon: <MonitorSmartphone className="size-[18px]" strokeWidth={1.75} /> },
   { id: 'cleanup', label: t('Cleanup'), icon: <BrushCleaning className="size-[18px]" strokeWidth={1.75} /> },
   { id: 'imports', label: t('Imports'), icon: <FolderInput className="size-[18px]" strokeWidth={1.75} /> },
   { id: 'duplicates', label: t('Duplicates'), icon: <Copy className="size-[18px]" strokeWidth={1.75} /> },
@@ -85,6 +86,7 @@ export function Sidebar(props: {
               <span className={active ? 'text-accent-600 dark:text-accent-400' : ''}>{item.icon}</span>
               <span className="flex-1">{item.label}</span>
               {item.soon && <span className="text-[10px] uppercase tracking-wider text-stone-400 dark:text-stone-500">{t('Soon')}</span>}
+              {item.id === 'screenshots' && props.library.screenshotCount > 0 && <span className="text-[11px] tabular-nums text-stone-400">{n(props.library.screenshotCount)}</span>}
               {item.id === 'hidden' && props.library.hiddenCount > 0 && <span className="text-[11px] tabular-nums text-stone-400">{n(props.library.hiddenCount)}</span>}
               {item.id === 'bin' && props.library.binCount > 0 && <span className="text-[11px] tabular-nums text-stone-400">{n(props.library.binCount)}</span>}
               {item.id === 'storage' && props.library.unprotectedCount > 0 && props.library.assetCount > 0 && (

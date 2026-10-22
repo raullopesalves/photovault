@@ -95,6 +95,7 @@ function query(v: unknown): AssetQuery | undefined {
   )?.map((c) => ({ make: typeof c.make === 'string' ? c.make.slice(0, 200) : null, model: c.model.slice(0, 200) }))
   out.sourceTypes = list(q.sourceTypes, word)
   out.origins = list(q.origins, word) as AssetQuery['origins']
+  out.excludeOrigins = list(q.excludeOrigins, word) as AssetQuery['excludeOrigins']
   return out
 }
 
@@ -662,7 +663,12 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   })
   ipcMain.handle('db:openSnapshots', () => shell.openPath(snapshotDir(lib())))
 
-  const settingsOut = (): Settings => ({ theme: settings.theme, language: languageOf(settings), offline: settings.offline === true })
+  const settingsOut = (): Settings => ({
+    theme: settings.theme,
+    language: languageOf(settings),
+    offline: settings.offline === true,
+    showScreenshots: settings.showScreenshots === true
+  })
   ipcMain.handle('settings:get', (): Settings => settingsOut())
   ipcMain.handle('settings:set', (_e, patch: unknown): Settings => {
     const p = (patch ?? {}) as Partial<Settings>
@@ -673,6 +679,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
       setOffline(p.offline)
       if (!p.offline) void checkForUpdates()
     }
+    if (typeof p.showScreenshots === 'boolean') settings = { ...settings, showScreenshots: p.showScreenshots }
     saveSettings(settings)
     applyTheme(settings)
     return settingsOut()

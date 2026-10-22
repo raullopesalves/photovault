@@ -4,12 +4,14 @@ import { dirname, join } from 'node:path'
 import type { Language, Settings, ThemePreference } from '@shared/types'
 
 /** App-level settings (not library data) stored in the OS user-data folder. */
-export interface StoredSettings extends Omit<Settings, 'language' | 'offline'> {
+export interface StoredSettings extends Omit<Settings, 'language' | 'offline' | 'showScreenshots'> {
   libraryPath: string | null
   /** Unset until chosen: follows the system language. */
   language?: Language
   /** Offline mode (main/network.ts). */
   offline?: boolean
+  /** Screenshots in the Photos timeline (D89); off unless turned on. */
+  showScreenshots?: boolean
 }
 
 const DEFAULTS: StoredSettings = { theme: 'system', libraryPath: null }
@@ -29,7 +31,7 @@ export function loadSettings(): StoredSettings {
     const parsed = JSON.parse(readFileSync(file(), 'utf8')) as Partial<StoredSettings>
     const theme: ThemePreference = parsed.theme === 'light' || parsed.theme === 'dark' ? parsed.theme : 'system'
     const language = parsed.language === 'en' || parsed.language === 'pt' ? parsed.language : undefined
-    return { theme, libraryPath: typeof parsed.libraryPath === 'string' ? parsed.libraryPath : null, language, offline: parsed.offline === true }
+    return { theme, libraryPath: typeof parsed.libraryPath === 'string' ? parsed.libraryPath : null, language, offline: parsed.offline === true, showScreenshots: parsed.showScreenshots === true }
   } catch {
     return { ...DEFAULTS }
   }

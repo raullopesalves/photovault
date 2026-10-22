@@ -70,6 +70,10 @@ export function assetWhere(q: AssetQuery | undefined): WhereClause {
     parts.push('a.origin = ?')
     params.push(q.origin)
   }
+  if (q.excludeOrigins?.length) {
+    parts.push(`(a.origin IS NULL OR a.origin NOT IN (${q.excludeOrigins.map(() => '?').join(', ')}))`)
+    params.push(...q.excludeOrigins)
+  }
   if (q.originHint === 'none') parts.push('a.origin_hint IS NULL')
   else if (q.originHint === 'whatsapp_size' || q.originHint === 'social_size') {
     parts.push('a.origin_hint = ?')

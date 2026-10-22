@@ -1,21 +1,42 @@
 import { useState } from 'react'
 import { FileArchive, FolderInput, ImagePlus, SearchX, ShieldCheck, Copy as CopyIcon, Fingerprint } from 'lucide-react'
-import type { AssetQuery, LibraryInfo } from '@shared/types'
+import type { AssetOrigin, AssetQuery, LibraryInfo } from '@shared/types'
 import { AssetGrid } from '../components/AssetGrid'
 import { FilterBar } from '../components/FilterBar'
 import type { ImportKind } from '../components/ImportMenu'
+import { plural } from '../lib/format'
 import { t } from '../lib/i18n'
 
-export function PhotosView(props: { version: number; library: LibraryInfo; onImport: (kind: ImportKind) => void }) {
+/** Kept out of the Photos timeline unless Settings say otherwise; they have their own view. */
+export const SCREEN_ORIGINS: AssetOrigin[] = ['screenshot', 'screen_recording']
+
+export function PhotosView(props: {
+  version: number
+  library: LibraryInfo
+  showScreenshots: boolean
+  onImport: (kind: ImportKind) => void
+  onShowScreenshots: () => void
+}) {
   const [query, setQuery] = useState<AssetQuery>({})
 
   if (props.library.assetCount === 0) return <EmptyLibrary onImport={props.onImport} />
 
+  // Searching, or picking Screenshots in the Origin filter, still finds them.
+  const asked = !!query.text || !!query.ids || !!query.origins?.some((o) => o !== 'unknown' && SCREEN_ORIGINS.includes(o))
+  const leftOut = !props.showScreenshots && !asked && props.library.screenshotCount > 0
+
   return (
     <AssetGrid
       version={props.version}
-      query={{ ...query, hidden: 'exclude' }}
+      query={{ ...query, hidden: 'exclude', excludeOrigins: leftOut ? SCREEN_ORIGINS : undefined }}
       title={t('Photos')}
+      subtitle={
+        leftOut ? (
+          <button onClick={props.onShowScreenshots} className="no-drag hover:text-stone-800 hover:underline dark:hover:text-stone-200">
+            {t('{screenshots} kept apart in Screenshots', { screenshots: plural(props.library.screenshotCount, 'screenshot') })}
+          </button>
+        ) : undefined
+      }
       toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} />}
       empty={<NoMatches onClear={() => setQuery({})} />}
     />

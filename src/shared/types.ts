@@ -54,6 +54,8 @@ export interface LibraryInfo {
   totalBytes: number
   pendingThumbnails: number
   hiddenCount: number
+  /** Screenshots and screen recordings (not in the Bin). */
+  screenshotCount: number
   binCount: number
   binBytes: number
   /** Content the user deleted permanently; re-imports of it are skipped. */
@@ -109,6 +111,8 @@ export interface AssetQuery {
   sourceType?: string
   albumId?: number
   origin?: AssetOrigin | 'unknown'
+  /** Leave out these origins (the Photos timeline drops screenshots unless asked to show them). */
+  excludeOrigins?: AssetOrigin[]
   /** Sub-group of a probable origin; 'none' = no size clue. */
   originHint?: 'whatsapp_size' | 'social_size' | 'none'
   kind?: AssetKind
@@ -704,6 +708,8 @@ export interface Settings {
   language: Language
   /** Blocks every internet connection (model downloads, map tiles, updates). */
   offline: boolean
+  /** Screenshots and screen recordings appear in the Photos timeline (off: only in their own view). */
+  showScreenshots: boolean
 }
 
 export type LibraryChangeReason = 'import' | 'thumbnails' | 'favorite' | 'opened' | 'albums'

@@ -107,6 +107,7 @@ export function libraryInfo(library: Library): LibraryInfo {
     bytes: number | null
     pending: number | null
     hidden: number | null
+    screenshots: number | null
     bin: number | null
     binBytes: number | null
   }>(
@@ -116,6 +117,7 @@ export function libraryInfo(library: Library): LibraryInfo {
             SUM(size_bytes) AS bytes,
             SUM(thumb_status = 'pending') AS pending,
             SUM(hidden = 1 AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL) AS hidden,
+            SUM(origin IN ('screenshot', 'screen_recording') AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL) AS screenshots,
             SUM(trashed_at IS NOT NULL) AS bin,
             SUM(CASE WHEN trashed_at IS NOT NULL THEN size_bytes ELSE 0 END) AS binBytes
        FROM assets`
@@ -134,6 +136,7 @@ export function libraryInfo(library: Library): LibraryInfo {
     totalBytes: r?.bytes ?? 0,
     pendingThumbnails: r?.pending ?? 0,
     hiddenCount: r?.hidden ?? 0,
+    screenshotCount: r?.screenshots ?? 0,
     binCount: r?.bin ?? 0,
     binBytes: r?.binBytes ?? 0,
     deletedCount: deleted,

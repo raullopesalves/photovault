@@ -1,5 +1,14 @@
 /** European Portuguese (pt-PT). Keys are the English interface text; see i18n.ts. Missing keys show in English. */
 export const PT: Record<string, string> = {
+  "screenshot": "captura de ecrã",
+  "screenshots": "capturas de ecrã",
+  "{screenshots} kept apart in Screenshots": "{screenshots} à parte, em Capturas de ecrã",
+  "Screenshots and screen recordings — also shown in the Photos timeline.": "Capturas e gravações de ecrã — também mostradas na cronologia de Fotografias.",
+  "Screenshots and screen recordings — kept out of the Photos timeline. Search still finds them.": "Capturas e gravações de ecrã — fora da cronologia de Fotografias. A pesquisa continua a encontrá-las.",
+  "Keep out of Photos": "Manter fora de Fotografias",
+  "Show in Photos too": "Mostrar também em Fotografias",
+  "No screenshots": "Sem capturas de ecrã",
+  "Screenshots from phones and computers are recognised by their file name and folder, and collected here.": "As capturas de ecrã de telemóveis e computadores são reconhecidas pelo nome do ficheiro e pela pasta, e reunidas aqui.",
   "Offline mode": "Modo offline",
   "Photo Vault works without the internet. Its only connections are ones you start: downloading an AI model, the detailed map, and update checks. Offline mode blocks all of them at once, as a guarantee. Models you already have keep working.": "O Photo Vault funciona sem internet. As únicas ligações são as que inicia: transferir um modelo de IA, o mapa detalhado e a procura de atualizações. O modo offline bloqueia-as todas de uma vez, como garantia. Os modelos que já tem continuam a funcionar.",
   "On — nothing connects to the internet.": "Ligado — nada se liga à internet.",

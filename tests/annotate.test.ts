@@ -64,6 +64,19 @@ describe('annotations', () => {
     expect(smartAlbums(lib)[0]!.count).toBe(2)
   })
 
+  it('the Photos timeline can leave screenshots out', async () => {
+    await makeJpeg(join(sb.source, 'a.jpg'), { color: '#101010' })
+    await makeJpeg(join(sb.source, 'b.jpg'), { color: '#202020' })
+    await makeJpeg(join(sb.source, 'c.jpg'), { color: '#303030' })
+    await runImport(lib, sb.source)
+    const [a, b, c] = [idOf('a.jpg'), idOf('b.jpg'), idOf('c.jpg')]
+    lib.db.run("UPDATE assets SET origin = 'screenshot' WHERE id = ?", [b])
+    lib.db.run("UPDATE assets SET origin = 'camera' WHERE id = ?", [c])
+    const ids = (q: Parameters<typeof assetIdsInRange>[1]): number[] => assetIdsInRange(lib, q, 0, 10).sort((x, y) => x - y)
+    expect(ids({ excludeOrigins: ['screenshot', 'screen_recording'] })).toEqual([a, c].sort((x, y) => x - y)) // unknown origin stays
+    expect(ids({ origins: ['screenshot', 'screen_recording'] })).toEqual([b])
+  })
+
   it('hand-marked faces can be named and removed', async () => {
     await makeJpeg(join(sb.source, 'a.jpg'), { color: '#101010' })
     await runImport(lib, sb.source)
