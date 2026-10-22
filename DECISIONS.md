@@ -451,3 +451,11 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 ## Screenshots (0.12)
 
 **D89. Screenshots kept out of Photos by default.** Screenshots and screen recordings (origin from D31, ~5 % of a real library) have their own sidebar view and are left out of the Photos timeline by a query filter (`AssetQuery.excludeOrigins`), not by the per-item hidden flag: new imports follow automatically, nothing is written to the catalogue, and the choice reverses at once. "Show in Photos too" on the Screenshots view flips an app setting (`showScreenshots`). In Photos, a text or smart search, or picking Screenshots in the Origin filter, still finds them. Memories already used only camera/unknown origins.
+
+## Mount identity (0.13)
+
+**D90. The Mount identity, first step** (design system "Photo Vault" on claude.ai; directions compared on the "Photo Vault Redesign" canvas). A mount is the card a print sits behind; the logo is one (window set high, brass label), and so is the new app icon (`build/icon.svg`).
+- **Tokens:** Tailwind's `stone` scale is remapped to mat-board greys with a faint green cast and `accent` to brass, so every existing view changed at once; brass fills take dark text (`text-on-accent`), never white (white on brass is 3.6:1). New components use semantic tokens (`bg-mat`, `bg-shelf`, `text-ink`, `text-brass-ink`, `bg-safe-soft`, …) that switch with `.dark`.
+- **Fonts:** Schibsted Grotesk (variable) and Fragment Mono, both OFL, bundled through `@fontsource` so the app stays offline. Vite must not inline font files (`assetsInlineLimit`): the renderer CSP blocks `data:` fonts.
+- **Sidebar:** fourteen flat items became groups: Photos, Memories, People, Places (was Map), Albums · Collections: Favourites, Screenshots, Videos (new view) · Look after: Tidy up (was Cleanup), Duplicates, Hidden, Bin. Past imports open from the Import menu; Storage (now titled Safety) opens from a safety card that says in words whether every item has a backup copy; Settings is an icon beside Import. Duplicates and Hidden fold into Tidy up when that hub is rebuilt.
+

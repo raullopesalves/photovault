@@ -106,7 +106,7 @@ export function LocationPicker(props: {
           <button
             onClick={() => setDetailed((d) => !d)}
             className={`absolute left-14 top-3 z-[500] inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium shadow-md ${
-              detailed ? 'bg-accent-500 text-white' : 'bg-white text-stone-700 dark:bg-stone-800 dark:text-stone-200'
+              detailed ? 'bg-accent-500 text-on-accent' : 'bg-white text-stone-700 dark:bg-stone-800 dark:text-stone-200'
             }`}
             title={detailed ? t('OpenStreetMap (the visible area is requested from tile.openstreetmap.org)') : t('Offline map — click for streets and towns')}
           >

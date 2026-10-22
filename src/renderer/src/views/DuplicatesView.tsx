@@ -260,7 +260,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                   </div>
                 )}
                 {selected && (
-                  <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10.5px] font-semibold text-white">
+                  <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10.5px] font-semibold text-on-accent">
                     <Check className="size-3" strokeWidth={3} />{' '}{t('Keep')}</span>
                 )}
                 {m.asset.hidden && (

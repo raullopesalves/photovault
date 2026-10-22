@@ -9,7 +9,7 @@ import { t } from '../lib/i18n'
 export function StorageView({ library, version }: { library: LibraryInfo; version: number }) {
   return (
     <div className="scroll-page h-full overflow-y-auto">
-      <PageHeader title={t('Storage')} subtitle={t('Where your originals live, their backup copies, and checks that every file is still intact.')} />
+      <PageHeader title={t('Safety')} subtitle={t('Where your originals live, their backup copies, and checks that every file is still intact.')} />
       <div className="mx-auto max-w-4xl space-y-4 px-8 pb-12">
         <div className="flex items-center gap-5 rounded-xl bg-white p-5 shadow-sm shadow-stone-900/5 dark:bg-stone-900">
           <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">

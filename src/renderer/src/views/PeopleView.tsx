@@ -596,7 +596,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
             >
               <img src={faceUrl(f.id)} alt="" loading="lazy" className={`size-full object-cover transition ${on ? 'scale-90 rounded-lg' : ''}`} />
               {on && (
-                <span className="absolute left-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-accent-500 text-white">
+                <span className="absolute left-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-accent-500 text-on-accent">
                   <Check className="size-3" strokeWidth={3} />
                 </span>
               )}

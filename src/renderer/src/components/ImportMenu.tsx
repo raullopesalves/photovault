@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { FileArchive, FolderOpen, Smartphone } from 'lucide-react'
+import { FileArchive, FolderOpen, History, Smartphone } from 'lucide-react'
 import { t } from '../lib/i18n'
 
 export type ImportKind = 'folder' | 'zip' | 'phone'
 
 /** A button that offers the two import sources: a folder, or ZIP archives (e.g. Google Takeout). */
-export function ImportMenu(props: { onImport: (kind: ImportKind) => void; className: string; children: ReactNode; placement?: 'above' | 'below' }) {
+export function ImportMenu(props: { onImport: (kind: ImportKind) => void; onShowImports?: () => void; className: string; children: ReactNode; placement?: 'above' | 'below' }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -45,6 +45,20 @@ export function ImportMenu(props: { onImport: (kind: ImportKind) => void; classN
           <MenuItem icon={<FolderOpen className="size-4" />} title={t('Folder…')} body={t('Photos on a disk, phone backup, extracted export')} onClick={() => pick('folder')} />
           <MenuItem icon={<FileArchive className="size-4" />} title={t('ZIP archives…')} body={t('Google Takeout or any ZIP — select several at once')} onClick={() => pick('zip')} />
           <MenuItem icon={<Smartphone className="size-4" />} title={t('Phone or camera…')} body={t('Connected by USB — copies only what is new')} onClick={() => pick('phone')} />
+          {props.onShowImports && (
+            <>
+              <div className="mx-2 my-1 h-px bg-line" />
+              <MenuItem
+                icon={<History className="size-4" />}
+                title={t('Past imports')}
+                body={t('What each import found and copied; resume one that stopped')}
+                onClick={() => {
+                  setOpen(false)
+                  props.onShowImports?.()
+                }}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

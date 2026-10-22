@@ -284,7 +284,7 @@ function ToolBtn(props: { onClick: () => void; label: string; active?: boolean; 
       onClick={props.onClick}
       title={props.label}
       aria-label={props.label}
-      className={`flex flex-1 flex-col items-center gap-1 rounded-lg py-2.5 text-[11px] transition ${props.active ? 'bg-accent-500 text-white' : 'bg-white/10 hover:bg-white/15'}`}
+      className={`flex flex-1 flex-col items-center gap-1 rounded-lg py-2.5 text-[11px] transition ${props.active ? 'bg-accent-500 text-on-accent' : 'bg-white/10 hover:bg-white/15'}`}
     >
       {props.children}
       {props.label}

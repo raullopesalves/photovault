@@ -76,7 +76,7 @@ export const Tile = memo(function Tile(props: {
         }}
         className={`absolute left-1.5 top-1.5 grid size-[22px] place-items-center rounded-full transition ${
           selected
-            ? 'bg-accent-500 text-white opacity-100 ring-2 ring-white dark:ring-stone-900'
+            ? 'bg-accent-500 text-on-accent opacity-100 ring-2 ring-white dark:ring-stone-900'
             : `border-2 border-white/90 bg-black/10 text-transparent hover:bg-white/30 ${props.selecting ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`
         }`}
       >

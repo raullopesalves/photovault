@@ -219,7 +219,7 @@ export function MapView(props: { version: number }) {
                 : t('Offline map. Click to show streets and places from OpenStreetMap (the visible area is requested from tile.openstreetmap.org).')
             }
             className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium shadow-md transition ${
-              online ? 'bg-accent-500 text-white' : 'bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-60 dark:bg-stone-800 dark:text-stone-200'
+              online ? 'bg-accent-500 text-on-accent' : 'bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-60 dark:bg-stone-800 dark:text-stone-200'
             }`}
           >
             <Layers className="size-3.5" />

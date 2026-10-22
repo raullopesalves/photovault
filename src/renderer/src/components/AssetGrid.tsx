@@ -331,7 +331,7 @@ export function AssetGrid(props: {
                           aria-label={all ? t('Deselect this month') : t('Select this month')}
                           className={`-ml-6 mr-1.5 mb-[3px] grid size-[18px] place-items-center rounded-full transition ${
                             all
-                              ? 'bg-accent-500 text-white opacity-100'
+                              ? 'bg-accent-500 text-on-accent opacity-100'
                               : `border-2 border-stone-400 text-transparent hover:border-accent-500 dark:border-stone-500 ${selecting ? 'opacity-100' : 'opacity-0 group-hover/month:opacity-100'}`
                           }`}
                         >

@@ -1139,6 +1139,10 @@ See `DECISIONS.md` (D1–D88) for reasoning and `readme.md` for commands.
 - **Search:** full-text search via FTS5 trigrams (accent-insensitive, includes folders and albums); **smart search** with CLIP on the device, opt-in, model downloaded once, results best match first.
 - **Scale:** a 100k-item performance test (`npm run test:perf`).
 
+### In progress (0.13)
+
+- **Mount identity:** new logo and app icon, mat-grey and brass palette, Schibsted Grotesk and Fragment Mono bundled, and a grouped sidebar with a safety card and a Videos view (D90).
+
 ### Added in 0.12
 
 - **Screenshots** have their own view and stay out of the Photos timeline unless turned back on there (D89).

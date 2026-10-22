@@ -1,18 +1,13 @@
-import { FolderOpen, ShieldCheck, Sparkles } from 'lucide-react'
+import { FolderOpen, ShieldCheck } from 'lucide-react'
+import { Mark } from '../components/Mark'
 import { t } from '../lib/i18n'
 
 export function Welcome(props: { error?: string; onCreate: () => void; onOpen: () => void }) {
   return (
     <div className="drag relative flex h-full items-center justify-center overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 opacity-70 dark:opacity-40">
-        <div className="absolute -left-40 -top-40 size-[520px] rounded-full bg-accent-100 blur-3xl dark:bg-accent-600/30" />
-        <div className="absolute -bottom-48 -right-32 size-[560px] rounded-full bg-amber-100 blur-3xl dark:bg-amber-700/20" />
-      </div>
       <div className="no-drag relative w-[520px] text-center animate-rise-in">
-        <div className="mx-auto mb-8 grid size-16 place-items-center rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 text-white shadow-lg shadow-accent-600/30">
-          <Sparkles className="size-8" strokeWidth={1.5} />
-        </div>
-        <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold tracking-tight">{t('Your photos, permanently yours.')}</h1>
+        <Mark size={72} className="mx-auto mb-8" />
+        <h1 className="font-[family-name:var(--font-display)] text-[44px] font-[750] leading-[48px] tracking-[-0.025em]">{t('Your photos, permanently yours.')}</h1>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Photo Vault keeps your originals as ordinary files in a folder you choose, detects exact duplicates and remembers where every photo came from.')}</p>
 
         <div className="mt-10 flex flex-col items-center gap-3">

@@ -235,7 +235,7 @@ export function Lightbox(props: {
             {detail?.mediaType === 'photo' && showFaces && (
               <button
                 onClick={() => setAddingFace((a) => !a)}
-                className={`mr-1 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition ${addingFace ? 'bg-accent-500 text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                className={`mr-1 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition ${addingFace ? 'bg-accent-500 text-on-accent' : 'bg-white/10 hover:bg-white/20'}`}
                 title={t('Draw a box around a face that was not found')}
               >
                 <UserPlus className="size-3.5" /> {addingFace ? t('Draw around the face…') : t('Add a face')}

@@ -5,7 +5,7 @@ import { api, mediaUrl, n, plural } from '../lib/format'
 import { isClutterOrigin, kindIcon, kindLabel, originIcon, originLabel } from '../lib/labels'
 import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog } from '../components/Dialog'
-import { NoMatches } from './PhotosView'
+import { NoMatches, SCREEN_ORIGINS } from './PhotosView'
 import { t } from '../lib/i18n'
 
 interface Group {
@@ -18,7 +18,7 @@ interface Group {
   note?: string
 }
 
-export function CleanupView(props: { version: number }) {
+export function CleanupView(props: { version: number; showScreenshots: boolean }) {
   const [facets, setFacets] = useState<Facets | null>(null)
   const [open, setOpen] = useState<Group | null>(null)
 
@@ -52,7 +52,8 @@ export function CleanupView(props: { version: number }) {
       icon: originIcon(o.origin, 'size-4'),
       query: { origin: o.origin },
       count: o.count,
-      hidden: o.hidden ?? 0
+      hidden: o.hidden ?? 0,
+      note: !props.showScreenshots && o.origin !== 'unknown' && SCREEN_ORIGINS.includes(o.origin) ? t('Kept out of Photos') : undefined
     }))
   const kinds: Group[] = (facets?.kinds ?? [])
     .filter((k) => k.kind === 'loop' || k.kind === 'sticker' || k.kind === 'animated')
@@ -80,7 +81,7 @@ export function CleanupView(props: { version: number }) {
   return (
     <div className="scroll-page h-full overflow-y-auto">
       <div className="drag sticky top-0 z-10 bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
-        <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Cleanup')}</h1>
+        <h1 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-tight">{t('Tidy up')}</h1>
         <div className="mt-0.5 max-w-2xl text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Media from chat apps, screenshots and downloads, grouped so you can review it in bulk. Hiding only removes items from the Photos timeline — nothing is deleted, and hidden items stay searchable here.')}</div>
       </div>
       <div className="space-y-8 px-7 pb-12 pt-2">
@@ -184,7 +185,7 @@ function GroupDetail(props: { group: Group; version: number; onBack: () => void 
             <button
               onClick={props.onBack}
               className="no-drag grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-200/70 hover:text-stone-900 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-              aria-label={t('Back to Cleanup')}
+              aria-label={t('Back to Tidy up')}
             >
               <ArrowLeft className="size-4" />
             </button>

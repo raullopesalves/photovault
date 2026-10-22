@@ -124,7 +124,7 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
               title={smart ? t('Smart search: finds photos by what they show. Click to search names instead.') : t('Search by what photos show (on-device AI)')}
               aria-label={t('Smart search')}
               aria-pressed={smart}
-              className={`grid size-6 shrink-0 place-items-center rounded-md transition ${smart ? 'bg-accent-500 text-white' : 'text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}
+              className={`grid size-6 shrink-0 place-items-center rounded-md transition ${smart ? 'bg-accent-500 text-on-accent' : 'text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}
             >
               <Sparkles className="size-3.5" />
             </button>
@@ -332,7 +332,7 @@ function Menu(props: {
             >
               <span
                 className={`grid size-4 shrink-0 place-items-center rounded border transition ${
-                  o.checked ? 'border-accent-500 bg-accent-500 text-white' : 'border-stone-300 bg-white dark:border-stone-600 dark:bg-stone-900'
+                  o.checked ? 'border-accent-500 bg-accent-500 text-on-accent' : 'border-stone-300 bg-white dark:border-stone-600 dark:bg-stone-900'
                 }`}
               >
                 {o.checked && <Check className="size-3" strokeWidth={3} />}

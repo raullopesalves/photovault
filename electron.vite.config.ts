@@ -15,6 +15,8 @@ export default defineConfig({
   renderer: {
     root: 'src/renderer',
     resolve: { alias: { '@shared': resolve('src/shared'), '@renderer': resolve('src/renderer/src') } },
-    plugins: [react(), tailwindcss()]
+    plugins: [react(), tailwindcss()],
+    // Font files stay files: the page's CSP (default-src 'self') blocks data: fonts.
+    build: { assetsInlineLimit: (file: string) => (/\.(woff2?|ttf|otf)$/.test(file) ? false : undefined) }
   }
 })

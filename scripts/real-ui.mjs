@@ -69,7 +69,7 @@ try {
       console.log(`captions ${st.phase} ${st.described}/${st.total} (${Math.round((Date.now() - t0) / 1000)} s)`, st.error ?? '')
       if (st.phase === 'error' || st.phase === 'ready' || st.described >= Number(process.env.CAPTIONS_MIN ?? 40) || Date.now() - t0 > 10 * 60_000) break
     }
-    await page.locator('nav button').last().click()
+    await page.click('aside button[aria-label="Settings"]')
     await page.waitForTimeout(1500)
     await page.locator('text=/Automatic descriptions|Descrições automáticas/').first().scrollIntoViewIfNeeded()
     await page.screenshot({ path: join(shots, 'captions-settings.png') })
@@ -103,7 +103,7 @@ try {
       const ids = (await window.photoVault.assetsPage(0, 40, { mediaType: 'photo' })).map((a) => a.id)
       await window.photoVault.createAlbum('Web gallery test', ids)
     })
-    await page.locator('nav button').nth(3).click()
+    await page.click('nav >> text=Albums')
     await page.waitForTimeout(1500)
     await page.locator('main button:has-text("Web gallery test")').first().click()
     await page.waitForTimeout(2000)
@@ -140,7 +140,7 @@ try {
       const ids = (await window.photoVault.assetsPage(0, 300, { mediaType: 'photo', origins: ['camera'] })).map((a) => a.id).filter((_, i) => i % 10 === 0)
       await window.photoVault.createAlbum('Summer book', ids)
     })
-    await page.locator('nav button').nth(3).click()
+    await page.click('nav >> text=Albums')
     await page.waitForTimeout(1500)
     await page.locator('main button:has-text("Summer book")').first().click()
     await page.waitForTimeout(2000)
@@ -188,11 +188,11 @@ try {
       }
       await page.evaluate(() => window.photoVault.setCaptionsEnabled(false))
     }
-    await page.locator('nav button').last().click()
+    await page.click('aside button[aria-label="Settings"]')
     await page.waitForTimeout(1500)
     await page.locator('text=Offline mode').first().scrollIntoViewIfNeeded()
     await page.screenshot({ path: join(shots, 'offline-settings.png') })
-    await page.locator('nav button').nth(5).click()
+    await page.click('nav >> text=Places')
     await page.waitForTimeout(2500)
     await page.screenshot({ path: join(shots, 'offline-map.png') })
     await page.locator('nav button').first().click()
@@ -201,7 +201,7 @@ try {
 
   if (process.argv.includes('--map-labels')) {
     // Town names on the offline map at a few zoom levels.
-    await page.locator('nav button').nth(5).click()
+    await page.click('nav >> text=Places')
     await page.waitForTimeout(2000)
     for (let i = 0; i < 14; i++) {
       await page.locator('.leaflet-control-zoom-out').click({ force: true })
@@ -461,7 +461,7 @@ try {
   }
 
   if (smart) {
-    await page.click('nav >> text=Settings')
+    await page.click('aside button[aria-label="Settings"]')
     await page.click('button:has-text("Turn on smart search")')
     const t0 = Date.now()
     for (;;) {
@@ -492,7 +492,7 @@ try {
     const groups = await page.evaluate(() => window.photoVault.pets())
     console.log('pets:', groups.map((g) => `${g.kind} ${g.ids.length}`).join(', ') || 'none')
     writeFileSync(join(shots, 'pets.json'), JSON.stringify(groups))
-    await page.locator('nav button').nth(4).click()
+    await page.click('nav >> text=People')
     await page.waitForTimeout(3000)
     await page.screenshot({ path: join(shots, 'pets-people.png') })
     for (const g of groups) {
@@ -511,7 +511,7 @@ try {
   await page.screenshot({ path: join(shots, 'recently-added.png') })
   await page.click('button:has-text("Recently added")')
 
-  await page.click('nav >> text=Map')
+  await page.click('nav >> text=Places')
   await page.waitForTimeout(3500)
   await page.screenshot({ path: join(shots, 'map-world.png') })
   const pin = page.locator('.pv-pin').first()

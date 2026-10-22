@@ -2,16 +2,102 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* The Mount identity (design system "Photo Vault", D90). Fonts are bundled (OFL), so the app works offline. */
 @theme {
-  --font-sans: 'Segoe UI Variable Text', 'Segoe UI Variable', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
-  --font-display: 'Segoe UI Variable Display', 'Segoe UI Variable', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
-  --font-mono: 'Cascadia Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
-  --color-accent-50: oklch(0.97 0.02 250);
-  --color-accent-100: oklch(0.93 0.04 250);
-  --color-accent-400: oklch(0.7 0.14 250);
-  --color-accent-500: oklch(0.62 0.17 252);
-  --color-accent-600: oklch(0.55 0.18 254);
+  --font-sans: 'Schibsted Grotesk Variable', 'Segoe UI Variable Text', 'Segoe UI Variable', system-ui, sans-serif;
+  --font-display: 'Schibsted Grotesk Variable', 'Segoe UI Variable Display', 'Segoe UI Variable', system-ui, sans-serif;
+  --font-mono: 'Fragment Mono', 'Cascadia Mono', ui-monospace, Consolas, monospace;
+
+  /* Mat-board greys with a faint green cast replace Tailwind's stone, so every view takes the new neutrals:
+     50 = mat, 100 = shelf, 200 = line, 500 = line-strong, 600 = ink-muted, 900 = ink, 950 = dark mat. */
+  --color-stone-50: #f4f4f0;
+  --color-stone-100: #e9eae4;
+  --color-stone-200: #d6d8d0;
+  --color-stone-300: #b9bdb4;
+  --color-stone-400: #979d95;
+  --color-stone-500: #7c827b;
+  --color-stone-600: #565d57;
+  --color-stone-700: #3f4540;
+  --color-stone-800: #2a2f2b;
+  --color-stone-900: #1a1e1b;
+  --color-stone-950: #121412;
+
+  /* Brass, the one accent. 500 is the fill (dark text on it: text-on-accent), 600 brass as text on light grounds,
+     400 brass as text and fills on dark grounds, 50 the soft ground behind brass text. */
+  --color-accent-50: #f3e7cc;
+  --color-accent-100: #ead7a8;
+  --color-accent-300: #e3b968;
+  --color-accent-400: #d8a94f;
+  --color-accent-500: #ad7e25;
+  --color-accent-600: #7a5612;
+  --color-on-accent: #1a1e1b;
+
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-mount: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* Semantic Mount tokens for new components: bg-mat, bg-shelf, text-ink, text-brass-ink, … (switch with .dark). */
+@theme inline {
+  --color-mat: var(--mat);
+  --color-shelf: var(--shelf);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-on-ink: var(--on-ink);
+  --color-brass: var(--brass);
+  --color-brass-ink: var(--brass-ink);
+  --color-brass-soft: var(--brass-soft);
+  --color-safe: var(--safe);
+  --color-safe-soft: var(--safe-soft);
+  --color-risk: var(--risk);
+  --color-risk-soft: var(--risk-soft);
+}
+
+:root {
+  --mat: #f4f4f0;
+  --shelf: #e9eae4;
+  --card: #ffffff;
+  --line: #d6d8d0;
+  --line-strong: #7c827b;
+  --ink: #1a1e1b;
+  --ink-muted: #565d57;
+  --ink-faint: #7d847d;
+  --on-ink: #f4f4f0;
+  --brass: #ad7e25;
+  --brass-ink: #7a5612;
+  --brass-soft: #f3e7cc;
+  --safe: #2d7350;
+  --safe-soft: #ddeee3;
+  --risk: #b23a24;
+  --risk-soft: #f7e0da;
+  --dur-instant: 80ms;
+  --dur-quick: 140ms;
+  --dur-base: 220ms;
+  --dur-gentle: 320ms;
+  --dur-develop: 420ms;
+}
+.dark {
+  --mat: #121412;
+  --shelf: #191c19;
+  --card: #212521;
+  --line: #2f3430;
+  --line-strong: #737a72;
+  --ink: #ecede7;
+  --ink-muted: #a2a9a1;
+  --ink-faint: #7b827a;
+  --on-ink: #121412;
+  --brass: #d8a94f;
+  --brass-ink: #e3b968;
+  --brass-soft: #3a2e17;
+  --safe: #6cc795;
+  --safe-soft: #16301f;
+  --risk: #f0826b;
+  --risk-soft: #3d1d16;
 }
 
 @layer base {

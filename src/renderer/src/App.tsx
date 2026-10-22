@@ -18,6 +18,7 @@ import { MemoriesView } from './views/MemoriesView'
 import { FavoritesView } from './views/FavoritesView'
 import { CleanupView } from './views/CleanupView'
 import { ScreenshotsView } from './views/ScreenshotsView'
+import { VideosView } from './views/VideosView'
 import { BinView, HiddenView } from './views/HiddenBinViews'
 import { t } from './lib/i18n'
 
@@ -204,8 +205,9 @@ export default function App() {
         {view === 'map' && <MapView version={version} />}
         {view === 'people' && <PeopleView version={version} />}
         {view === 'memories' && <MemoriesView version={version} />}
+        {view === 'videos' && <VideosView version={version} showScreenshots={showScreenshots} />}
         {view === 'screenshots' && <ScreenshotsView version={version} showInPhotos={showScreenshots} onShowInPhotos={(s) => void changeShowScreenshots(s)} />}
-        {view === 'cleanup' && <CleanupView version={version} />}
+        {view === 'cleanup' && <CleanupView version={version} showScreenshots={showScreenshots} />}
         {view === 'hidden' && <HiddenView version={version} library={library} />}
         {view === 'bin' && <BinView version={version} library={library} />}
       </main>
