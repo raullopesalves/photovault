@@ -132,7 +132,7 @@ export function FilterBar(props: {
           <button onClick={() => set({ types: q.types?.includes('video') ? undefined : ['video'] })} aria-pressed={!!q.types?.includes('video')} className={`${chipBase} ${q.types?.includes('video') ? chipOn : chipOff}`}>
             <Play className={`size-3.5 ${q.types?.includes('video') ? 'fill-current' : ''}`} />
             {t('Videos')}
-            {facets ? <span className="font-mono text-[12px] opacity-75">{n(facets.videos)}</span> : null}
+            {facets ? <span className="font-mono text-[12px]">{n(facets.videos)}</span> : null}
           </button>
         ) : null}
 

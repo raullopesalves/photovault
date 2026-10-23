@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, CalendarHeart, Plane, PartyPopper, Sparkles } from 'lucide-react'
 import type { Memory } from '@shared/types'
 import { AssetGrid } from '../components/AssetGrid'
-import { api, mediaUrl, n } from '../lib/format'
-import { PageHeader } from './Placeholder'
+import { api, mediaUrl, plural } from '../lib/format'
+import { SectionTitle, ViewHeader } from '../components/ViewHeader'
 import { t } from '../lib/i18n'
 
 const SECTIONS: Array<{ kind: Memory['kind']; title: string; icon: React.ReactNode; empty?: string }> = [
@@ -45,8 +45,8 @@ export function MemoriesView(props: { version: number }) {
 
   return (
     <div className="scroll-page h-full overflow-y-auto">
-      <PageHeader title={t('Memories')} subtitle={t('Found in your own photos: the same day in earlier years, trips away from home, and days you took a lot of pictures.')} />
-      <div className="mx-auto max-w-5xl space-y-10 px-8 pb-12">
+      <ViewHeader title={t('Memories')} subtitle={t('Found in your own photos: the same day in earlier years, trips away from home, and days you took a lot of pictures.')} />
+      <div className="space-y-12 px-7 pb-12 pt-2">
         {list === null && <div className="skeleton h-48 rounded-2xl" />}
         {list?.length === 0 && (
           <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-ink-muted dark:border-stone-700 dark:text-stone-400">
@@ -59,13 +59,11 @@ export function MemoriesView(props: { version: number }) {
             if (items.length === 0 && !s.empty) return null
             return (
               <section key={s.kind}>
-                <h2 className="mb-3 flex items-center gap-2 text-[15px] font-semibold">
-                  {s.icon} {s.title}
-                </h2>
+                <SectionTitle title={s.title} icon={s.icon} count={items.length || undefined} />
                 {items.length === 0 ? (
-                  <div className="text-[13px] text-ink-muted">{s.empty}</div>
+                  <div className="rounded-[14px] border border-dashed border-line px-5 py-6 text-[13px] text-ink-muted">{s.empty}</div>
                 ) : (
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
                     {items.map((m) => (
                       <MemoryCard key={m.key} memory={m} onOpen={() => setOpen(m)} />
                     ))}
@@ -94,8 +92,11 @@ function MemoryCard(props: { memory: Memory; onOpen: () => void }) {
       </div>
       <div className="px-4 py-3">
         <div className="truncate text-[14px] font-semibold">{m.title}</div>
-        <div className="truncate text-xs text-ink-muted">
-          {m.subtitle} · {n(m.count)}{' '}{t('photos')}</div>
+        {/* The count never truncates; a long date range does. */}
+        <div className="flex gap-1.5 text-xs text-ink-muted">
+          <span className="min-w-0 truncate">{m.subtitle}</span>
+          <span className="shrink-0">· {plural(m.count, 'photo')}</span>
+        </div>
         {m.places && m.places.length > 1 && <div className="truncate text-xs text-ink-faint">{m.places.join(' · ')}</div>}
       </div>
     </button>

@@ -325,6 +325,49 @@ try {
     await shot('viewer-closed')
   }
 
+  if (process.argv.includes('--design')) {
+    // People, Memories and Albums with real content, for the design pass. Opens and looks only.
+    // Each page is also checked with axe-core, with real content (the audit's test library has no people or trips).
+    const { readFileSync } = await import('node:fs')
+    const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8')
+    const snap = async (name) => {
+      await page.waitForTimeout(2200)
+      await page.screenshot({ path: join(shots, `design-${name}.png`) })
+      const found = await page.evaluate(async (src) => {
+        if (!window.axe) (0, eval)(src)
+        const r = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] }, resultTypes: ['violations'] })
+        return r.violations.map((v) => `${v.id} (${v.nodes.length}): ${v.nodes[0]?.target.join(' ')} ${v.nodes[0]?.failureSummary?.split('\n')[1] ?? ''}`)
+      }, axeSource)
+      console.log(`axe ${name}:`, found.length ? found : 'none')
+    }
+    await page.click('nav >> text=People')
+    await snap('people')
+    await page.locator('main').evaluate((el) => el.querySelector('.overflow-y-auto, .scroll-page')?.scrollBy(0, 700))
+    await snap('people-scrolled')
+    const person = page.locator('main button:has-text("photos")').first()
+    if (await person.count()) {
+      await person.click()
+      await snap('person')
+    }
+    await page.click('nav >> text=Memories')
+    await snap('memories')
+    await page.locator('main').evaluate((el) => el.querySelector('.overflow-y-auto, .scroll-page')?.scrollBy(0, 800))
+    await snap('memories-scrolled')
+    await page.locator('main').evaluate((el) => el.querySelector('.overflow-y-auto, .scroll-page')?.scrollTo(0, 0))
+    const memory = page.locator('main button img').first()
+    if (await memory.count()) {
+      await memory.click()
+      await snap('memory')
+    }
+    await page.click('nav >> text=Albums')
+    await snap('albums')
+    const album = page.locator('main button img').first()
+    if (await album.count()) {
+      await album.click()
+      await snap('album')
+    }
+  }
+
   if (process.argv.includes('--all-views')) {
     // Every sidebar view in turn (works in any interface language).
     const count = await page.locator('nav button').count()

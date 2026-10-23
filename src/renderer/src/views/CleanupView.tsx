@@ -7,6 +7,7 @@ import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog } from '../components/Dialog'
 import { NoMatches, SCREEN_ORIGINS } from './PhotosView'
 import { t } from '../lib/i18n'
+import { ViewHeader } from '../components/ViewHeader'
 
 interface Group {
   key: string
@@ -131,7 +132,7 @@ export function CleanupView(props: { version: number; showScreenshots: boolean; 
   return (
     <div className="scroll-page h-full overflow-y-auto">
       <ViewHeader title={t('Tidy up')} subtitle={t('Groups worth reviewing together, biggest first. Hiding only takes items out of Photos, and nothing is deleted until you empty the Bin.')} />
-      <div className="space-y-12 px-6 pb-12 pt-2">
+      <div className="space-y-12 px-7 pb-12 pt-2">
         {facets && facets.unclassified > 0 && (
           <div className="flex items-center gap-2 rounded-[14px] bg-brass-soft px-4 py-3 text-[13px] text-brass-ink">
             <LoaderCircle className="size-4 animate-spin" />{' '}{t('Labelling')}{' '}{plural(facets.unclassified, 'item')}{t('… groups update as it goes.')}</div>
@@ -164,16 +165,6 @@ export function CleanupView(props: { version: number; showScreenshots: boolean; 
         />
         <Section title={t('Your own photos')} groups={yours} onOpen={openGroup} />
       </div>
-    </div>
-  )
-}
-
-/** The sticky title row of full-page views: title-1 with a small subtitle. */
-export function ViewHeader(props: { title: ReactNode; subtitle?: ReactNode }) {
-  return (
-    <div className="drag sticky top-0 z-10 bg-mat/85 px-6 pb-4 pr-40 pt-4 backdrop-blur-xl">
-      <h1 className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{props.title}</h1>
-      {props.subtitle && <div className="mt-0.5 max-w-2xl text-[12.5px] leading-[18px] text-ink-muted">{props.subtitle}</div>}
     </div>
   )
 }

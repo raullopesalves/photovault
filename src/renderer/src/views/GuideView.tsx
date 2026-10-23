@@ -3,7 +3,7 @@ import guideEn from '../../../../docs/USER_GUIDE.md?raw'
 import guidePt from '../../../../docs/USER_GUIDE.pt.md?raw'
 import changelog from '../../../../CHANGELOG.md?raw'
 import { Markdown, parseMarkdown } from '../components/Markdown'
-import { ViewHeader } from './CleanupView'
+import { ViewHeader } from '../components/ViewHeader'
 import { language, t } from '../lib/i18n'
 
 export type GuideTab = 'guide' | 'new'
@@ -26,7 +26,7 @@ export function GuideView(props: { initialTab?: GuideTab }) {
         title={t('Guide')}
         subtitle={tab === 'guide' ? t('How Photo Vault keeps your photos, and how to keep them safe.') : t('What changed in each version.')}
       />
-      <div className="px-6 pb-16 pt-2">
+      <div className="px-7 pb-16 pt-2">
         <div role="tablist" className="mb-8 inline-flex rounded-lg bg-line/60 p-0.5">
           {(
             [

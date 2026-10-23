@@ -7,6 +7,7 @@ import { ConfirmDialog, PrintDialog, PromptDialog } from '../components/Dialog'
 import { FilterBar } from '../components/FilterBar'
 import { NoMatches } from './PhotosView'
 import { t } from '../lib/i18n'
+import { SectionTitle, ViewHeader } from '../components/ViewHeader'
 
 export function AlbumsView(props: { version: number }) {
   const [albums, setAlbums] = useState<AlbumSummary[] | null>(null)
@@ -29,32 +30,34 @@ export function AlbumsView(props: { version: number }) {
 
   return (
     <div className="scroll-page h-full overflow-y-auto">
-      <div className="drag sticky top-0 z-10 flex items-end justify-between bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
-        <div>
-          <h1 className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{t('Albums')}</h1>
-          <div className="mt-0.5 text-xs text-ink-muted">{t('Albums only reference photos — removing or deleting never touches your files.')}</div>
-        </div>
-        <button
-          onClick={() => setCreating(true)}
-          className="no-drag inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
-        >
-          <Plus className="size-4" />{' '}{t('New album')}</button>
-      </div>
+      <ViewHeader
+        title={t('Albums')}
+        subtitle={t('Albums only reference photos — removing or deleting never touches your files.')}
+        actions={
+          <button
+            onClick={() => setCreating(true)}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+          >
+            <Plus className="size-4" />{' '}{t('New album')}</button>
+        }
+      />
 
-      <div className="px-7 pb-12">
+      <div className="space-y-12 px-7 pb-12 pt-2">
         {albums?.length === 0 && smart.length === 0 && (
-          <div className="mx-auto mt-20 max-w-sm text-center">
-            <div className="mx-auto mb-5 grid size-16 place-items-center rounded-3xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
-              <Album className="size-7" strokeWidth={1.5} />
+          <div className="flex max-w-2xl items-start gap-4 rounded-[14px] border border-dashed border-line px-5 py-5">
+            <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-brass-soft text-brass-ink">
+              <Album className="size-5" strokeWidth={1.75} />
             </div>
-            <div className="text-[17px] font-semibold">{t('No albums yet')}</div>
-            <p className="mt-2 text-[13.5px] leading-relaxed text-ink-muted">{t('Select photos in the timeline and choose “Add to album”, or create an empty one. Albums from a Google Takeout appear here automatically.')}</p>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14px] font-semibold">{t('No albums yet')}</div>
+              <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{t('Select photos in the timeline and choose “Add to album”, or create an empty one. Albums from a Google Takeout appear here automatically.')}</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{t('Albums that fill themselves: search for something in Photos, then choose “Save as smart album”.')}</p>
+            </div>
           </div>
         )}
         {smart.length > 0 && (
-          <section className="mt-4">
-            <h2 className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-wider text-ink-muted">
-              <Wand2 className="size-3.5" />{' '}{t('Smart albums')}</h2>
+          <section>
+            <SectionTitle title={t('Smart albums')} icon={<Wand2 className="size-4" />} count={smart.length} />
             <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-6">
               {smart.map((a) => (
                 <button key={a.id} onClick={() => setOpenSmart(a.id)} className="group text-left outline-none">
@@ -176,8 +179,8 @@ function describeQuery(q: AssetQuery): string {
 
 function AlbumSection(props: { title: string; albums: AlbumSummary[]; onOpen: (id: number) => void }) {
   return (
-    <section className="mt-4">
-      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-muted">{props.title}</h2>
+    <section>
+      <SectionTitle title={props.title} count={props.albums.length} />
       <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-6">
         {props.albums.map((a) => (
           <button key={a.id} onClick={() => props.onOpen(a.id)} className="group text-left outline-none">

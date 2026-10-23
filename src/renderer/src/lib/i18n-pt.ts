@@ -1015,5 +1015,10 @@ export const PT: Record<string, string> = {
   "Photo viewer": "Visualizador de fotografias",
   "Selection": "Seleção",
   "Skip to content": "Saltar para o conteúdo",
-  "Adjustments": "Ajustes"
+  "Adjustments": "Ajustes",
+  "Named": "Com nome",
+  "Not named yet": "Ainda sem nome",
+  "Found in your photos": "Encontradas nas suas fotografias",
+  "Name the people you know, and they can be found by name. Strangers can stay unnamed, or be hidden from their page.": "Dê nome às pessoas que conhece e passa a encontrá-las pelo nome. Desconhecidos podem ficar sem nome, ou ser ocultados na página deles.",
+  "Albums that fill themselves: search for something in Photos, then choose “Save as smart album”.": "Álbuns que se enchem sozinhos: pesquise algo em Fotografias e escolha “Guardar como álbum inteligente”."
 }

@@ -6,7 +6,7 @@ import { AssetGrid } from '../components/AssetGrid'
 import { ConfirmDialog, PromptDialog } from '../components/Dialog'
 import { FilterBar } from '../components/FilterBar'
 import { api, bytes, mediaUrl, n, plural } from '../lib/format'
-import { PageHeader } from './Placeholder'
+import { SectionTitle, ViewHeader } from '../components/ViewHeader'
 import { NoMatches } from './PhotosView'
 import { locale, t } from '../lib/i18n'
 
@@ -76,12 +76,15 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void; onOp
 
   const visible = (people ?? []).filter((p) => !p.hidden)
   const hidden = (people ?? []).filter((p) => p.hidden)
+  // The people you know first; groups the app found but nobody has named yet below them.
+  const named = visible.filter((p) => p.name)
+  const unnamed = visible.filter((p) => !p.name)
   const line = statusLine(status)
 
   return (
     <div className="scroll-page h-full overflow-y-auto">
-      <PageHeader title={t('People')} subtitle={t('Photos grouped by the faces in them. Name someone to find them by name in search; merge duplicates; fix mistakes from a person\'s page.')} />
-      <div className="mx-auto max-w-5xl px-8 pb-12">
+      <ViewHeader title={t('People')} subtitle={t('Photos grouped by the faces in them. Name someone to find them by name in search; merge duplicates; fix mistakes from a person\'s page.')} />
+      <div className="px-7 pb-12 pt-2">
         {line && (
           <div className={`mb-6 flex items-center gap-2 rounded-[14px] border border-line bg-card px-4 py-3 text-[13px] ${status.phase === 'error' ? 'text-red-600 dark:text-red-400' : ''}`}>
             {status.phase !== 'error' && <LoaderCircle className="size-3.5 shrink-0 animate-spin" />}
@@ -111,22 +114,33 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void; onOp
         {people && visible.length === 0 && status.phase === 'ready' && (
           <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-ink-muted dark:border-stone-700 dark:text-stone-400">{t('No people found yet. A person appears once their face is on at least 3 photos.')}</div>
         )}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-x-4 gap-y-6">
-          {visible.map((p) => (
-            <PersonCard key={p.id} person={p} onOpen={() => props.onOpen(p.id)} />
-          ))}
+        <div className="space-y-12">
+          {named.length > 0 && (
+            <section>
+              <SectionTitle title={t('Named')} count={named.length} />
+              <PeopleGrid people={named} onOpen={props.onOpen} />
+            </section>
+          )}
+          {unnamed.length > 0 && (
+            <section>
+              <SectionTitle
+                title={named.length ? t('Not named yet') : t('Found in your photos')}
+                count={unnamed.length}
+                subtitle={t('Name the people you know, and they can be found by name. Strangers can stay unnamed, or be hidden from their page.')}
+              />
+              <PeopleGrid people={unnamed} onOpen={props.onOpen} small />
+            </section>
+          )}
+          <Pets version={props.version} onOpen={props.onOpenPet} />
         </div>
-        <Pets version={props.version} onOpen={props.onOpenPet} />
         {hidden.length > 0 && (
           <div className="mt-10">
             <button onClick={() => setShowHidden((v) => !v)} className="mb-4 text-[13px] font-medium text-ink-muted hover:text-stone-800 dark:hover:text-stone-200">
               {showHidden ? t('Hide') : t('Show')}{' '}{t('hidden people (')}{hidden.length})
             </button>
             {showHidden && (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-x-4 gap-y-6 opacity-70">
-                {hidden.map((p) => (
-                  <PersonCard key={p.id} person={p} onOpen={() => props.onOpen(p.id)} />
-                ))}
+              <div className="opacity-70">
+                <PeopleGrid people={hidden} onOpen={props.onOpen} />
               </div>
             )}
           </div>
@@ -271,12 +285,12 @@ function Pets(props: { version: number; onOpen: (g: PetGroup) => void }) {
     void api.smartSearchStatus().then((s) => setSmartOn(!!s?.enabled))
     void api.pets().then(setGroups, () => setGroups([]))
   }, [props.version])
-  if (!smartOn) return <p className="mt-10 text-xs text-ink-muted">{t('Pets: turn on smart search in Settings and your dogs and cats get their own groups here.')}</p>
+  if (!smartOn) return <p className="text-xs text-ink-muted">{t('Pets: turn on smart search in Settings and your dogs and cats get their own groups here.')}</p>
   if (groups.length === 0) return null
   return (
-    <div className="mt-10">
-      <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-wider text-ink-muted">{t('Pets')}</h2>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-x-4 gap-y-6">
+    <section>
+      <SectionTitle title={t('Pets')} count={groups.length} />
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(128px,1fr))] gap-x-4 gap-y-6">
         {groups.map((g) => (
           <button key={g.kind} onClick={() => props.onOpen(g)} className="group flex flex-col items-center gap-2 text-center">
             <div className="rounded-full ring-accent-500 ring-offset-2 ring-offset-stone-50 transition group-hover:ring-2 dark:ring-offset-stone-950">
@@ -287,7 +301,7 @@ function Pets(props: { version: number; onOpen: (g: PetGroup) => void }) {
           </button>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -314,12 +328,23 @@ function PetPage(props: { group: PetGroup; version: number; onBack: () => void }
   )
 }
 
-function PersonCard(props: { person: Person; onOpen: () => void }) {
+/** `small`: the unnamed, which can run to hundreds, so the people you know stay the page's focus. */
+function PeopleGrid(props: { people: Person[]; onOpen: (id: number) => void; small?: boolean }) {
+  return (
+    <div className={`grid gap-x-4 gap-y-6 ${props.small ? 'grid-cols-[repeat(auto-fill,minmax(96px,1fr))]' : 'grid-cols-[repeat(auto-fill,minmax(128px,1fr))]'}`}>
+      {props.people.map((p) => (
+        <PersonCard key={p.id} person={p} size={props.small ? 76 : 112} onOpen={() => props.onOpen(p.id)} />
+      ))}
+    </div>
+  )
+}
+
+function PersonCard(props: { person: Person; size?: number; onOpen: () => void }) {
   const p = props.person
   return (
     <button onClick={props.onOpen} className="group flex flex-col items-center gap-2 text-center">
       <div className="rounded-full ring-accent-500 ring-offset-2 ring-offset-stone-50 transition group-hover:ring-2 dark:ring-offset-stone-950">
-        <Face person={p} size={112} />
+        <Face person={p} size={props.size ?? 112} />
       </div>
       <div className="w-full truncate text-[13.5px] font-medium">{p.name ?? <span className="text-ink-faint">{t('Add a name')}</span>}</div>
       <div className="-mt-1.5 text-xs text-ink-muted">{plural(p.photos, 'photo')}</div>
@@ -374,6 +399,8 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
   if (!person) return <div className="h-full" />
   const iconBtn =
     'grid size-8 place-items-center rounded-lg text-ink-muted transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100'
+  const textBtn =
+    'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium text-stone-600 transition hover:bg-stone-200/70 dark:text-stone-300 dark:hover:bg-stone-800'
 
   const tabs = (
     <div className="inline-flex rounded-lg bg-stone-200/60 p-0.5 text-[12.5px] font-medium dark:bg-stone-800/80">
@@ -424,22 +451,24 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
                 )}
               </div>
             )}
-            <button onClick={() => setNaming(true)} className={iconBtn} aria-label={t('Rename')} title={t('Name this person')}>
-              <Pencil className="size-4" />
+            <button onClick={() => setNaming(true)} className={textBtn} title={t('Name this person')}>
+              <Pencil className="size-3.5" />
+              {person.name ? t('Rename') : t('Add a name')}
             </button>
-            <button onClick={() => setMerging(true)} className={iconBtn} aria-label={t('Merge')} title={t('Same person as someone else? Merge')}>
-              <Merge className="size-4" />
+            <button onClick={() => setMerging(true)} className={textBtn} title={t('Same person as someone else? Merge')}>
+              <Merge className="size-3.5" />
+              {t('Merge')}
             </button>
             <button
               onClick={async () => {
                 await api.setPersonHidden(person.id, !person.hidden)
                 setPerson({ ...person, hidden: !person.hidden })
               }}
-              className={iconBtn}
-              aria-label={person.hidden ? t('Show person') : t('Hide person')}
+              className={textBtn}
               title={person.hidden ? t('Show this person in People again') : t('Hide this person from People (photos stay)')}
             >
-              {person.hidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+              {person.hidden ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
+              {person.hidden ? t('Show person') : t('Hide person')}
             </button>
           </>
   )
