@@ -221,6 +221,28 @@ export function AssetGrid(props: {
       if (frame) cancelAnimationFrame(frame)
     }
   }, [scrollEl, rowOffsets, rows, showRail, groups])
+  /** Where the tile for a timeline index is on screen, scrolling it into view first if it is not (viewer close). */
+  const findTile = useCallback(
+    async (index: number): Promise<DOMRect | null> => {
+      const el = scrollEl
+      if (!el) return null
+      const visible = (): DOMRect | null => {
+        const tileEl = el.querySelector<HTMLElement>(`[data-index="${index}"]`)
+        if (!tileEl) return null
+        const r = tileEl.getBoundingClientRect()
+        const box = el.getBoundingClientRect()
+        return r.top >= box.top + headerH && r.bottom <= box.bottom ? r : null
+      }
+      const now = visible()
+      if (now) return now
+      const row = rows.findIndex((r) => r.kind === 'tiles' && index >= r.start && index < r.start + r.count)
+      if (row < 0) return null
+      el.scrollTo({ top: Math.max(0, (rowOffsets[row] ?? 0) - (el.clientHeight - headerH - tile) / 2) })
+      for (let i = 0; i < 3; i++) await new Promise((r) => requestAnimationFrame(r))
+      return visible()
+    },
+    [scrollEl, rows, rowOffsets, headerH, tile]
+  )
   const jumpToMonth = useCallback(
     (month: string) => {
       const i = rows.findIndex((r) => r.kind === 'header' && r.month === month)
@@ -410,6 +432,7 @@ export function AssetGrid(props: {
                     return (
                       <Tile
                         key={asset ? `a${asset.id}` : `s${index}`}
+                        index={index}
                         asset={asset}
                         size={tile}
                         selected={asset ? selected.has(asset.id) : false}
@@ -458,6 +481,7 @@ export function AssetGrid(props: {
           version={props.version}
           onIndex={setOpenIndex}
           onClose={() => setOpenIndex(null)}
+          findTile={findTile}
         />
       )}
       {slideshow !== null && (

@@ -27,6 +27,28 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+  # The end-to-end smoke test drives the built app through import, the viewer, albums, Tidy up, the Bin,
+  # backups and more against a throwaway library. It went stale once when it only ran by hand.
+  e2e:
+    needs: test
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:e2e -- "${{ runner.temp }}/photovault-e2e-shots"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: ${{ runner.temp }}/photovault-e2e-shots
+          if-no-files-found: ignore
+          retention-days: 7
+
   build:
     needs: test
     strategy:

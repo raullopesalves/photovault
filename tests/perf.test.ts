@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { Library } from '@core/library/library'
 import { runDating } from '@core/dating/dating'
 import { facets } from '@core/repo/filters'
-import { mapClusters } from '@core/repo/geo'
+import { libraryPlaces, mapClusters } from '@core/repo/geo'
 import { nearDuplicates } from '@core/repo/nearDuplicates'
 import { assetIdsInRange, assetsPage, libraryInfo, timeline } from '@core/repo/queries'
 import { refreshSearchIndex } from '@core/repo/search'
@@ -91,6 +91,8 @@ describe.runIf(process.env.PERF === '1')('100k library', () => {
   })
 
   it('answers every UI query within budget', () => {
+    // Place names for the geotagged items, as the background lookup would set them (about 400 towns).
+    lib.db.run("UPDATE assets SET place = 'Town ' || (id % 400) || ', Portugal' WHERE latitude IS NOT NULL")
     time('search index build (all)', 30_000, () => refreshSearchIndex(lib))
     time('library info', 300, () => libraryInfo(lib))
     const months = time('timeline (months)', 300, () => timeline(lib, { hidden: 'exclude' }))
@@ -100,6 +102,10 @@ describe.runIf(process.env.PERF === '1')('100k library', () => {
     time('recently added', 300, () => timeline(lib, { sort: 'added' }))
     time('filter: year + origin', 300, () => timeline(lib, { years: [2016], origins: ['whatsapp'] }))
     time('facets', 800, () => facets(lib))
+    time('Photos without screenshots (timeline)', 300, () => timeline(lib, { hidden: 'exclude', excludeOrigins: ['screenshot', 'screen_recording'] }))
+    time('Photos without screenshots (deep page)', 150, () => assetsPage(lib, 60_000, 200, { hidden: 'exclude', excludeOrigins: ['screenshot', 'screen_recording'] }))
+    time('places for search', 300, () => libraryPlaces(lib))
+    time('filter: place', 300, () => timeline(lib, { place: 'Town 7, Portugal' }))
     time('search "WA00" (timeline)', 300, () => timeline(lib, { text: 'WA00' }))
     time('search "camera 2019" (page)', 300, () => assetsPage(lib, 0, 200, { text: 'camera 2019' }))
     time('search 2-letter token', 500, () => timeline(lib, { text: 'sc' }))

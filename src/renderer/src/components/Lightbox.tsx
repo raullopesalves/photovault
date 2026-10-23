@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Album, Sparkles, Users, Calendar, Camera, Eye, EyeOff, RotateCcw, RotateCw, Smartphone, Trash2, Check, ChevronLeft, ChevronRight, Copy, Download, ExternalLink, SlidersHorizontal, UserPlus, Tag, Share2, Files, FolderOpen, Heart, Info, Link2, MapPin, Fingerprint, HardDrive, History, Minus, Plus, X } from 'lucide-react'
 import type { AlbumSummary, AssetDetail, AssetSummary } from '@shared/types'
 import { kindLabel, originLabel } from '../lib/labels'
@@ -12,6 +13,8 @@ import { t } from '../lib/i18n'
 export function Lightbox(props: {
   /** The tile the viewer was opened from: the photo grows out of it. */
   from?: DOMRect | null
+  /** Finds (scrolling to it if needed) the tile for an index, so closing flies the photo back into it. */
+  findTile?: (index: number) => Promise<DOMRect | null>
   index: number
   total: number
   getSummary: (index: number) => AssetSummary | undefined
@@ -65,6 +68,7 @@ export function Lightbox(props: {
 
   // Open: the thumbnail flies from its tile to where the photo will sit (dur-gentle, ease-standard), then gets out of
   // the way of the full image. Skipped when Windows asks for reduced motion.
+  const [opening, setOpening] = useState(false)
   const [flight, setFlight] = useState<{ src: string; rect: { left: number; top: number; width: number; height: number }; moving: boolean } | null>(null)
   useLayoutEffect(() => {
     const from = props.from
@@ -82,9 +86,16 @@ export function Lightbox(props: {
     to.left = area.left + (area.width - to.width) / 2
     to.top = area.top + (area.height - to.height) / 2
     const src = mediaUrl('thumb', summary.id, summary.rev)
+    setOpening(true)
     setFlight({ src, rect: { left: from.left, top: from.top, width: from.width, height: from.height }, moving: false })
-    const frame = requestAnimationFrame(() => setFlight({ src, rect: to, moving: true }))
-    const done = setTimeout(() => setFlight(null), 380)
+    // Two frames, so the start position is painted before the move (otherwise there is nothing to animate from).
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setFlight({ src, rect: to, moving: true }))
+    })
+    const done = setTimeout(() => {
+      setOpening(false)
+      setFlight(null)
+    }, 400)
     return () => {
       cancelAnimationFrame(frame)
       clearTimeout(done)
@@ -168,7 +179,7 @@ export function Lightbox(props: {
       }
       if (e.key === 'Escape') {
         if (zoom.scale > 1) zoom.reset()
-        else props.onClose()
+        else void requestClose()
       } else if (e.key === 'ArrowRight') go(1)
       else if (e.key === 'ArrowLeft') go(-1)
       else if (e.key === '+' || e.key === '=') zoom.zoomBy(1.5)
@@ -224,12 +235,37 @@ export function Lightbox(props: {
   // A different rendition (e.g. after rotating) has a different URL, so it loads behind the blurred thumbnail again.
   const fullLoaded = full !== null && loadedSrc === full
 
+  // Close: the darkroom fades while the photo flies back into its tile (scrolled into view if needed).
+  const [closing, setClosing] = useState(false)
+  const requestClose = async (): Promise<void> => {
+    if (closing) return
+    const img = zoom.imageRef.current
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced || !props.findTile || !summary || summary.thumb !== 'ready' || !img || !fullLoaded || zoom.scale > 1 || detail?.fullView === 'video') {
+      props.onClose()
+      return
+    }
+    const r = img.getBoundingClientRect()
+    const src = mediaUrl('thumb', summary.id, summary.rev)
+    setClosing(true)
+    setFlight({ src, rect: { left: r.left, top: r.top, width: r.width, height: r.height }, moving: false })
+    const to = await props.findTile(index)
+    if (!to) {
+      props.onClose()
+      return
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => setFlight({ src, rect: { left: to.left, top: to.top, width: to.width, height: to.height }, moving: true })))
+    setTimeout(props.onClose, 340)
+  }
+
   return (
     // no-drag: the sidebar underneath is a window-drag region, which would otherwise swallow clicks on the left arrow.
-    <div className="no-drag fixed inset-0 z-40 flex bg-[#0b0c0b] text-stone-100 animate-fade-in">
+    <div
+      className={`no-drag fixed inset-0 z-40 flex bg-[#0b0c0b] text-stone-100 animate-fade-in transition-opacity duration-[var(--dur-gentle)] ease-[var(--ease-out-soft)] ${closing ? 'pointer-events-none opacity-0' : ''}`}
+    >
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="drag absolute inset-x-0 top-0 z-10 flex h-14 items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-4 pr-40">
-          <button onClick={props.onClose} className="no-drag grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label={t('Close')}>
+          <button onClick={() => void requestClose()} className="no-drag grid size-9 place-items-center rounded-full transition hover:bg-white/10" aria-label={t('Close')}>
             <X className="size-5" />
           </button>
           <div className="no-drag flex items-center gap-1">
@@ -341,7 +377,7 @@ export function Lightbox(props: {
             e.preventDefault()
             if (detail) setMenu({ x: e.clientX, y: e.clientY })
           }}
-          className={`relative flex flex-1 touch-none items-center justify-center overflow-hidden p-6 pt-14 ${
+          className={`relative flex flex-1 touch-none items-center justify-center overflow-hidden p-6 pt-14 ${closing || opening ? 'invisible' : ''} ${
             zoom.scale > 1 ? (zoom.dragging ? 'cursor-grabbing' : 'cursor-grab') : ''
           }`}
         >
@@ -487,7 +523,8 @@ export function Lightbox(props: {
         </div>
       )}
 
-      {flight && (
+      {flight &&
+        createPortal(
         <img
           src={flight.src}
           alt=""
@@ -497,8 +534,9 @@ export function Lightbox(props: {
             ...flight.rect,
             transition: flight.moving ? 'left var(--dur-gentle) var(--ease-standard), top var(--dur-gentle) var(--ease-standard), width var(--dur-gentle) var(--ease-standard), height var(--dur-gentle) var(--ease-standard)' : 'none'
           }}
-        />
-      )}
+        />,
+          document.body
+        )}
 
       {showInfo && (
         <aside className="scroll-page w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.08] bg-[#151715] px-6 pb-8 pt-16 animate-fade-in">

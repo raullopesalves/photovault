@@ -301,9 +301,18 @@ try {
     await page.click('nav >> text=Photos')
     await page.waitForTimeout(1500)
     await page.locator('main img').nth(5).click()
+    await page.waitForTimeout(60)
+    await shot('viewer-opening')
     await page.waitForTimeout(2000)
     await shot('viewer')
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('ArrowRight')
+    await page.waitForTimeout(1500)
     await page.keyboard.press('Escape')
+    await page.waitForTimeout(90)
+    await shot('viewer-closing')
+    await page.waitForTimeout(800)
+    await shot('viewer-closed')
   }
 
   if (process.argv.includes('--all-views')) {

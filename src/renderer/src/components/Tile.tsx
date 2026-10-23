@@ -5,6 +5,8 @@ import { api, duration, mediaUrl, mimeLabel } from '../lib/format'
 import { t } from '../lib/i18n'
 
 export const Tile = memo(function Tile(props: {
+  /** Position in the timeline, as data-index (the viewer closes into it). */
+  index: number
   asset: AssetSummary | undefined
   size: number
   selected: boolean
@@ -32,6 +34,7 @@ export const Tile = memo(function Tile(props: {
   return (
     <div
       role="button"
+      data-index={props.index}
       tabIndex={0}
       aria-pressed={selected}
       onClick={onClick}
