@@ -25,6 +25,8 @@ export function SettingsView(props: {
   onTheme: (t: ThemePreference) => void
   onOpenLibrary: () => void
   onCreateLibrary: () => void
+  /** Opens the Guide at What's new. */
+  onWhatsNew: () => void
 }) {
   const themes: Array<{ id: ThemePreference; label: string; icon: ReactNode }> = [
     { id: 'system', label: t('System'), icon: <Monitor className="size-4" /> },
@@ -88,7 +90,7 @@ export function SettingsView(props: {
 
         <CaptionsGroup />
 
-        <UpdatesGroup />
+        <UpdatesGroup onWhatsNew={props.onWhatsNew} />
 
         <Group title={t('Library')}>
           <div className="text-[13px] text-stone-500 dark:text-stone-400">{t('Location')}</div>
@@ -225,7 +227,7 @@ function ModelsGroup() {
   )
 }
 
-function UpdatesGroup() {
+function UpdatesGroup(props: { onWhatsNew: () => void }) {
   const [s, setS] = useState<UpdateStatus | null>(null)
   const [token, setToken] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -257,15 +259,15 @@ function UpdatesGroup() {
     <Group title={t('Updates')}>
       <div className="text-[13px] text-stone-600 dark:text-stone-400">{t('Photo Vault')}{' '}{s.version}. {line}
       </div>
-      {s.canUpdate && (
-        <div className="mt-3 flex gap-2">
-          {s.state === 'ready' ? (
+      <div className="mt-3 flex gap-2">
+        {s.canUpdate &&
+          (s.state === 'ready' ? (
             <button onClick={() => void api.installUpdate()} className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white dark:bg-white dark:text-stone-900">{t('Restart and update')}</button>
           ) : (
             <Btn onClick={() => void api.checkForUpdates().then(setS)}>{t('Check now')}</Btn>
-          )}
-        </div>
-      )}
+          ))}
+        <Btn onClick={props.onWhatsNew}>{t('What’s new')}</Btn>
+      </div>
       {s.canUpdate && (
         <div className="mt-5 border-t border-stone-100 pt-4 dark:border-stone-800">
           <div className="text-[13px] font-medium">{t('GitHub access')}{' '}{s.tokenSet && <span className="ml-1 text-emerald-600 dark:text-emerald-400">{t('· saved')}</span>}</div>

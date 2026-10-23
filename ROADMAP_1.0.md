@@ -45,10 +45,10 @@ Backups and catalogue snapshots are well tested in code (`tests/backup.test.ts`,
 
 ### 4. Release notes and help
 
-- [ ] Each release lists what changed, from the handoff's "Added in" notes, instead of just the version number.
-- [ ] A short user guide (in the app or the repository): importing, backups and backup drives, what "probably received" means, hiding versus the Bin, moving to a new PC, and what smart search and descriptions do.
+- [x] Each release lists what changed, from the handoff's "Added in" notes, instead of just the version number: [CHANGELOG.md](CHANGELOG.md), shown on each release page and in the app.
+- [x] A short user guide (in the app or the repository): importing, backups and backup drives, what "probably received" means, hiding versus the Bin, moving to a new PC, and what smart search and descriptions do: [docs/USER_GUIDE.md](docs/USER_GUIDE.md) (and in Portuguese), shown in the app under Guide.
 
-**Done when** someone who has never seen the app can set up a backup from the guide alone.
+**Done when** someone who has never seen the app can set up a backup from the guide alone. *Built 2026-10-23 (D98). Its backup steps were written against the app's own buttons and messages, and the smoke test follows the same steps. Still to do: have someone who has never used the app try it (you).*
 
 ### 5. A real library is protected (you)
 

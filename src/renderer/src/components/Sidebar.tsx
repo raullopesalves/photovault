@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import {
   Album,
   BrushCleaning,
+  CircleHelp,
   Heart,
   Images,
   LoaderCircle,
@@ -39,11 +40,12 @@ export type View =
   | 'bin'
   | 'storage'
   | 'settings'
+  | 'guide'
 
 const icon = (I: typeof Images): ReactNode => <I className="size-[17px]" strokeWidth={1.75} />
 
 /** Ten places in three groups. Duplicates and Hidden open from Tidy up, imports from the Import button, Safety from the
- * status card, Settings from the footer. */
+ * status card, the Guide and Settings from the footer. */
 const SECTIONS: Array<{ label?: string; items: Array<{ id: View; label: string; icon: ReactNode }> }> = [
   {
     items: [
@@ -181,6 +183,15 @@ export function Sidebar(props: {
               {t('Import')}
             </ImportMenu>
           </div>
+          <button
+            onClick={() => props.onView('guide')}
+            aria-label={t('Guide')}
+            title={t('Guide')}
+            aria-current={props.view === 'guide' ? 'page' : undefined}
+            className={`grid size-8 place-items-center rounded-lg transition-colors ${props.view === 'guide' ? 'bg-brass-soft text-brass-ink' : 'text-ink-muted hover:bg-line/60 hover:text-ink'}`}
+          >
+            <CircleHelp className="size-4" strokeWidth={1.75} />
+          </button>
           <button
             onClick={() => props.onView('settings')}
             aria-label={t('Settings')}

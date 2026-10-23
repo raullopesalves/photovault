@@ -463,7 +463,10 @@ await page.waitForTimeout(500)
 await page.screenshot({ path: join(shots, '26-backup.png') })
 const backup = await page.evaluate(() => window.photoVault.backupStatus())
 console.log('backup:', { total: backup.totalAssets, protected: backup.protectedAssets, files: backup.targets[0]?.filesBackedUp })
-await page.click('text=Verify library')
+// The app's own monthly check starts a minute after a library first opens, so on a slow machine one may already be
+// running ("Stop") or done ("Verify again").
+const verifyButton = page.locator('main button:has-text("Verify library"), main button:has-text("Verify again")')
+if (await verifyButton.count()) await verifyButton.first().click()
 await page.waitForSelector('text=/verified intact/', { timeout: 60000 })
 await page.screenshot({ path: join(shots, '10-verify.png') })
 
@@ -638,6 +641,18 @@ if (process.env.PV_HEIC) {
 }
 console.log('0.7:', { rotation, exported, pins, smart: smartIds?.length ?? 'skipped', heic: heicThumb ?? 'skipped', faces: faces ?? 'skipped', captions: captions ?? 'skipped' })
 
+// --- Guide and What's new (1.0 must-have 4) --------------------------------------------------------------------
+await page.click('aside button[aria-label="Guide"]')
+await page.waitForSelector('main h2:has-text("Backups")')
+await page.screenshot({ path: join(shots, '36-guide.png') })
+const guideBackup = await page.locator('main h3:has-text("Setting up a backup drive")').isVisible()
+await page.click('main [role="tab"]:has-text("What’s new")')
+const appVersion = await app.evaluate(({ app }) => app.getVersion())
+await page.waitForSelector(`main h2:has-text("${appVersion}")`)
+await page.screenshot({ path: join(shots, '37-whats-new.png') })
+const guide = { guideBackup, whatsNewHasVersion: (await page.locator(`main h2:has-text("${appVersion}")`).count()) === 1 }
+console.log('guide:', guide)
+
 // --- Crash recovery (1.0): a page, the main process and the worker thread each crash, are logged and recover ------
 const logText = (root) => {
   const dir = join(root, 'logs')
@@ -802,6 +817,7 @@ if (errors2.length) console.log('renderer errors (recovered app):', errors2)
 await app2.close()
 
 const ok =
+  Object.values(guide).every(Boolean) &&
   Object.values(crashes).every(Boolean) &&
   Object.values(snapshotDrill).every(Boolean) &&
   Object.values(recoveryDrill).every(Boolean) &&

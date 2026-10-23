@@ -1004,5 +1004,10 @@ export const PT: Record<string, string> = {
   "Zoom in": "Ampliar",
   "Zoom in (+)": "Ampliar (+)",
   "Zoom out": "Reduzir",
-  "Zoom out (−)": "Reduzir (−)"
+  "Zoom out (−)": "Reduzir (−)",
+  "Contents": "Conteúdo",
+  "Guide": "Guia",
+  "How Photo Vault keeps your photos, and how to keep them safe.": "Como o Photo Vault guarda as suas fotografias, e como as manter em segurança.",
+  "What changed in each version.": "O que mudou em cada versão.",
+  "What’s new": "Novidades"
 }

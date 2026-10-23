@@ -11,6 +11,7 @@ import { ImportsView } from './views/ImportsView'
 import { DuplicatesView } from './views/DuplicatesView'
 import { StorageView } from './views/StorageView'
 import { SettingsView } from './views/SettingsView'
+import { GuideView, type GuideTab } from './views/GuideView'
 import { AlbumsView } from './views/AlbumsView'
 import { MapView } from './views/MapView'
 import { PeopleView } from './views/PeopleView'
@@ -45,6 +46,7 @@ export default function App() {
   }, [])
   useEffect(() => setCrashTest(false), [view])
   const [duplicatesTab, setDuplicatesTab] = useState<'exact' | 'probable' | 'similar'>('exact')
+  const [guideTab, setGuideTab] = useState<GuideTab>('guide')
   const [progress, setProgress] = useState<ImportProgress | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [version, setVersion] = useState(0)
@@ -180,7 +182,10 @@ export default function App() {
     >
       <Sidebar
         view={view}
-        onView={setView}
+        onView={(v) => {
+          if (v === 'guide') setGuideTab('guide')
+          setView(v)
+        }}
         library={library}
         importRunning={importRunning}
         progress={progress}
@@ -217,8 +222,13 @@ export default function App() {
               onTheme={changeTheme}
               onOpenLibrary={async () => setState(await api.openLibrary())}
               onCreateLibrary={async () => setState(await api.createLibrary())}
+              onWhatsNew={() => {
+                setGuideTab('new')
+                setView('guide')
+              }}
             />
           )}
+          {view === 'guide' && <GuideView key={guideTab} initialTab={guideTab} />}
           {view === 'favorites' && <FavoritesView version={version} />}
           {view === 'albums' && <AlbumsView version={version} />}
           {view === 'map' && <MapView version={version} />}
