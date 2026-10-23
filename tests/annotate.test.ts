@@ -5,6 +5,7 @@ import sharp from 'sharp'
 import type { Library } from '@core/library/library'
 import { addManualFace, allTags, assetFaces, createSmartAlbum, deleteFace, setDescription, setLocation, setTags, smartAlbums } from '@core/repo/annotate'
 import { countryAt, memories } from '@core/repo/memories'
+import { facets } from '@core/repo/filters'
 import { listPeople, moveFaces } from '@core/repo/people'
 import { assetDetail, assetIdsInRange } from '@core/repo/queries'
 import { makeJpeg, openLibrary, runImport, sandbox, type Sandbox } from './helpers'
@@ -75,6 +76,14 @@ describe('annotations', () => {
     const ids = (q: Parameters<typeof assetIdsInRange>[1]): number[] => assetIdsInRange(lib, q, 0, 10).sort((x, y) => x - y)
     expect(ids({ excludeOrigins: ['screenshot', 'screen_recording'] })).toEqual([a, c].sort((x, y) => x - y)) // unknown origin stays
     expect(ids({ origins: ['screenshot', 'screen_recording'] })).toEqual([b])
+    // Filter counts follow the view: the whole library by default, Photos without its screenshot.
+    const yearTotal = (f: ReturnType<typeof facets>): number => f.years.reduce((s, y) => s + y.count, 0)
+    expect(yearTotal(facets(lib))).toBe(3)
+    const photos = facets(lib, { hidden: 'exclude', excludeOrigins: ['screenshot', 'screen_recording'] })
+    expect(yearTotal(photos)).toBe(2)
+    expect(photos.origins.some((o) => o.origin === 'screenshot')).toBe(false)
+    lib.db.run('UPDATE assets SET favorite = 1 WHERE id = ?', [c])
+    expect(facets(lib, { favorite: true }).years.reduce((s, y) => s + y.count, 0)).toBe(1)
   })
 
   it('hand-marked faces can be named and removed', async () => {

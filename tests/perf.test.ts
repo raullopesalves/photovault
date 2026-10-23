@@ -102,6 +102,7 @@ describe.runIf(process.env.PERF === '1')('100k library', () => {
     time('recently added', 300, () => timeline(lib, { sort: 'added' }))
     time('filter: year + origin', 300, () => timeline(lib, { years: [2016], origins: ['whatsapp'] }))
     time('facets', 800, () => facets(lib))
+    time('facets (Photos view)', 800, () => facets(lib, { hidden: 'exclude', excludeOrigins: ['screenshot', 'screen_recording'] }))
     time('Photos without screenshots (timeline)', 300, () => timeline(lib, { hidden: 'exclude', excludeOrigins: ['screenshot', 'screen_recording'] }))
     time('Photos without screenshots (deep page)', 150, () => assetsPage(lib, 60_000, 200, { hidden: 'exclude', excludeOrigins: ['screenshot', 'screen_recording'] }))
     time('places for search', 300, () => libraryPlaces(lib))

@@ -31,7 +31,7 @@ export function ScreenshotsView(props: { version: number; showInPhotos: boolean;
           {props.showInPhotos ? t('Keep out of Photos') : t('Show in Photos too')}
         </button>
       }
-      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} hideOrigin />}
+      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} base={{ origins: SCREEN_ORIGINS }} hideOrigin />}
       empty={
         filtered ? (
           <NoMatches onClear={() => setQuery({})} />

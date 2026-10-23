@@ -10,12 +10,13 @@ import { t } from '../lib/i18n'
 export function VideosView(props: { version: number; showScreenshots: boolean }) {
   const [query, setQuery] = useState<AssetQuery>({})
   const filtered = Object.values(query).some((v) => v !== undefined)
+  const base: AssetQuery = { mediaType: 'video', excludeOrigins: props.showScreenshots ? undefined : SCREEN_ORIGINS }
   return (
     <AssetGrid
       version={props.version}
-      query={{ ...query, mediaType: 'video', excludeOrigins: props.showScreenshots ? undefined : SCREEN_ORIGINS }}
+      query={{ ...query, ...base }}
       title={t('Videos')}
-      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} />}
+      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} base={base} />}
       empty={
         filtered ? (
           <NoMatches onClear={() => setQuery({})} />

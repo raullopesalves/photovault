@@ -14,7 +14,7 @@ export function FavoritesView(props: { version: number }) {
       version={props.version}
       query={{ ...query, favorite: true }}
       title={t('Favourites')}
-      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} hideFavorite />}
+      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} base={{ favorite: true }} hideFavorite />}
       empty={
         filtered ? (
           <NoMatches onClear={() => setQuery({})} />

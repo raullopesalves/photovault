@@ -290,7 +290,7 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
             </button>
           </>
         }
-        toolbar={album.count > 0 ? <FilterBar query={query} onChange={(q) => setQuery({ ...q, albumId: props.id })} version={props.version} /> : undefined}
+        toolbar={album.count > 0 ? <FilterBar query={query} onChange={(q) => setQuery({ ...q, albumId: props.id })} version={props.version} base={{ albumId: props.id }} /> : undefined}
         empty={
           album.count === 0 ? (
             <NoMatches title={t('This album is empty')} body={t('Select photos in the Photos view and choose “Add to album”.')} />

@@ -28,14 +28,23 @@ function toggle<T>(list: T[] | undefined, value: T, eq: (a: T, b: T) => boolean 
  * Search field + multi-select filter menus, with the active filters shown as removable badges underneath.
  * Within one menu any ticked value matches (OR); different menus combine (AND).
  */
-export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) => void; version: number; hideFavorite?: boolean; hideOrigin?: boolean }) {
+export function FilterBar(props: {
+  query: AssetQuery
+  onChange: (q: AssetQuery) => void
+  version: number
+  /** What the view itself shows (Photos without screenshots, one album…): the filter counts are counted within it. */
+  base?: AssetQuery
+  hideFavorite?: boolean
+  hideOrigin?: boolean
+}) {
   const [facets, setFacets] = useState<Facets | null>(null)
   const [labels, setLabels] = useState<SearchLabels>({})
   const q = props.query
 
+  const baseKey = JSON.stringify(props.base ?? {})
   useEffect(() => {
-    void api.facets().then(setFacets)
-  }, [props.version])
+    void api.facets(props.base).then(setFacets)
+  }, [props.version, baseKey])
 
   const set = (patch: Partial<AssetQuery>): void => props.onChange({ ...q, ...patch })
   const [saving, setSaving] = useState(false)
@@ -61,9 +70,9 @@ export function FilterBar(props: { query: AssetQuery; onChange: (q: AssetQuery) 
       ),
       remove: () => set({ ids: undefined, smartText: undefined, sort: q.sort === 'relevance' ? undefined : q.sort })
     })
-  if (typeof q.personId === 'number') badges.push({ key: 'person', label: <><Users className="size-3" />{' '}{labels.person || t('Person')}</>, remove: () => set({ personId: undefined }) })
+  if (typeof q.personId === 'number' && props.base?.personId === undefined) badges.push({ key: 'person', label: <><Users className="size-3" />{' '}{labels.person || t('Person')}</>, remove: () => set({ personId: undefined }) })
   if (q.place) badges.push({ key: 'place', label: <><MapIcon className="size-3" />{' '}{q.place}</>, remove: () => set({ place: undefined }) })
-  if (typeof q.albumId === 'number') badges.push({ key: 'album', label: <><Album className="size-3" />{' '}{labels.album || t('Album')}</>, remove: () => set({ albumId: undefined }) })
+  if (typeof q.albumId === 'number' && props.base?.albumId === undefined) badges.push({ key: 'album', label: <><Album className="size-3" />{' '}{labels.album || t('Album')}</>, remove: () => set({ albumId: undefined }) })
   if (q.favorite && !props.hideFavorite) badges.push({ key: 'fav', label: t('Favourites'), remove: () => set({ favorite: undefined }) })
   for (const t of q.types ?? []) badges.push({ key: `t:${t}`, label: TYPE_LABEL[t], remove: () => set({ types: toggle(q.types, t) }) })
   for (const y of q.years ?? []) badges.push({ key: `y:${y}`, label: y === 0 ? t('No date') : String(y), remove: () => set({ years: toggle(q.years, y) }) })

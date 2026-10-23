@@ -722,7 +722,8 @@ export interface PhotoVaultApi {
   openLibrary(): Promise<AppState>
   timeline(query?: AssetQuery): Promise<TimelineGroup[]>
   assetsPage(offset: number, limit: number, query?: AssetQuery): Promise<AssetSummary[]>
-  facets(): Promise<Facets>
+  /** Filter values with counts, within `base` (the view the filters sit in); the whole library without it. */
+  facets(base?: AssetQuery): Promise<Facets>
   asset(id: number): Promise<AssetDetail | null>
   setFavorite(id: number, favorite: boolean): Promise<void>
   setFavorites(ids: number[], favorite: boolean): Promise<void>

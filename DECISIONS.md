@@ -477,3 +477,5 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 
 **D93. Background work is visible (0.15).** Smart search, descriptions and people run for hours on a large library, and their progress lived only deep in Settings. A "Working on your photos" card at the foot of the sidebar (`BackgroundWork.tsx`) shows one bar per running job (percentage on the card, exact counts on hover), disappears when nothing runs, and opens Settings scrolled to the AI sections. Also in 0.15: the viewer closes back into its tile, the smoke test runs in CI (temp paths resolved with `realpathSync.native`; artifact uploads cannot fail a job), and the 100k performance test covers the redesign's queries.
 
+**D94. Filter counts follow the view (0.15.1).** `facets(library, base)` counts within the view's own constraints, which each page passes to its filter bar as `base`: Photos (no hidden items, no screenshots unless shown), Favourites, Screenshots, Videos, an album, a person or pet. Picking a value then shows exactly the number beside it. Tidy up still counts the whole library. The Photos grid itself is unchanged: a search still finds screenshots.
+

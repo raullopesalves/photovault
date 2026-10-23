@@ -1076,7 +1076,7 @@ It is trust.
 The user must be able to give Photo Vault irreplaceable personal photographs and understand exactly what the application has done with them.
 ---
 
-# 29. Implementation Status (updated 2026-10-23, version 0.15.0)
+# 29. Implementation Status (updated 2026-10-23, version 0.15.1)
 
 Milestones 0–5 are implemented, and most of Milestone 6:
 - **Import and safety:** resumable imports, library verification, catalogue snapshots and mirror backups.
@@ -1141,6 +1141,7 @@ See `DECISIONS.md` (D1–D88) for reasoning and `readme.md` for commands.
 
 ### Added in 0.15
 
+- **0.15.1:** filter counts count within the page they sit on (Photos without screenshots and hidden items, one album, one person…), so "2026: 620" no longer stands over a Photos view showing 4.
 - **Working on your photos:** a sidebar card with a bar for smart search, descriptions and people while they run; it opens their Settings sections. The viewer closes back into its tile; the smoke test runs in CI (D93).
 
 ### Added in 0.14

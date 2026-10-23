@@ -24,6 +24,8 @@ export function PhotosView(props: {
   // Searching, or picking Screenshots in the Origin filter, still finds them.
   const asked = !!query.text || !!query.ids || !!query.origins?.some((o) => o !== 'unknown' && SCREEN_ORIGINS.includes(o))
   const leftOut = !props.showScreenshots && !asked && props.library.screenshotCount > 0
+  // What Photos itself leaves out; the filter counts follow it, so a year's count is what that year shows here.
+  const base: AssetQuery = { hidden: 'exclude', excludeOrigins: !props.showScreenshots && props.library.screenshotCount > 0 ? SCREEN_ORIGINS : undefined }
 
   return (
     <AssetGrid
@@ -37,7 +39,7 @@ export function PhotosView(props: {
           </button>
         ) : undefined
       }
-      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} />}
+      toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} base={base} />}
       empty={<NoMatches onClear={() => setQuery({})} />}
     />
   )

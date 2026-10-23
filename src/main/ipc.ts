@@ -144,7 +144,7 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
   ipcMain.handle('library:page', (_e, offset: unknown, limit: unknown, q: unknown) =>
     assetsPage(lib(), int(offset, 'offset'), int(limit, 'limit', 1), query(q))
   )
-  ipcMain.handle('library:facets', () => facets(lib()))
+  ipcMain.handle('library:facets', (_e, base: unknown) => facets(lib(), query(base)))
   ipcMain.handle('library:favorites', (_e, ids: unknown, fav: unknown) => {
     setFavorites(lib(), idList(ids), fav === true)
     changed('favorite')

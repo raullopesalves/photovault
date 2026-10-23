@@ -157,34 +157,48 @@ export function isEmptyQuery(q: AssetQuery | undefined): boolean {
   return assetWhere(q).sql === assetWhere(undefined).sql
 }
 
-/** Values the filter menus offer, with counts. */
-export function facets(library: Library): Facets {
+/**
+ * Values the filter menus offer, with counts. `base` is the view the menus sit in (Photos leaves out hidden items and
+ * screenshots, Favourites counts only favourites, an album only its items), so each count is what picking that value
+ * would show there. Without it, the whole library is counted (Tidy up).
+ */
+export function facets(library: Library, base?: AssetQuery): Facets {
   const db = library.db
+  const w = assetWhere(base)
+  const and = (extra: string): string => `${w.sql} AND ${extra}`
   return {
     years: db.all<{ year: number; count: number }>(
-      `SELECT CASE WHEN undated = 1 THEN 0 ELSE CAST(substr(sort_day, 1, 4) AS INTEGER) END AS year, COUNT(*) AS count
-         FROM assets WHERE trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL GROUP BY year ORDER BY year = 0, year DESC`
+      `SELECT CASE WHEN a.undated = 1 THEN 0 ELSE CAST(substr(a.sort_day, 1, 4) AS INTEGER) END AS year, COUNT(*) AS count
+         FROM assets a ${w.sql} GROUP BY year ORDER BY year = 0, year DESC`,
+      w.params
     ),
     cameras: db.all<{ make: string | null; model: string; count: number }>(
-      `SELECT camera_make AS make, camera_model AS model, COUNT(*) AS count FROM assets
-        WHERE camera_model IS NOT NULL AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL GROUP BY camera_make, camera_model ORDER BY count DESC LIMIT 50`
+      `SELECT a.camera_make AS make, a.camera_model AS model, COUNT(*) AS count FROM assets a
+        ${and('a.camera_model IS NOT NULL')} GROUP BY a.camera_make, a.camera_model ORDER BY count DESC LIMIT 50`,
+      w.params
     ),
     sources: db.all<{ type: string; count: number }>(
       `SELECT p.source_type AS type, COUNT(DISTINCT p.asset_id) AS count FROM provenance p JOIN assets a ON a.id = p.asset_id
-        WHERE a.trashed_at IS NULL AND a.live_photo_of IS NULL AND a.version_of IS NULL GROUP BY p.source_type ORDER BY count DESC`
+        ${w.sql} GROUP BY p.source_type ORDER BY count DESC`,
+      w.params
     ),
-    favorites: db.get<{ n: number }>('SELECT COUNT(*) AS n FROM assets WHERE favorite = 1 AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL')?.n ?? 0,
-    videos: db.get<{ n: number }>("SELECT COUNT(*) AS n FROM assets WHERE media_type = 'video' AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL")?.n ?? 0,
+    favorites: db.get<{ n: number }>(`SELECT COUNT(*) AS n FROM assets a ${and('a.favorite = 1')}`, w.params)?.n ?? 0,
+    videos: db.get<{ n: number }>(`SELECT COUNT(*) AS n FROM assets a ${and("a.media_type = 'video'")}`, w.params)?.n ?? 0,
     origins: db.all<{ origin: AssetOrigin | 'unknown'; count: number; hidden: number }>(
-      "SELECT COALESCE(origin, 'unknown') AS origin, COUNT(*) AS count, SUM(hidden) AS hidden FROM assets WHERE kind IS NOT NULL AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL GROUP BY origin ORDER BY count DESC"
+      `SELECT COALESCE(a.origin, 'unknown') AS origin, COUNT(*) AS count, SUM(a.hidden) AS hidden FROM assets a
+        ${and('a.kind IS NOT NULL')} GROUP BY a.origin ORDER BY count DESC`,
+      w.params
     ),
     kinds: db.all<{ kind: AssetKind; count: number; hidden: number }>(
-      'SELECT kind, COUNT(*) AS count, SUM(hidden) AS hidden FROM assets WHERE kind IS NOT NULL AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL GROUP BY kind ORDER BY count DESC'
+      `SELECT a.kind AS kind, COUNT(*) AS count, SUM(a.hidden) AS hidden FROM assets a ${and('a.kind IS NOT NULL')} GROUP BY a.kind ORDER BY count DESC`,
+      w.params
     ),
     receivedHints: db.all<{ hint: 'whatsapp_size' | 'social_size' | 'none'; count: number; hidden: number }>(
-      "SELECT COALESCE(origin_hint, 'none') AS hint, COUNT(*) AS count, SUM(hidden) AS hidden FROM assets WHERE origin = 'received' AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL GROUP BY origin_hint ORDER BY count DESC"
+      `SELECT COALESCE(a.origin_hint, 'none') AS hint, COUNT(*) AS count, SUM(a.hidden) AS hidden FROM assets a
+        ${and("a.origin = 'received'")} GROUP BY a.origin_hint ORDER BY count DESC`,
+      w.params
     ),
-    hidden: db.get<{ n: number }>('SELECT COUNT(*) AS n FROM assets WHERE hidden = 1 AND trashed_at IS NULL AND live_photo_of IS NULL AND version_of IS NULL')?.n ?? 0,
+    hidden: db.get<{ n: number }>(`SELECT COUNT(*) AS n FROM assets a ${and('a.hidden = 1')}`, w.params)?.n ?? 0,
     unclassified: db.get<{ n: number }>('SELECT COUNT(*) AS n FROM assets WHERE classify_version = 0')?.n ?? 0
   }
 }

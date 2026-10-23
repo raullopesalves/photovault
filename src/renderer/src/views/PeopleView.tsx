@@ -305,7 +305,7 @@ function PetPage(props: { group: PetGroup; version: number; onBack: () => void }
           version={props.version}
           query={{ ...query, ids: props.group.ids, hidden: 'exclude' }}
           title={<span>{PET_NAMES[props.group.kind]}</span>}
-          toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} />}
+          toolbar={<FilterBar query={query} onChange={setQuery} version={props.version} base={{ ids: props.group.ids, hidden: 'exclude' }} />}
           empty={<NoMatches />}
         />
       </div>
@@ -455,7 +455,7 @@ function PersonPage(props: { id: number; version: number; onBack: () => void; on
           toolbar={
             <div className="space-y-2.5">
               {tabs}
-              <FilterBar query={query} onChange={setQuery} version={props.version} />
+              <FilterBar query={query} onChange={setQuery} version={props.version} base={{ personId: props.id, hidden: 'exclude' }} />
             </div>
           }
           empty={<NoMatches onClear={() => setQuery({})} />}
