@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ModalPanel } from '../components/Modal'
 import { Check, Copy, Eye, EyeOff, ImageOff, Images, LoaderCircle, Maximize2, Sparkles, Trash2, X } from 'lucide-react'
 import type { DuplicateGroup, NearDuplicateGroup, NearDuplicates } from '@shared/types'
 import { api, basename, bytes, isoLocal, mediaUrl, n, plural, sortTimeLabel } from '../lib/format'
@@ -203,12 +204,12 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
       )}
 
       {preview !== null && (
-        <div className="no-drag fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-10 animate-fade-in" onClick={() => setPreview(null)}>
+        <ModalPanel className="no-drag fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-10 animate-fade-in" onClick={() => setPreview(null)} aria-label={t('Close preview')}>
           <img src={mediaUrl('preview', preview)} alt="" className="max-h-full max-w-full object-contain" />
           <button className="absolute right-5 top-5 grid size-9 place-items-center rounded-full text-white hover:bg-white/10" aria-label={t('Close preview')}>
             <X className="size-5" />
           </button>
-        </div>
+        </ModalPanel>
       )}
     </>
   )
@@ -247,7 +248,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
             <div key={m.asset.id} className="w-40 shrink-0">
               <button
                 onClick={() => setKeep(m.asset.id)}
-                className={`group relative block size-40 overflow-hidden rounded-lg bg-stone-200 outline-none transition dark:bg-stone-800 ${
+                className={`group relative block size-40 overflow-hidden rounded-lg bg-stone-200 outline-none transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-brass-ink dark:bg-stone-800 ${
                   selected ? 'ring-[3px] ring-accent-500' : 'ring-1 ring-stone-200 hover:ring-stone-300 dark:ring-stone-800'
                 }`}
                 title={t('Keep this copy')}

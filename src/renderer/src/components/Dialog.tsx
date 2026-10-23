@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { ModalPanel } from './Modal'
 import type { PhotoBookLayout, ShareOptions } from '@shared/types'
 import { plural } from '../lib/format'
 import { t } from '../lib/i18n'
@@ -16,12 +17,12 @@ function Shell(props: { children: ReactNode; onClose: () => void }) {
   })
   return (
     <div className="no-drag fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/30 p-8 backdrop-blur-[4px] animate-fade-in dark:bg-black/50" onMouseDown={props.onClose}>
-      <div
+      <ModalPanel
         className="w-[420px] rounded-2xl bg-white p-6 shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {props.children}
-      </div>
+      </ModalPanel>
     </div>
   )
 }
@@ -113,8 +114,8 @@ export function ConfirmDialog(props: { title: string; body: ReactNode; confirm: 
       <h2 className="text-[17px] font-semibold">{props.title}</h2>
       <div className="mt-2 text-[13.5px] leading-relaxed text-stone-600 dark:text-stone-400">{props.body}</div>
       <div className="mt-6 flex justify-end gap-2">
-        <button onClick={props.onClose} className={secondary}>{t('Cancel')}</button>
-        <button onClick={props.onConfirm} className={props.destructive ? danger : primary}>
+        <button onClick={props.onClose} className={secondary} data-autofocus={props.destructive ? true : undefined}>{t('Cancel')}</button>
+        <button onClick={props.onConfirm} className={props.destructive ? danger : primary} data-autofocus={props.destructive ? undefined : true}>
           {props.confirm}
         </button>
       </div>
@@ -148,7 +149,7 @@ export function ShareDialog(props: { count: number; onShare: (opts: ShareOptions
         <input type="checkbox" checked={includeDate} onChange={(e) => setIncludeDate(e.target.checked)} className="accent-accent-500" />{t('Keep the date taken')}</label>
       <div className="mt-6 flex justify-end gap-2">
         <button onClick={props.onClose} className={secondary}>{t('Cancel')}</button>
-        <button onClick={() => props.onShare({ size, includeDate })} className={primary}>{t('Prepare copies')}</button>
+        <button onClick={() => props.onShare({ size, includeDate })} className={primary} data-autofocus>{t('Prepare copies')}</button>
       </div>
     </Shell>
   )
@@ -191,7 +192,7 @@ export function PrintDialog(props: { count: number; title: string; onMake: (layo
         <button onClick={props.onClose} className={secondary}>
           {t('Cancel')}
         </button>
-        <button onClick={() => props.onMake(layout, title.trim() || t('Photos'))} className={primary}>
+        <button onClick={() => props.onMake(layout, title.trim() || t('Photos'))} className={primary} data-autofocus>
           {t('Make PDF')}
         </button>
       </div>

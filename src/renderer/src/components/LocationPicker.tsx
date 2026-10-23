@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ModalPanel } from './Modal'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { feature } from 'topojson-client'
@@ -93,7 +94,7 @@ export function LocationPicker(props: {
 
   return (
     <div className="no-drag fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/50 backdrop-blur-sm animate-fade-in" onClick={props.onClose}>
-      <div className="flex h-[78vh] w-[860px] max-w-[92vw] flex-col overflow-hidden rounded-2xl bg-white text-stone-900 shadow-2xl dark:bg-stone-900 dark:text-stone-100" onClick={(e) => e.stopPropagation()}>
+      <ModalPanel className="flex h-[78vh] w-[860px] max-w-[92vw] flex-col overflow-hidden rounded-2xl bg-white text-stone-900 shadow-2xl dark:bg-stone-900 dark:text-stone-100" onClick={(e) => e.stopPropagation()} aria-label={props.title}>
         <div className="flex items-center gap-3 border-b border-stone-100 px-5 py-3.5 dark:border-stone-800">
           <MapPin className="size-4 text-stone-400" />
           <div className="flex-1 text-[15px] font-semibold">{props.title}</div>
@@ -135,7 +136,7 @@ export function LocationPicker(props: {
             className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900"
           >{t('Save location')}</button>
         </div>
-      </div>
+      </ModalPanel>
     </div>
   )
 }

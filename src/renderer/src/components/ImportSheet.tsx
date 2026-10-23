@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { ModalPanel } from './Modal'
 import { Check, ChevronDown, CircleAlert, Copy, FileQuestion, FolderInput, LoaderCircle, ShieldCheck, X } from 'lucide-react'
 import type { ImportItemInfo, ImportProgress, ImportSummary, ItemClassification } from '@shared/types'
 import { api, basename, bytes, clockLabel, etaLabel, n, plural, rateLabel, sourcesLabel, sourceTypeLabel } from '../lib/format'
@@ -18,7 +19,7 @@ export function ImportSheet(props: {
 
   return (
     <div className="no-drag fixed inset-0 z-30 flex items-center justify-center bg-stone-950/30 p-8 backdrop-blur-[6px] animate-fade-in dark:bg-black/50">
-      <div className="relative flex max-h-full w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10">
+      <ModalPanel className="relative flex max-h-full w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10" aria-label={t('Import')}>
         <button
           onClick={working || p?.phase === 'ready' ? props.onHide : props.onClose}
           className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
@@ -44,7 +45,7 @@ export function ImportSheet(props: {
         ) : (
           <ErrorState title={t('Import stopped')} message={p.error ?? t('The import failed.')} onClose={props.onClose} />
         )}
-      </div>
+      </ModalPanel>
     </div>
   )
 }

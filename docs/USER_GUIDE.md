@@ -90,6 +90,17 @@ These features are off until you turn them on in **Settings**. They run entirely
 
 While they work, a card in the sidebar shows how far along they are. **Offline mode** in Settings blocks every internet connection, as a guarantee. Features whose models are already downloaded keep working.
 
+## Using the keyboard
+
+Everything in Photo Vault works without a mouse. Each photo and control has a name that screen readers such as Windows Narrator read out.
+
+- **Tab** moves between controls. The first press offers **Skip to content**, past the sidebar.
+- **Ctrl K** opens the search box.
+- In a grid of photos, the **arrow keys** move between photos, **Page Up** and **Page Down** move a screenful, **Home** and **End** go to the start or end of the row, and **Ctrl Home** and **Ctrl End** to the first or last photo.
+- **Enter** opens a photo, **Space** selects it, **Shift** with the arrow keys selects several, **Ctrl A** selects everything in the view, and **Esc** clears the selection.
+- In the viewer: **left** and **right arrows** for the previous and next photo, **+**, **-** and **0** to zoom, **I** for details, **R** to rotate, **E** to edit, **F** to show faces, **Ctrl C** to copy the picture, and **Esc** to close. Closing returns you to the photo in the grid.
+- In menus, the **arrow keys** move between items. **Esc** closes a menu or dialog and returns you to the button that opened it.
+
 ## Updates
 
 Installed copies update themselves. A new version downloads in the background and installs when you quit, or click **Restart and update** in **Settings → Updates**. What changed in each version is under **What's new** in this guide.

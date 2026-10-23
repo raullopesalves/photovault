@@ -414,7 +414,7 @@ try {
     await page.click('button:has-text("More")')
     await page.waitForTimeout(500)
     await shot('more-menu')
-    await page.click('button[aria-label="More actions"]')
+    await page.click('button[aria-haspopup="menu"]:has-text("More")')
     await page.waitForTimeout(300)
     await page.locator('button:has-text("Share"):visible').last().click()
     await page.waitForTimeout(600)

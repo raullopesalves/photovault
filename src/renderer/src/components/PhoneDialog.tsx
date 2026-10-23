@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ModalPanel } from './Modal'
 import { RefreshCw, Smartphone } from 'lucide-react'
 import type { PhoneCopyProgress, PhoneDevice } from '@shared/types'
 import { api, n } from '../lib/format'
@@ -66,7 +67,7 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
 
   return (
     <div className="no-drag fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/30 p-8 backdrop-blur-[4px] animate-fade-in dark:bg-black/50">
-      <div className="w-[460px] rounded-2xl bg-white p-6 shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10">
+      <ModalPanel className="w-[460px] rounded-2xl bg-white p-6 shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10">
         <div className="flex items-center justify-between">
           <h2 className="text-[17px] font-semibold">{t('Import from a phone or camera')}</h2>
           {!copying && (
@@ -124,7 +125,7 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
             <button onClick={() => void start()} disabled={!device || device.folders.length === 0} className={primary}>{t('Copy and import')}</button>
           )}
         </div>
-      </div>
+      </ModalPanel>
     </div>
   )
 }

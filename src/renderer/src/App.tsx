@@ -24,6 +24,26 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { BinView, HiddenView } from './views/HiddenBinViews'
 import { t } from './lib/i18n'
 
+/** Each page's name: the window title (read first by a screen reader) and the main region's label. */
+const VIEW_TITLES: Record<View, () => string> = {
+  photos: () => t('Photos'),
+  memories: () => t('Memories'),
+  favorites: () => t('Favourites'),
+  albums: () => t('Albums'),
+  people: () => t('People'),
+  map: () => t('Places'),
+  screenshots: () => t('Screenshots'),
+  videos: () => t('Videos'),
+  cleanup: () => t('Tidy up'),
+  imports: () => t('Past imports'),
+  duplicates: () => t('Duplicates'),
+  hidden: () => t('Hidden'),
+  bin: () => t('Bin'),
+  storage: () => t('Safety'),
+  settings: () => t('Settings'),
+  guide: () => t('Guide')
+}
+
 function applyThemeClass(theme: ThemePreference): void {
   const dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   document.documentElement.classList.toggle('dark', dark)
@@ -34,6 +54,9 @@ const ACTIVE_PHASES = new Set(['scanning', 'sidecars', 'analyzing', 'classifying
 export default function App() {
   const [state, setState] = useState<AppState | null>(null)
   const [view, setView] = useState<View>('photos')
+  useEffect(() => {
+    document.title = `${VIEW_TITLES[view]()} – ${t('Photo Vault')}`
+  }, [view])
   const [theme, setTheme] = useState<ThemePreference>('system')
   const [showScreenshots, setShowScreenshots] = useState(false)
   const [aiFocus, setAiFocus] = useState(0)
@@ -180,6 +203,13 @@ export default function App() {
       }}
       onDrop={onDrop}
     >
+      {/* The first Tab stop: skips the sidebar's thirteen buttons. Visible only while focused. */}
+      <button
+        onClick={() => document.getElementById('main')?.focus()}
+        className="sr-only z-[70] rounded-lg bg-brass text-[13px] font-semibold text-on-accent focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:px-3 focus:py-2"
+      >
+        {t('Skip to content')}
+      </button>
       <Sidebar
         view={view}
         onView={(v) => {
@@ -196,7 +226,7 @@ export default function App() {
           setAiFocus((f) => f + 1)
         }}
       />
-      <main className="relative min-w-0 flex-1">
+      <main id="main" tabIndex={-1} aria-label={VIEW_TITLES[view]()} className="relative min-w-0 flex-1 outline-none">
         {/* A page that crashes shows "Something went wrong" here; the sidebar stays usable. A new page starts fresh. */}
         <ErrorBoundary key={view} view={view} onHome={() => (setCrashTest(false), setView('photos'))}>
           {crashTest && <CrashProbe />}

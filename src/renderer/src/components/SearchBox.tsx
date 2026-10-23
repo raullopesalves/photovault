@@ -173,7 +173,7 @@ export function SearchBox(props: { query: AssetQuery; onChange: (q: AssetQuery) 
     <div ref={box} className="relative w-[340px] max-w-full">
       <label
         className={`flex h-9 items-center gap-2 rounded-lg border px-3 text-ink-muted transition-[background-color,border-color,box-shadow] duration-[var(--dur-quick)] ${
-          showPanel ? 'border-line-strong bg-card shadow-[0_6px_20px_rgba(26,30,27,0.10)]' : 'border-transparent bg-shelf focus-within:border-line-strong focus-within:bg-card'
+          showPanel ? 'border-line-strong bg-card shadow-[0_6px_20px_rgba(26,30,27,0.10)]' : 'border-transparent bg-shelf focus-within:border-brass-ink focus-within:bg-card'
         }`}
       >
         {mode === 'smart' ? <Sparkles className="size-4 shrink-0 text-brass-ink" /> : <Search className="size-4 shrink-0" />}

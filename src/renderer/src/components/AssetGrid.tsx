@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useReducer, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Album, CalendarClock, Check, Eye, EyeOff, Heart, HeartOff, ImageMinus, ImageUp, Minus, MapPin, MoreHorizontal, Play, Plus, RotateCcw, RotateCw, FolderOutput, Printer, Share2, Tag, Trash2, UserX, X } from 'lucide-react'
 import type { AlbumSummary, AssetQuery, AssetSummary, TimelineGroup } from '@shared/types'
@@ -11,6 +11,7 @@ import { DateDialog, PrintDialog, PromptDialog, ShareDialog } from './Dialog'
 import { LocationPicker } from './LocationPicker'
 import { BinDeleteDialog } from './BinDelete'
 import { t } from '../lib/i18n'
+import { useMenu } from '../lib/a11y'
 
 const PAGE = 240
 const ZOOM_SIZES = [116, 168, 236, 320]
@@ -109,6 +110,10 @@ export function AssetGrid(props: {
   const [selected, setSelected] = useState<Map<number, number>>(new Map()) // assetId -> index
   const anchor = useRef<number | null>(null)
   const pages = usePages(props.version, props.query, queryKey)
+  // The keyboard's place in the grid: the one tile Tab reaches (see tabStop below).
+  const [focusIndex, setFocusIndex] = useState(0)
+  const titleId = useId()
+  const helpId = useId()
 
   useEffect(() => {
     let alive = true
@@ -122,6 +127,7 @@ export function AssetGrid(props: {
   useEffect(() => {
     setSelected(new Map())
     anchor.current = null
+    setFocusIndex(0)
     scrollEl?.scrollTo(0, 0)
   }, [queryKey])
 
@@ -265,6 +271,91 @@ export function AssetGrid(props: {
     if (lastIdx >= 0) pages.ensure(firstIdx, lastIdx)
   })
 
+  // One tile is the grid's Tab stop: the last one focused while it is on screen, otherwise the first on screen.
+  const tabStop = focusIndex >= firstIdx && focusIndex <= lastIdx ? focusIndex : Number.isFinite(firstIdx) ? firstIdx : 0
+  /** Scrolls a tile into view (loading it if needed) and focuses it. */
+  const focusTile = useCallback(
+    async (index: number) => {
+      setFocusIndex(index)
+      await findTile(index)
+      for (let i = 0; i < 30; i++) {
+        const el = scrollEl?.querySelector<HTMLElement>(`[role="gridcell"][data-index="${index}"]`)
+        if (el) return el.focus({ preventScroll: true })
+        await new Promise((r) => requestAnimationFrame(r))
+      }
+    },
+    [findTile, scrollEl]
+  )
+  /** The tiles row holding a timeline index (a month's header row starts at the same index, just before it). */
+  const tileRowOf = (index: number): number => {
+    let lo = 0
+    let hi = rows.length - 1
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1
+      if ((rows[mid] as Row).start <= index) lo = mid
+      else hi = mid - 1
+    }
+    return lo
+  }
+  // Arrow keys move between photos, as in a grid of files; Page Up/Down a screenful; Home/End the row (with Ctrl,
+  // the whole view). With Shift, the photos passed over are added to the selection.
+  const onGridKey = (e: ReactKeyboardEvent<HTMLDivElement>): void => {
+    const cell = (e.target as HTMLElement).closest<HTMLElement>('[role="gridcell"]')
+    if (!cell || e.altKey || total === 0) return
+    const index = Number(cell.dataset.index)
+    const r = tileRowOf(index)
+    const row = rows[r]
+    if (row?.kind !== 'tiles') return
+    const col = index - row.start
+    const step = (from: number, dir: 1 | -1): number => {
+      for (let i = from + dir; i >= 0 && i < rows.length; i += dir) if (rows[i]?.kind === 'tiles') return i
+      return from
+    }
+    const at = (ri: number): number => {
+      const x = rows[ri] as Row
+      return x.start + Math.min(col, x.count - 1)
+    }
+    const screen = Math.max(1, Math.floor(((scrollEl?.clientHeight ?? 600) - headerH) / (tile + GAP)))
+    let next: number
+    switch (e.key) {
+      case 'ArrowRight':
+        next = index + 1
+        break
+      case 'ArrowLeft':
+        next = index - 1
+        break
+      case 'ArrowDown':
+        next = at(step(r, 1))
+        break
+      case 'ArrowUp':
+        next = at(step(r, -1))
+        break
+      case 'PageDown':
+      case 'PageUp': {
+        let ri = r
+        for (let k = 0; k < screen; k++) ri = step(ri, e.key === 'PageDown' ? 1 : -1)
+        next = at(ri)
+        break
+      }
+      case 'Home':
+        next = e.ctrlKey ? 0 : row.start
+        break
+      case 'End':
+        next = e.ctrlKey ? total - 1 : row.start + row.count - 1
+        break
+      default:
+        return
+    }
+    e.preventDefault()
+    next = Math.max(0, Math.min(total - 1, next))
+    if (next === index) return
+    if (e.shiftKey) {
+      if (anchor.current === null) anchor.current = index
+      void selectRange(Math.min(anchor.current, next), Math.max(anchor.current, next))
+    }
+    void focusTile(next)
+  }
+
   // Ctrl/Cmd + wheel zooms the grid, like other photo apps.
   useEffect(() => {
     const el = scrollEl
@@ -344,7 +435,7 @@ export function AssetGrid(props: {
         >
           <div className="flex min-h-[40px] items-end justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="truncate font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{props.title}</h1>
+              <h1 id={titleId} className="truncate font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{props.title}</h1>
               {props.subtitle && <div className="mt-0.5 truncate text-[12.5px] leading-[18px] text-ink-muted">{props.subtitle}</div>}
             </div>
             <div className="no-drag flex shrink-0 items-center gap-3">
@@ -384,14 +475,26 @@ export function AssetGrid(props: {
         {showEmpty ? (
           <div className="px-7 py-10">{props.empty}</div>
         ) : (
-          <div style={{ height: virtualizer.getTotalSize() + 96, position: 'relative' }}>
+          <div
+            role="grid"
+            aria-labelledby={titleId}
+            aria-describedby={helpId}
+            aria-multiselectable="true"
+            aria-rowcount={rows.length}
+            onKeyDown={onGridKey}
+            style={{ height: virtualizer.getTotalSize() + 96, position: 'relative' }}
+          >
+            <p id={helpId} className="sr-only">
+              {t('Arrow keys move between photos. Enter opens a photo, Space selects it, and Shift with the arrow keys selects several.')}
+            </p>
             {items.map((vi) => {
               const row = rows[vi.index]
               if (!row) return null
               const top = vi.start - headerH
               if (row.kind === 'header') {
                 return (
-                  <div key={vi.key} className="group/month absolute inset-x-0 flex items-end px-7 pb-2.5" style={{ top, height: MONTH_H }}>
+                  <div key={vi.key} role="row" aria-rowindex={vi.index + 1} className="group/month absolute inset-x-0 flex items-end px-7 pb-2.5" style={{ top, height: MONTH_H }}>
+                    <div role="rowheader" className="flex min-w-0 items-end">
                     {(() => {
                       // Select the whole month: all its items are selected when every loaded one is.
                       let all = true
@@ -407,7 +510,7 @@ export function AssetGrid(props: {
                           className={`-ml-6 mr-1.5 mb-[3px] grid size-[18px] place-items-center rounded-full transition ${
                             all
                               ? 'bg-accent-500 text-on-accent opacity-100'
-                              : `border-2 border-stone-400 text-transparent hover:border-accent-500 dark:border-stone-500 ${selecting ? 'opacity-100' : 'opacity-0 group-hover/month:opacity-100'}`
+                              : `border-2 border-stone-400 text-transparent hover:border-accent-500 focus-visible:opacity-100 dark:border-stone-500 ${selecting ? 'opacity-100' : 'opacity-0 group-hover/month:opacity-100'}`
                           }`}
                         >
                           <Check className="size-3" strokeWidth={3} />
@@ -421,11 +524,12 @@ export function AssetGrid(props: {
                     {row.month === 'undated' && (
                       <span className="ml-3 truncate text-xs text-stone-500 dark:text-stone-400">{t('No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.')}</span>
                     )}
+                    </div>
                   </div>
                 )
               }
               return (
-                <div key={vi.key} className="absolute flex" style={{ top, left: PAD_X, gap: GAP, height: tile }}>
+                <div key={vi.key} role="row" aria-rowindex={vi.index + 1} className="absolute flex" style={{ top, left: PAD_X, gap: GAP, height: tile }}>
                   {Array.from({ length: row.count }, (_, i) => {
                     const index = row.start + i
                     const asset = pages.get(index)
@@ -437,6 +541,8 @@ export function AssetGrid(props: {
                         size={tile}
                         selected={asset ? selected.has(asset.id) : false}
                         selecting={selecting}
+                        tabbable={index === tabStop}
+                        onFocus={() => setFocusIndex(index)}
                         onOpen={(from) => {
                           setOpenFrom(from ?? null)
                           setOpenIndex(index)
@@ -480,7 +586,11 @@ export function AssetGrid(props: {
           ensure={pages.ensure}
           version={props.version}
           onIndex={setOpenIndex}
-          onClose={() => setOpenIndex(null)}
+          onClose={() => {
+            // Back to the photo the viewer was showing, which may not be the one it opened on.
+            setOpenIndex(null)
+            requestAnimationFrame(() => requestAnimationFrame(() => void focusTile(openIndex)))
+          }}
           findTile={findTile}
         />
       )}
@@ -538,6 +648,8 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
   const [dating, setDating] = useState(false)
   const [more, setMore] = useState(false)
   const moreRef = useRef<HTMLDivElement>(null)
+  const moreMenu = useRef<HTMLDivElement>(null)
+  useMenu(moreMenu, more, () => setMore(false))
   // Close the More menu on any click outside it (a backdrop would be clipped by the bar's transform).
   useEffect(() => {
     if (!more) return
@@ -581,6 +693,10 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
   return (
     <>
       <div className="no-drag fixed bottom-6 left-[calc(50%+114px)] z-30 -translate-x-1/2 animate-rise-in">
+        {/* Read out by screen readers: the count as it changes, and what an action did. */}
+        <div role="status" className="sr-only">
+          {toast ?? `${n(count)} ${t('selected')}`}
+        </div>
         {toast ? (
           <div className="flex items-center gap-3 rounded-[14px] bg-ink/95 py-2 pl-5 pr-2 text-[13px] font-medium text-on-ink shadow-2xl backdrop-blur ">
             {toast}
@@ -598,7 +714,7 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
             {!undo && <span className="w-3" />}
           </div>
         ) : (
-          <div className="relative flex items-center gap-1 rounded-[14px] bg-ink/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur  dark:ring-1">
+          <div role="group" aria-label={t('Selection')} className="relative flex items-center gap-1 rounded-[14px] bg-ink/95 py-1.5 pl-2 pr-1.5 shadow-2xl shadow-stone-950/30 backdrop-blur  dark:ring-1">
             <button onClick={props.onDone} className="grid size-8 place-items-center rounded-full text-on-ink/70 hover:bg-on-ink/15 hover:text-on-ink" aria-label={t('Clear selection')}>
               <X className="size-4" />
             </button>
@@ -650,11 +766,11 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
             >
               <Trash2 className="size-4" />{' '}{t('Bin')}</button>
             <div className="relative" ref={moreRef}>
-              <button className={barBtn} onClick={() => setMore((m) => !m)} aria-label={t('More actions')}>
+              <button className={barBtn} onClick={() => setMore((m) => !m)} aria-haspopup="menu" aria-expanded={more}>
                 <MoreHorizontal className="size-4" />{' '}{t('More')}</button>
               {more && (
                 <>
-                  <div className="absolute bottom-12 right-0 z-20 w-56 rounded-xl bg-ink/95 p-1.5 shadow-2xl ring-1 ring-on-ink/10 backdrop-blur ">
+                  <div ref={moreMenu} role="menu" aria-label={t('More')} className="absolute bottom-12 right-0 z-20 w-56 rounded-xl bg-ink/95 p-1.5 shadow-2xl ring-1 ring-on-ink/10 backdrop-blur ">
                     {[
                       { label: t('Set date…'), icon: <CalendarClock className="size-4" />, run: () => setDating(true) },
                       { label: t('Set location…'), icon: <MapPin className="size-4" />, run: () => setPlacing(true) },
@@ -687,11 +803,12 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
                     ].map((a) => (
                       <button
                         key={a.label}
+                        role="menuitem"
                         onClick={() => {
                           setMore(false)
                           void a.run()
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] text-on-ink/90 hover:bg-on-ink/10"
+                        className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] text-on-ink/90 hover:bg-on-ink/10 focus-visible:bg-on-ink/10"
                       >
                         <span className="text-on-ink/60">{a.icon}</span>
                         {a.label}
@@ -845,29 +962,38 @@ function SelectionBar(props: { ids: number[]; allFavorite: boolean; allHidden: b
 function AlbumPicker(props: { excludeId?: number; onPick: (a: AlbumSummary) => void; onNew: () => void; onClose: () => void }) {
   const [albums, setAlbums] = useState<AlbumSummary[] | null>(null)
   const ref = useRef<HTMLDivElement>(null)
+  useMenu(ref, true, props.onClose)
   useEffect(() => {
     void api.albums().then((a) => setAlbums(a.filter((x) => x.id !== props.excludeId)))
     const close = (e: MouseEvent): void => {
       if (!ref.current?.contains(e.target as Node)) props.onClose()
     }
+    const esc = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') props.onClose()
+    }
     const t = setTimeout(() => window.addEventListener('mousedown', close), 0)
+    window.addEventListener('keydown', esc)
     return () => {
       clearTimeout(t)
       window.removeEventListener('mousedown', close)
+      window.removeEventListener('keydown', esc)
     }
   }, [])
   return (
     <div
       ref={ref}
+      role="menu"
+      aria-label={t('Add to album')}
       className="absolute bottom-full left-1/2 mb-3 w-72 -translate-x-1/2 overflow-hidden rounded-xl bg-white p-1.5 shadow-2xl shadow-stone-950/20 ring-1 ring-stone-200 animate-rise-in dark:bg-stone-800 dark:ring-white/10"
     >
-      <button onClick={props.onNew} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13.5px] font-medium text-accent-600 hover:bg-stone-100 dark:text-accent-400 dark:hover:bg-stone-700/70">
+      <button role="menuitem" onClick={props.onNew} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13.5px] font-medium text-accent-600 hover:bg-stone-100 focus-visible:bg-stone-100 dark:text-accent-400 dark:hover:bg-stone-700/70">
         <Plus className="size-4" />{' '}{t('New album…')}</button>
       <div className="scroll-thin max-h-72 overflow-y-auto">
         {albums === null && <div className="skeleton m-2 h-4 w-40 rounded" />}
         {albums?.map((a) => (
           <button
             key={a.id}
+            role="menuitem"
             onClick={() => props.onPick(a)}
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left hover:bg-stone-100 dark:hover:bg-stone-700/70"
           >

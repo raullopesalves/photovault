@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { ModalPanel } from '../components/Modal'
 import { ArrowLeft, ArrowRightLeft, Check, Eye, Undo2, UserPlus, UserX, EyeOff, HelpCircle, LoaderCircle, Merge, Pencil, ShieldCheck, UserRound, Users, X } from 'lucide-react'
 import type { AssetQuery, PeopleStatus, PeopleSuggestion, Person, PersonMerge, PetGroup } from '@shared/types'
 import { AssetGrid } from '../components/AssetGrid'
@@ -220,7 +221,7 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
 
   return (
     <div className="no-drag fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 backdrop-blur-sm animate-fade-in" onClick={props.onClose}>
-      <div className="w-[640px] rounded-2xl bg-white p-6 shadow-2xl dark:bg-stone-900" onClick={(e) => e.stopPropagation()}>
+      <ModalPanel className="w-[640px] rounded-2xl bg-white p-6 shadow-2xl dark:bg-stone-900" onClick={(e) => e.stopPropagation()} aria-label={t('Same or different person?')}>
         <div className="mb-6 flex items-center">
           <div className="flex-1">
             <div className="text-[17px] font-semibold">{t('Same or different person?')}</div>
@@ -255,7 +256,7 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
           </button>
           <button disabled={busy} onClick={() => void answer(null)} className="h-10 rounded-xl px-4 text-[13px] font-medium text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">{t('Not sure')}</button>
         </div>
-      </div>
+      </ModalPanel>
     </div>
   )
 }
@@ -680,7 +681,7 @@ function MergePicker(props: {
   )
   return (
     <div className="no-drag fixed inset-0 z-50 flex items-center justify-center bg-stone-950/40 backdrop-blur-sm animate-fade-in" onClick={props.onClose}>
-      <div className="flex max-h-[75vh] w-[560px] flex-col rounded-2xl bg-white shadow-2xl dark:bg-stone-900" onClick={(e) => e.stopPropagation()}>
+      <ModalPanel className="flex max-h-[75vh] w-[560px] flex-col rounded-2xl bg-white shadow-2xl dark:bg-stone-900" onClick={(e) => e.stopPropagation()} aria-label={props.title ?? t('Merge with…')}>
         <div className="flex items-center gap-3 border-b border-stone-100 px-5 py-4 dark:border-stone-800">
           <div className="flex-1">
             <div className="text-[15px] font-semibold">{props.title ?? t('Merge with…')}</div>
@@ -719,7 +720,7 @@ function MergePicker(props: {
           ))}
           {people && shown.length === 0 && <div className="col-span-4 py-6 text-center text-[13px] text-stone-500">{t('Nobody else matches.')}</div>}
         </div>
-      </div>
+      </ModalPanel>
     </div>
   )
 }

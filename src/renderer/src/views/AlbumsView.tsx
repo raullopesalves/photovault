@@ -58,7 +58,7 @@ export function AlbumsView(props: { version: number }) {
             <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-6">
               {smart.map((a) => (
                 <button key={a.id} onClick={() => setOpenSmart(a.id)} className="group text-left outline-none">
-                  <div className="relative aspect-square overflow-hidden rounded-xl bg-stone-200 shadow-sm dark:bg-stone-800">
+                  <div className="relative aspect-square overflow-hidden rounded-xl bg-stone-200 shadow-sm ring-accent-500 group-focus-visible:ring-2 dark:bg-stone-800">
                     {a.coverId ? (
                       <img src={mediaUrl('thumb', a.coverId)} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                     ) : (

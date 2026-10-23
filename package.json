@@ -17,6 +17,7 @@
     "@types/yauzl": "^3.4.0",
     "@types/yazl": "^3.3.1",
     "@vitejs/plugin-react": "^5.2.0",
+    "axe-core": "4.13.0",
     "electron": "^44.5.1",
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
@@ -55,6 +56,7 @@
     "dist:dir": "node scripts/electron-vite.mjs build && electron-builder --win --dir",
     "test:e2e:packaged": "node scripts/electron-vite.mjs build && electron-builder --win --dir && node scripts/e2e-smoke.mjs --packaged",
     "test:perf": "node scripts/perf.mjs",
+    "test:a11y": "node scripts/electron-vite.mjs build && node scripts/a11y-audit.mjs",
     "release": "node scripts/release.mjs"
   },
   "productName": "Photo Vault",

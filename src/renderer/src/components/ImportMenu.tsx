@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { FileArchive, FolderOpen, History, Smartphone } from 'lucide-react'
 import { t } from '../lib/i18n'
+import { useMenu } from '../lib/a11y'
 
 export type ImportKind = 'folder' | 'zip' | 'phone'
 
@@ -8,6 +9,8 @@ export type ImportKind = 'folder' | 'zip' | 'phone'
 export function ImportMenu(props: { onImport: (kind: ImportKind) => void; onShowImports?: () => void; className: string; children: ReactNode; placement?: 'above' | 'below' }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const menu = useRef<HTMLDivElement>(null)
+  useMenu(menu, open, () => setOpen(false))
 
   useEffect(() => {
     if (!open) return
@@ -37,7 +40,9 @@ export function ImportMenu(props: { onImport: (kind: ImportKind) => void; onShow
       </button>
       {open && (
         <div
+          ref={menu}
           role="menu"
+          aria-label={t('Import')}
           className={`absolute left-0 z-20 w-full min-w-[248px] overflow-hidden rounded-xl bg-white p-1.5 text-left shadow-xl shadow-stone-950/15 ring-1 ring-stone-200 animate-rise-in dark:bg-stone-800 dark:ring-white/10 ${
             props.placement === 'below' ? 'top-full mt-2' : 'bottom-full mb-2'
           }`}
@@ -70,7 +75,7 @@ function MenuItem(props: { icon: ReactNode; title: string; body: string; onClick
     <button
       role="menuitem"
       onClick={props.onClick}
-      className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-stone-100 dark:hover:bg-stone-700/70"
+      className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-stone-100 focus-visible:bg-stone-100 dark:hover:bg-stone-700/70 dark:focus-visible:bg-stone-700/70"
     >
       <span className="mt-0.5 text-accent-600 dark:text-accent-400">{props.icon}</span>
       <span>

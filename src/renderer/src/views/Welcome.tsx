@@ -5,7 +5,7 @@ import { t } from '../lib/i18n'
 export function Welcome(props: { error?: string; onCreate: () => void; onOpen: () => void }) {
   return (
     <div className="drag relative flex h-full items-center justify-center overflow-hidden">
-      <div className="no-drag relative w-[520px] text-center animate-rise-in">
+      <main className="no-drag relative w-[520px] text-center animate-rise-in">
         <Mark size={72} className="mx-auto mb-8" />
         <h1 className="font-[family-name:var(--font-display)] text-[44px] font-[750] leading-[48px] tracking-[-0.025em]">{t('Your photos, permanently yours.')}</h1>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Photo Vault keeps your originals as ordinary files in a folder you choose, detects exact duplicates and remembers where every photo came from.')}</p>
@@ -30,7 +30,7 @@ export function Welcome(props: { error?: string; onCreate: () => void; onOpen: (
 
         <div className="mt-12 flex items-center justify-center gap-2 text-xs text-stone-500 dark:text-stone-500">
           <ShieldCheck className="size-3.5" />{t('Imports copy files. Your source folders are never modified or deleted.')}</div>
-      </div>
+      </main>
     </div>
   )
 }

@@ -294,10 +294,20 @@ function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; la
       window.removeEventListener('keydown', esc)
     }
   }, [open])
+  // Opening the panel moves focus to its first option; closing it (Escape) returns it to the chip.
+  const panel = useRef<HTMLDivElement>(null)
+  const chip = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!open) return
+    panel.current?.querySelector<HTMLElement>('[role="checkbox"]')?.focus({ preventScroll: true })
+    return () => {
+      if (!document.activeElement || document.activeElement === document.body || panel.current?.contains(document.activeElement)) chip.current?.focus({ preventScroll: true })
+    }
+  }, [open])
   const selected = props.sections.reduce((sum, sec) => sum + sec.options.filter((o) => o.checked).length, 0)
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className={`${chipBase} ${selected ? chipOn : chipOff}`} aria-expanded={open} aria-haspopup="dialog">
+      <button ref={chip} onClick={() => setOpen((o) => !o)} className={`${chipBase} ${selected ? chipOn : chipOff}`} aria-expanded={open} aria-haspopup="dialog">
         <SlidersHorizontal className="size-3.5" />
         {t('Filters')}
         {selected > 0 && <span className="grid h-4 min-w-4 place-items-center rounded-full bg-white/25 px-1 font-mono text-[10.5px] tabular-nums dark:bg-stone-900/20">{selected}</span>}
@@ -305,6 +315,7 @@ function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; la
       </button>
       {open && (
         <div
+          ref={panel}
           role="dialog"
           aria-label={t('Filters')}
           className="absolute right-0 top-full z-20 mt-1.5 grid w-[612px] grid-cols-3 gap-x-1 gap-y-3 rounded-[14px] border border-line bg-card p-2 shadow-[0_6px_20px_rgba(26,30,27,0.12)] animate-pop"
@@ -320,7 +331,7 @@ function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; la
                 {sec.options.map((o) => (
                   <button
                     key={o.key}
-                    role="menuitemcheckbox"
+                    role="checkbox"
                     aria-checked={o.checked}
                     onClick={o.onToggle}
                     className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-ink hover:bg-shelf"

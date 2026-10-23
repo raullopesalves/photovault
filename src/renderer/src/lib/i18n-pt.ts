@@ -588,7 +588,6 @@ export const PT: Record<string, string> = {
   "missing or damaged": "em falta ou danificado",
   "More": "Mais",
   "more (see Imports)": "mais (ver Importações)",
-  "More actions": "Mais ações",
   "more groups)": "mais grupos)",
   "Move {total} to the Bin?": "Mover {total} para o Lixo?",
   "Move all to Bin": "Mover todos para o Lixo",
@@ -1009,5 +1008,11 @@ export const PT: Record<string, string> = {
   "Guide": "Guia",
   "How Photo Vault keeps your photos, and how to keep them safe.": "Como o Photo Vault guarda as suas fotografias, e como as manter em segurança.",
   "What changed in each version.": "O que mudou em cada versão.",
-  "What’s new": "Novidades"
+  "What’s new": "Novidades",
+  "Arrow keys move between photos. Enter opens a photo, Space selects it, and Shift with the arrow keys selects several.": "As setas movem entre fotografias. Enter abre uma fotografia, Espaço seleciona-a, e Shift com as setas seleciona várias.",
+  "Edit photo": "Editar fotografia",
+  "Live Photo": "Live Photo",
+  "Photo viewer": "Visualizador de fotografias",
+  "Selection": "Seleção",
+  "Skip to content": "Saltar para o conteúdo"
 }

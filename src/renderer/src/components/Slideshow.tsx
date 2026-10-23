@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ModalPanel } from './Modal'
 import { ChevronLeft, ChevronRight, Pause, Play, X } from 'lucide-react'
 import type { AssetSummary } from '@shared/types'
 import { mediaUrl } from '../lib/format'
@@ -90,7 +91,7 @@ export function Slideshow(props: {
 
   const top = shown[shown.length - 1]
   return (
-    <div className={`no-drag fixed inset-0 z-[60] bg-black ${controls ? '' : 'cursor-none'}`} onMouseMove={wake} onClick={wake}>
+    <ModalPanel className={`no-drag fixed inset-0 z-[60] bg-black ${controls ? '' : 'cursor-none'}`} onMouseMove={wake} onClick={wake} aria-label={t('Slideshow')}>
       {shown.map((s) =>
         s.video ? (
           <video
@@ -148,6 +149,6 @@ export function Slideshow(props: {
       >
         <X className="size-5" />
       </button>
-    </div>
+    </ModalPanel>
   )
 }

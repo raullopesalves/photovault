@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ModalPanel } from './Modal'
 import { LoaderCircle, Trash2 } from 'lucide-react'
 import type { BinDeleteProgress, BinDeleteResult } from '@shared/types'
 import { api, bytes, n, plural } from '../lib/format'
@@ -28,7 +29,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
 
   return (
     <div className="no-drag fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/40 p-8 backdrop-blur-[4px] animate-fade-in" onMouseDown={() => phase !== 'running' && props.onClose(phase === 'done')}>
-      <div className="w-[460px] rounded-2xl bg-white p-6 shadow-2xl animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10" onMouseDown={(e) => e.stopPropagation()}>
+      <ModalPanel className="w-[460px] rounded-2xl bg-white p-6 shadow-2xl animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10" onMouseDown={(e) => e.stopPropagation()}>
         <div className="mb-4 grid size-11 place-items-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400">
           {phase === 'running' ? <LoaderCircle className="size-5 animate-spin" /> : <Trash2 className="size-5" />}
         </div>
@@ -50,7 +51,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
               </span>
             </label>
             <div className="mt-6 flex justify-end gap-2">
-              <button onClick={() => props.onClose(false)} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">{t('Cancel')}</button>
+              <button data-autofocus onClick={() => props.onClose(false)} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">{t('Cancel')}</button>
               <button onClick={run} className="h-9 rounded-lg bg-red-600 px-4 text-[13.5px] font-medium text-white hover:bg-red-700">{t('Delete')}{' '}{plural(props.count, 'item')}
               </button>
             </div>
@@ -87,7 +88,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
             </div>
           </>
         )}
-      </div>
+      </ModalPanel>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { ModalPanel } from './Modal'
 import { Crop, FlipHorizontal2, LoaderCircle, RotateCcw, RotateCw, SlidersHorizontal, Sparkles, Undo2, X } from 'lucide-react'
 import type { PhotoEdits } from '@shared/types'
 import { api } from '../lib/format'
@@ -124,7 +125,7 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
   )
 
   return (
-    <div className="no-drag fixed inset-0 z-50 flex bg-stone-950 text-stone-100 animate-fade-in">
+    <ModalPanel className="no-drag fixed inset-0 z-50 flex bg-stone-950 text-stone-100 animate-fade-in" aria-label={t('Edit photo')}>
       <div className="relative flex min-w-0 flex-1 items-center justify-center overflow-hidden p-10">
         {preview ? (
           tab === 'crop' ? (
@@ -250,7 +251,7 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
           <div className="text-center text-[11px] text-stone-500">{t('Your original file is never changed.')}</div>
         </div>
       </aside>
-    </div>
+    </ModalPanel>
   )
 }
 

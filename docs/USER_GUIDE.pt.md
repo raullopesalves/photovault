@@ -90,6 +90,17 @@ Estas funções estão desligadas até as ligar em **Definições**. Funcionam i
 
 Enquanto trabalham, um cartão na barra lateral mostra o progresso. O **Modo offline** em Definições bloqueia todas as ligações à internet, como garantia. As funções cujos modelos já foram transferidos continuam a funcionar.
 
+## Usar o teclado
+
+Tudo no Photo Vault funciona sem rato. Cada fotografia e cada controlo tem um nome que os leitores de ecrã, como o Narrador do Windows, leem em voz alta.
+
+- **Tab** passa de controlo em controlo. A primeira vez oferece **Saltar para o conteúdo**, passando a barra lateral.
+- **Ctrl K** abre a caixa de pesquisa.
+- Numa grelha de fotografias, as **setas** passam de fotografia em fotografia, **Page Up** e **Page Down** avançam um ecrã, **Home** e **End** vão ao início ou ao fim da fila, e **Ctrl Home** e **Ctrl End** à primeira ou à última fotografia.
+- **Enter** abre uma fotografia, **Espaço** seleciona-a, **Shift** com as setas seleciona várias, **Ctrl A** seleciona tudo o que está na vista, e **Esc** limpa a seleção.
+- No visualizador: **seta para a esquerda** e **para a direita** para a fotografia anterior e a seguinte, **+**, **-** e **0** para o zoom, **I** para os detalhes, **R** para rodar, **E** para editar, **F** para mostrar os rostos, **Ctrl C** para copiar a imagem e **Esc** para fechar. Ao fechar, volta à fotografia na grelha.
+- Nos menus, as **setas** passam de item em item. **Esc** fecha um menu ou uma caixa de diálogo e volta ao botão que o abriu.
+
 ## Atualizações
 
 As cópias instaladas atualizam-se sozinhas. Uma versão nova é transferida em segundo plano e instalada quando sai, ou clique em **Reiniciar e atualizar** em **Definições → Atualizações**. O que mudou em cada versão está em **Novidades** neste guia.
