@@ -694,11 +694,117 @@ for (let i = errors.length - 1; i >= 0; i--) if (/test: (page|main process|worke
 
 const state = await page.evaluate(() => window.photoVault.getState())
 console.log('library:', state.library)
+
+// --- Recovery drill (1.0 must-have 3) ---------------------------------------------------------------------------
+// 1. Catalogue snapshot: delete an album, restore this morning's catalogue from the Safety page, the album is back.
+const albumsBefore = await page.evaluate(() => window.photoVault.albums())
+const victim = albumsBefore.find((a) => a.name === 'Best of 2024')
+await page.evaluate(() => window.photoVault.snapshotNow())
+await page.evaluate((id) => window.photoVault.deleteAlbum(id), victim.id)
+const albumsDeleted = (await page.evaluate(() => window.photoVault.albums())).length
+await openSafety()
+await page.waitForSelector('text=Catalogue snapshots')
+await page.locator('main button:has-text("Restore")').first().click()
+await page.waitForTimeout(400)
+await page.locator('button:has-text("Restore")').last().click()
+let albumsRestored = []
+for (let i = 0; i < 40 && !albumsRestored.some((a) => a.name === 'Best of 2024'); i++) {
+  await page.waitForTimeout(500)
+  albumsRestored = await page.evaluate(() => window.photoVault.albums().catch(() => []))
+}
+const snapshotDrill = {
+  albumDeleted: albumsDeleted === albumsBefore.length - 1,
+  albumBack: albumsRestored.some((a) => a.name === 'Best of 2024' && a.count === victim.count),
+  sameAlbumCount: albumsRestored.length === albumsBefore.length
+}
+console.log('drill, catalogue snapshot:', snapshotDrill)
+
+// 2. The library is lost: bring the backup up to date, delete the whole library folder, then open the backup drive
+//    from a fresh install and find every photo, album, hand-set date and favourite there.
+const facts = (pg) =>
+  pg.evaluate(async () => {
+    const pv = window.photoVault
+    const s = await pv.getState()
+    const sum = (gs) => gs.reduce((n, g) => n + g.count, 0)
+    return {
+      assets: s.library.assetCount,
+      hidden: s.library.hiddenCount,
+      albums: (await pv.albums()).map((a) => `${a.name}:${a.count}`).sort(),
+      december2019: (await pv.timeline()).find((g) => g.month === '2019-12')?.count ?? 0,
+      favourites: sum(await pv.timeline({ favorite: true }))
+    }
+  })
+const backupTarget = (await page.evaluate(() => window.photoVault.backupStatus())).targets[0]
+const lastBackup = await page.evaluate((id) => window.photoVault.runBackup(id, false), backupTarget.id)
+const before = await facts(page)
+// The exporter writes sidecars every 15 s and the backup copies those present: run it once more after they settle.
+await page.waitForTimeout(16_000)
+await page.evaluate((id) => window.photoVault.runBackup(id, false), backupTarget.id)
 console.log('renderer errors:', errors.length ? errors : 'none')
 await app.close()
 
+const countThumbs = (dir) => (existsSync(dir) ? walk(dir).filter((f) => f.endsWith('-thumb.webp')).length : 0)
+const thumbsBefore = countThumbs(join(root, 'Library', 'thumbnails'))
+rmSync(join(root, 'Library'), { recursive: true, force: true })
+const freshProfile = join(root, 'userdata-new')
+mkdirSync(freshProfile)
+const app2 = process.env.PV_EXE
+  ? await electron.launch({ executablePath: process.env.PV_EXE, args: [], env: { ...env, PHOTOVAULT_USER_DATA: freshProfile } })
+  : await electron.launch({ executablePath: electronPath, args: ['.'], env: { ...env, PHOTOVAULT_USER_DATA: freshProfile } })
+const page2 = await app2.firstWindow()
+const errors2 = []
+page2.on('console', (m) => m.type() === 'error' && errors2.push(m.text()))
+page2.on('pageerror', (e) => errors2.push(String(e)))
+await page2.setViewportSize({ width: 1360, height: 860 }).catch(() => {})
+await page2.waitForSelector('text=Your photos, permanently yours.')
+await app2.evaluate(async ({ dialog }, dir) => {
+  dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [dir] })
+}, backupDir)
+await page2.click('text=Open an existing library')
+await page2.waitForSelector('nav button', { timeout: 60000 })
+const after = await facts(page2)
+// Thumbnails are not part of a backup: they come back on their own.
+let pendingThumbs = -1
+for (let i = 0; i < 90; i++) {
+  pendingThumbs = (await page2.evaluate(() => window.photoVault.getState())).library.pendingThumbnails
+  if (pendingThumbs === 0) break
+  await page2.waitForTimeout(1000)
+}
+await page2.evaluate(() => window.photoVault.startVerify())
+let verified = null
+for (let i = 0; i < 120; i++) {
+  verified = await page2.evaluate(() => window.photoVault.currentVerify())
+  if (verified && verified.status !== 'running') break
+  await page2.waitForTimeout(500)
+}
+await page2.waitForTimeout(800)
+await page2.screenshot({ path: join(shots, '41-recovered-from-backup.png') })
+const backupWalk = walk(join(backupDir, 'originals'))
+const backupOriginals = backupWalk.filter((f) => !f.endsWith('.xmp') && !f.includes('.tmp-'))
+const recoveryDrill = {
+  backupCompleted: lastBackup.status === 'completed' && lastBackup.failed === 0,
+  libraryGone: !existsSync(join(root, 'Library')),
+  sameItems: after.assets === before.assets && after.assets > 0,
+  sameAlbums: JSON.stringify(after.albums) === JSON.stringify(before.albums),
+  sameDates: after.december2019 === before.december2019 && after.december2019 > 0,
+  sameFavourites: after.favourites === before.favourites && after.favourites > 0,
+  sameHidden: after.hidden === before.hidden,
+  thumbnailsBack: pendingThumbs === 0 && thumbsBefore > 0 && countThumbs(join(backupDir, 'thumbnails')) >= thumbsBefore,
+  allVerified: verified?.status === 'completed' && verified.missing === 0 && verified.mismatched === 0 && verified.ok > 0,
+  sidecarsInBackup: backupOriginals.length > 0 && backupOriginals.every((f) => backupWalk.includes(`${f}.xmp`)),
+  catalogueInBackup: existsSync(join(backupDir, 'metadata', 'catalogue.json')),
+  // The backup drive is now the library: it must not count as its own backup.
+  honestStatus: (await page2.evaluate(() => window.photoVault.getState())).library.unprotectedCount >= after.assets,
+  noErrors: errors2.length === 0
+}
+console.log('drill, lost library:', { before, after, thumbsBefore, ...recoveryDrill })
+if (errors2.length) console.log('renderer errors (recovered app):', errors2)
+await app2.close()
+
 const ok =
   Object.values(crashes).every(Boolean) &&
+  Object.values(snapshotDrill).every(Boolean) &&
+  Object.values(recoveryDrill).every(Boolean) &&
   metadata.originals > 0 &&
   metadata.sidecars === metadata.originals &&
   metadata.catalogueAssets === metadata.originals &&

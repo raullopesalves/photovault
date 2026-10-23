@@ -38,10 +38,10 @@ Originals are plain files. Albums, dates and places set by hand, people's names,
 
 Backups and catalogue snapshots are well tested in code (`tests/backup.test.ts`, `tests/protection.test.ts`). The full story has never been run end to end.
 
-- [ ] The smoke test loses the library, opens the backup drive in a fresh install, and finds every photo, album and date there.
-- [ ] The same for restoring a catalogue snapshot from the Safety page.
+- [x] The smoke test loses the library, opens the backup drive in a fresh install, and finds every photo, album and date there.
+- [x] The same for restoring a catalogue snapshot from the Safety page.
 
-**Done when** both run in CI on every push.
+**Done when** both run in CI on every push. *Built 2026-10-23 (D97); the drill found and fixed two real problems: thumbnails never came back in a recovered library, and a recovered library claimed to be protected by itself.*
 
 ### 4. Release notes and help
 

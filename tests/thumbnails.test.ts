@@ -1,8 +1,8 @@
-import { existsSync } from 'node:fs'
+import { existsSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import sharp from 'sharp'
-import { ThumbnailQueue } from '@core/thumbnails/thumbnails'
+import { ThumbnailQueue, requeueMissingThumbnails } from '@core/thumbnails/thumbnails'
 import { assetsPage, thumbnailPath, timeline } from '@core/repo/queries'
 import { makeJpeg, openLibrary, runImport, sandbox } from './helpers'
 
@@ -37,6 +37,28 @@ describe('thumbnails and timeline', () => {
 
       const preview = await queue.ensurePreview(oldId)
       expect(preview && existsSync(preview)).toBe(true)
+    } finally {
+      lib.close()
+      sb.cleanup()
+    }
+  })
+
+  it('makes thumbnails again when their files are gone (a library opened from a backup drive)', async () => {
+    const sb = sandbox()
+    const lib = openLibrary(sb.libraryRoot)
+    try {
+      for (let i = 0; i < 3; i++) await makeJpeg(join(sb.source, `p${i}.jpg`), { color: `#${i}${i}${i}${i}${i}${i}` })
+      await runImport(lib, sb.source)
+      const queue = new ThumbnailQueue(lib, {})
+      await queue.drain()
+      expect(requeueMissingThumbnails(lib)).toBe(0) // healthy: nothing to do
+
+      rmSync(join(lib.root, 'thumbnails'), { recursive: true, force: true })
+      expect(requeueMissingThumbnails(lib)).toBe(3)
+      expect(lib.db.get<{ n: number }>("SELECT COUNT(*) AS n FROM assets WHERE thumb_status = 'pending'")?.n).toBe(3)
+      await queue.drain()
+      const ids = lib.db.all<{ id: number }>('SELECT id FROM assets').map((r) => r.id)
+      expect(ids.every((id) => existsSync(thumbnailPath(lib, id, 'thumb') ?? ''))).toBe(true)
     } finally {
       lib.close()
       sb.cleanup()

@@ -26,7 +26,7 @@ import { MetadataExporter } from '@core/library/metadataExport'
 import { maybeDailySnapshot, snapshotDatabase } from '@core/library/dbSnapshots'
 import { createLogger, type Logger } from '@core/log'
 import { libraryInfo } from '@core/repo/queries'
-import { ThumbnailQueue, originalPathFor, retryFailedThumbnailsOnce, type PlatformThumbnailer } from '@core/thumbnails/thumbnails'
+import { ThumbnailQueue, originalPathFor, requeueMissingThumbnails, retryFailedThumbnailsOnce, type PlatformThumbnailer } from '@core/thumbnails/thumbnails'
 import { errorMessage } from '@core/util'
 
 /** OS thumbnailer: Windows shell / macOS QuickLook. Handles HEIC (with the OS codec), RAW and video frames. */
@@ -272,6 +272,7 @@ export class LibraryController {
     this.verify = new VerifyService(opened, { onProgress: (p) => this.events.verifyProgress(p) })
     this.classify = new ClassifyQueue(opened, { onUpdated: () => this.notifyChanged('thumbnails') })
     retryFailedThumbnailsOnce(opened) // e.g. HEVC videos and HEIC photos that failed before ffmpeg/libheif existed
+    requeueMissingThumbnails(opened) // e.g. a library opened from a backup drive, which carries no thumbnails
     this.thumbnails.kick()
     this.backups = new BackupService(opened, {
       onProgress: (p) => {
@@ -279,6 +280,7 @@ export class LibraryController {
         if (p.status !== 'running') this.notifyChanged('import') // protection status changed
       }
     })
+    this.backups.forgetTargetsInsideLibrary() // a library opened from its own backup drive has no second copy
     this.classify.kick()
     this.hashes.kick()
     this.scheduleDating()

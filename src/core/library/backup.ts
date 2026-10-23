@@ -102,6 +102,31 @@ export class BackupService {
     return sub
   }
 
+  /**
+   * A library opened from its own backup drive (the original was lost) still lists that drive as its backup target, so
+   * every item would look protected by a copy that is the library itself. Such targets are forgotten (their copy
+   * records go with them), so the app says plainly that there is no second copy yet. Returns how many were forgotten.
+   */
+  forgetTargetsInsideLibrary(): number {
+    const canon = (p: string): string => {
+      try {
+        return realpathSync.native(resolve(p))
+      } catch {
+        return resolve(p)
+      }
+    }
+    let n = 0
+    for (const t of this.library.db.all<{ id: number; path: string }>('SELECT id, path FROM backup_targets')) {
+      const p = canon(t.path)
+      if (p === this.library.root || isInside(p, this.library.root) || isInside(this.library.root, p)) {
+        this.removeTarget(t.id)
+        this.library.logger.warn('backup.target_is_library', { path: t.path })
+        n++
+      }
+    }
+    return n
+  }
+
   /** Forgets a target. Its files are left exactly where they are. */
   removeTarget(id: number): void {
     this.library.db.run('DELETE FROM backup_targets WHERE id = ?', [id])

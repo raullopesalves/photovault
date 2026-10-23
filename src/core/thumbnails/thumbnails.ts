@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { existsSync } from 'node:fs'
 import { ffmpeg, videoFrame } from '../media/ffmpeg'
 import { applyEdits } from '../media/edits'
 import { isRawMime, rawPreviewImage } from '../media/raw'
@@ -347,3 +348,35 @@ export function retryFailedThumbnailsOnce(library: Library): number {
   if (n) library.logger.info('thumbnails.retry_failed', { count: n })
   return n
 }
+
+/**
+ * Thumbnails whose files are gone (a library opened from a backup drive, which does not carry them, or a deleted
+ * thumbnails/ folder) are queued to be made again; otherwise the grid would show broken images for good. A sample is
+ * checked first, so a healthy library costs a few file checks; any miss means a full check.
+ */
+export function requeueMissingThumbnails(library: Library, sample = 30): number {
+  const db = library.db
+  const exists = (rel: string): boolean => existsSync(join(library.root, ...rel.split('/')))
+  const probe = db.all<{ relative_path: string }>("SELECT relative_path FROM asset_thumbnails WHERE variant = 'thumb' ORDER BY RANDOM() LIMIT ?", [sample])
+  if (probe.every((r) => exists(r.relative_path))) return 0
+  const rows = db.all<{ asset_id: number; variant: string; relative_path: string }>('SELECT asset_id, variant, relative_path FROM asset_thumbnails')
+  const missing = rows.filter((r) => !exists(r.relative_path))
+  db.tx(() => {
+    for (const r of missing) {
+      db.run('DELETE FROM asset_thumbnails WHERE asset_id = ? AND variant = ?', [r.asset_id, r.variant])
+      if (r.variant === 'thumb') db.run("UPDATE assets SET thumb_status = 'pending' WHERE id = ?", [r.asset_id])
+    }
+  })
+  const thumbs = missing.filter((r) => r.variant === 'thumb').length
+  library.logger.warn('thumbnails.missing_requeued', { thumbs, previews: missing.length - thumbs })
+  return thumbs
+}
+
+/** One thumbnail asked for but missing on disk: queue it to be made again. */
+export function requeueThumbnail(library: Library, assetId: number): void {
+  library.db.tx(() => {
+    library.db.run("DELETE FROM asset_thumbnails WHERE asset_id = ? AND variant = 'thumb'", [assetId])
+    library.db.run("UPDATE assets SET thumb_status = 'pending' WHERE id = ?", [assetId])
+  })
+}
+

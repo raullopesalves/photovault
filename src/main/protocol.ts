@@ -3,7 +3,7 @@ import { createReadStream, existsSync } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { Readable } from 'node:stream'
 import { MEDIA_PROTOCOL } from '@shared/types'
-import { originalPathFor } from '@core/thumbnails/thumbnails'
+import { originalPathFor, requeueThumbnail } from '@core/thumbnails/thumbnails'
 import { thumbnailPath } from '@core/repo/queries'
 import type { LibraryController } from './controller'
 import sharp from 'sharp'
@@ -68,6 +68,12 @@ export function handleMediaProtocol(controller: LibraryController): void {
 
       if (kind === 'thumb') {
         const p = thumbnailPath(library, id, 'thumb')
+        if (p && !existsSync(p)) {
+          // Recorded but gone from disk: make it again (the grid refreshes when it is ready).
+          requeueThumbnail(library, id)
+          controller.thumbnails?.kick()
+          return new Response(null, { status: 404 })
+        }
         return p ? await serveFile(p, MIME_BY_KIND.thumb as string, request) : new Response(null, { status: 404 })
       }
       if (kind === 'preview') {

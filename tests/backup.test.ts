@@ -44,6 +44,11 @@ describe('mirror backup', () => {
     // The backup folder opens as a library with the same contents.
     const copy = Library.open(target)
     expect(copy.db.get<{ n: number }>('SELECT COUNT(*) AS n FROM assets')?.n).toBe(3)
+    // Opened as the library (the original was lost), it is not its own backup: no item counts as protected.
+    const copySvc = new BackupService(copy)
+    expect(copySvc.status()).toMatchObject({ protectedAssets: 3 })
+    expect(copySvc.forgetTargetsInsideLibrary()).toBe(1)
+    expect(copySvc.status()).toMatchObject({ totalAssets: 3, protectedAssets: 0, targets: [] })
     copy.close()
 
     const r2 = await svc.run(t.id)

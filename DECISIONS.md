@@ -493,3 +493,8 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 - **Backups** copy new or changed sidecars and `metadata/` after the originals; a permanent delete removes the sidecar with its original. Edits made to sidecars elsewhere are not read back (one source of truth).
 - **Harnesses** that link a real library's originals into a copy set `PHOTOVAULT_NO_METADATA_EXPORT=1` (scripts/real-ui.mjs does), so test runs never write into real originals.
 
+**D97. Recovery drill (1.0 must-have 3).** The end of the smoke test (CI, every push) proves recovery instead of assuming it.
+- **Catalogue snapshot:** take one, delete an album, restore from the Safety page (the real buttons), and the album is back with its photos.
+- **Lost library:** bring the backup up to date, close the app, delete the whole library folder, start a fresh install, open the backup drive from the welcome screen. Every item, album, hand-set date, favourite and hidden flag is there; thumbnails are made again; a full integrity check passes; sidecars and `metadata/catalogue.json` are on the drive; the recovered app logs no errors.
+- **What it found, now fixed:** (1) a backup carries no thumbnails but the catalogue said they were ready, so a recovered library showed broken images for good (also after deleting `thumbnails/`, which the library README calls safe). On open, a sample of 30 thumbnails is checked and, if any are missing, all are, and the missing ones are made again; a missing one asked for by the grid is also queued. (2) A library opened from its backup drive still listed that drive as its backup, so it claimed "Protected" with no second copy. Targets that are the library itself are now forgotten on open, and the app says "No backup yet".
+
