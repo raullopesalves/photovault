@@ -672,6 +672,23 @@ const crashes = {
   workerAgain
 }
 console.log('crash recovery:', crashes)
+
+// --- Metadata outside the app (1.0, D96): every original has its XMP sidecar, and the catalogue export lists them ---
+const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)]))
+let metadata = null
+for (let i = 0; i < 60; i++) {
+  const all = walk(join(libRoot, 'originals'))
+  const originals = all.filter((f) => !f.endsWith('.xmp') && !f.includes('.tmp-'))
+  const sidecars = originals.filter((f) => all.includes(`${f}.xmp`)).length
+  const catalogue = existsSync(join(libRoot, 'metadata', 'catalogue.json')) ? JSON.parse(readFileSync(join(libRoot, 'metadata', 'catalogue.json'), 'utf8')) : null
+  metadata = { originals: originals.length, sidecars, catalogueAssets: catalogue?.assets.length ?? 0, albums: catalogue?.albums.length ?? 0 }
+  if (sidecars === originals.length && metadata.catalogueAssets === originals.length) break
+  await page.waitForTimeout(1000)
+}
+const sampleSidecar = walk(join(libRoot, 'originals')).find((f) => f.endsWith('.xmp'))
+const sampleXml = sampleSidecar ? readFileSync(sampleSidecar, 'utf8') : ''
+metadata.wellFormed = sampleXml.startsWith('<?xpacket begin=') && sampleXml.includes('pv:SHA256="')
+console.log('metadata export:', metadata)
 // The deliberate crashes above print errors of their own; anything else is still a failure.
 for (let i = errors.length - 1; i >= 0; i--) if (/test: (page|main process|worker) crash|The above error occurred in/.test(errors[i])) errors.splice(i, 1)
 
@@ -682,6 +699,11 @@ await app.close()
 
 const ok =
   Object.values(crashes).every(Boolean) &&
+  metadata.originals > 0 &&
+  metadata.sidecars === metadata.originals &&
+  metadata.catalogueAssets === metadata.originals &&
+  metadata.albums > 0 &&
+  metadata.wellFormed &&
   edited.edited === true &&
   edited.fullView === 'preview' &&
   shared.files === 1 &&

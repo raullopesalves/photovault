@@ -45,7 +45,8 @@ mkdirSync(userData, { recursive: true })
 if (process.argv.includes('--offline')) rmSync(join(userData, 'models'), { recursive: true, force: true })
 if (modelsArg) cpSync(modelsArg, join(userData, 'models'), { recursive: true })
 writeFileSync(join(userData, 'settings.json'), JSON.stringify({ theme: process.env.THEME ?? 'light', libraryPath: lib, language: process.env.PV_LANG ?? 'en' }))
-const env = { ...process.env, PHOTOVAULT_USER_DATA: userData }
+// originals/ is the real library's (a junction): never let the copy write XMP sidecars into it.
+const env = { ...process.env, PHOTOVAULT_USER_DATA: userData, PHOTOVAULT_NO_METADATA_EXPORT: '1' }
 delete env.ELECTRON_RUN_AS_NODE
 delete env.ELECTRON_RENDERER_URL
 

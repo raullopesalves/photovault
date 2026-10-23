@@ -28,11 +28,11 @@ Today nothing catches an unexpected error: a bug in a page leaves a blank window
 
 Originals are plain files. Albums, dates and places set by hand, people's names, tags, favourites, hidden flags and descriptions live only in the catalogue database.
 
-- [ ] Write that metadata as XMP sidecars next to the originals and as one JSON export of the catalogue, and keep both current as it changes.
-- [ ] Backups carry it too, so a backup drive alone is a complete, app-independent archive.
-- [ ] A short document describing the library folder layout and the metadata files.
+- [x] Write that metadata as XMP sidecars next to the originals and as one JSON export of the catalogue, and keep both current as it changes.
+- [x] Backups carry it too, so a backup drive alone is a complete, app-independent archive.
+- [x] A short document describing the library folder layout and the metadata files: [docs/LIBRARY_FORMAT.md](docs/LIBRARY_FORMAT.md).
 
-**Done when** a library copied to another computer can be read by another photo program with its dates, places, albums and people intact, checked on a sample with digiKam or exiftool.
+**Done when** a library copied to another computer can be read by another photo program with its dates, places, albums and people intact, checked on a sample with digiKam or exiftool. *Built 2026-10-23 (D96): the sidecars are read back by an independent XMP reader (exifr) in the unit tests, and the smoke test checks every original gets one. Still to do: open a copy of the real library in digiKam or exiftool once (you).*
 
 ### 3. Recovery drill
 

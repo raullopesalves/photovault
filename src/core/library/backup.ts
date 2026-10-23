@@ -8,6 +8,7 @@ import { EtaEstimator } from '../eta'
 import { sha256File } from '../media/hash'
 import { errorMessage } from '../util'
 import { LIBRARY_MARKER, type Library } from './library'
+import { SIDECAR_EXT } from './metadataExport'
 
 const TMP_DIR = '.photovault-tmp'
 const DISPLACED_DIR = '.photovault-displaced'
@@ -240,6 +241,10 @@ export class BackupService {
         this.emit()
       }
 
+      // Metadata outside the app (D96): every original's XMP sidecar and the metadata/ folder, so the backup drive alone
+      // is a complete archive any photo program can read.
+      await this.copyMetadata(t.path, signal)
+
       // Catalogue snapshot into the backup (consistent copy via the SQLite backup API).
       await mkdir(join(t.path, 'database'), { recursive: true })
       const tmpDb = join(t.path, TMP_DIR, `photovault-${randomUUID()}.db`)
@@ -263,6 +268,44 @@ export class BackupService {
   }
 
   /** Copies (or, when verifying, re-checks) one original. Never overwrites a different file. */
+  /** Copies sidecars and metadata/ files that are new or changed (by size and modification time). */
+  private async copyMetadata(targetRoot: string, signal: AbortSignal): Promise<void> {
+    const changed = async (src: string, dest: string): Promise<boolean> => {
+      const a = await stat(src).catch(() => null)
+      if (!a) return false
+      const b = await stat(dest).catch(() => null)
+      return !b || b.size !== a.size || Math.abs(b.mtimeMs - a.mtimeMs) > 2000
+    }
+    const copyIfChanged = async (rel: string[]): Promise<void> => {
+      const src = join(this.library.root, ...rel)
+      const dest = join(targetRoot, ...rel)
+      if (!(await changed(src, dest))) return
+      await mkdir(dirname(dest), { recursive: true })
+      await copyFile(src, dest)
+      const s = await stat(src)
+      await utimes(dest, s.atime, s.mtime) // keeps the next comparison exact
+    }
+    let copied = 0
+    const files = this.library.db.all<{ relative_path: string }>("SELECT relative_path FROM files WHERE storage_location_id = ? AND role = 'original'", [
+      this.library.managedLocationId
+    ])
+    try {
+      for (const f of files) {
+        signal.throwIfAborted()
+        const parts = (f.relative_path + SIDECAR_EXT).split('/')
+        if (!existsSync(join(this.library.root, ...parts))) continue
+        await copyIfChanged(parts)
+        copied++
+      }
+      const metaDir = join(this.library.root, 'metadata')
+      if (existsSync(metaDir)) for (const name of readdirSync(metaDir)) if (!name.includes('.tmp-')) await copyIfChanged(['metadata', name])
+    } catch (err) {
+      if (signal.aborted) throw err
+      this.library.logger.warn('backup.metadata_failed', { target: targetRoot, error: errorMessage(err) })
+    }
+    this.library.logger.info('backup.metadata', { target: targetRoot, sidecars: copied })
+  }
+
   private async copyOne(targetRoot: string, f: FileRow): Promise<'copied' | 'present'> {
     const src = join(this.library.root, ...f.relative_path.split('/'))
     const dest = join(targetRoot, ...f.relative_path.split('/'))

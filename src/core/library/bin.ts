@@ -3,6 +3,7 @@ import { unlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { errorMessage } from '../util'
 import type { Library } from './library'
+import { removeSidecar } from './metadataExport'
 
 /** How a permanently deleted original leaves the library folder: e.g. the OS recycle bin, or plain unlink. */
 export type RemoveFile = (absolutePath: string) => Promise<void>
@@ -94,6 +95,7 @@ export async function deletePermanently(
       for (const f of files) {
         const abs = join(f.root_path ?? library.root, ...f.relative_path.split('/'))
         if (existsSync(abs)) await removeFile(abs)
+        await removeSidecar(abs)
       }
     } catch (err) {
       result.failed++

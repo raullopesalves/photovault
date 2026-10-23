@@ -97,6 +97,9 @@ export class Library {
         '             They are never modified by Photo Vault and remain usable without it.',
         'thumbnails/  Preview images. Safe to delete; they are regenerated.',
         'database/    The catalogue (SQLite): metadata, duplicates and where each photo came from.',
+        'metadata/    The catalogue as one JSON file (catalogue.json), readable without Photo Vault.',
+        '             Each original also has an XMP sidecar next to it (IMG_1234.jpg.xmp) with its date, place,',
+        '             tags, albums, people and description, for other photo programs.',
         ''
       ].join('\n'),
       { flag: 'wx' }

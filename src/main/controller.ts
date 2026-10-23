@@ -22,6 +22,7 @@ import { runDating } from '@core/dating/dating'
 import { linkLivePhotos } from '@core/library/livePhotos'
 import { linkEditedVersions } from '@core/library/editedVersions'
 import { BackupService } from '@core/library/backup'
+import { MetadataExporter } from '@core/library/metadataExport'
 import { maybeDailySnapshot, snapshotDatabase } from '@core/library/dbSnapshots'
 import { createLogger, type Logger } from '@core/log'
 import { libraryInfo } from '@core/repo/queries'
@@ -59,6 +60,8 @@ export class LibraryController {
   private captionWorker = new HeavyWork()
   captions: CaptionService | null = null
   private nearJob: Promise<void> | null = null
+  /** Keeps the XMP sidecars and metadata/catalogue.json current (D96). */
+  metadata: MetadataExporter | null = null
   thumbnails: ThumbnailQueue | null = null
   verify: VerifyService | null = null
   classify: ClassifyQueue | null = null
@@ -236,6 +239,12 @@ export class LibraryController {
     this.smart.start()
     this.captions = new CaptionService(opened, this.captionWorker, join(app.getPath('userData'), 'models'), (s) => this.events.captionStatus(s))
     this.captions.start()
+    // PHOTOVAULT_NO_METADATA_EXPORT: for harnesses that link a real library's originals into a copy (scripts/real-ui.mjs),
+    // so a test run never writes sidecars into someone's real originals folder.
+    if (process.env.PHOTOVAULT_NO_METADATA_EXPORT !== '1') {
+      this.metadata = new MetadataExporter(opened, app.getVersion())
+      this.metadata.start()
+    }
     this.people = new PeopleService(
       opened,
       this.heavy,
@@ -367,6 +376,8 @@ export class LibraryController {
     this.smart = null
     this.captions?.stop()
     this.captions = null
+    this.metadata?.stop()
+    this.metadata = null
     this.people?.stop()
     this.people = null
     this.watch?.stop()

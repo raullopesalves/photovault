@@ -661,6 +661,46 @@ export const migrations: Migration[] = [
       CREATE TRIGGER trg_search_caption_upd AFTER UPDATE ON asset_captions
         BEGIN INSERT INTO search_dirty SELECT new.asset_id WHERE NOT EXISTS (SELECT 1 FROM search_dirty WHERE asset_id = new.asset_id); END;
     `
+  },
+  {
+    version: 22,
+    name: 'metadata_export',
+    sql: `
+      -- Items whose XMP sidecar (and the catalogue export) needs rewriting; see core/library/metadataExport.ts.
+      -- Every change to something the sidecar records marks the item here; a background job writes and clears it.
+      CREATE TABLE metadata_dirty (asset_id INTEGER PRIMARY KEY);
+      CREATE TRIGGER trg_meta_asset AFTER UPDATE OF capture_time, capture_offset_minutes, capture_time_source, latitude, longitude,
+          favorite, hidden, trashed_at, description, rotation, place, origin ON assets
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.id); END;
+      CREATE TRIGGER trg_meta_file AFTER INSERT ON files
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      CREATE TRIGGER trg_meta_tag_ins AFTER INSERT ON asset_tags
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      CREATE TRIGGER trg_meta_tag_del AFTER DELETE ON asset_tags
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (old.asset_id); END;
+      CREATE TRIGGER trg_meta_album_ins AFTER INSERT ON album_assets
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      CREATE TRIGGER trg_meta_album_del AFTER DELETE ON album_assets
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (old.asset_id); END;
+      CREATE TRIGGER trg_meta_album_name AFTER UPDATE OF name ON albums
+        BEGIN INSERT OR IGNORE INTO metadata_dirty SELECT asset_id FROM album_assets WHERE album_id = new.id; END;
+      CREATE TRIGGER trg_meta_album_gone BEFORE DELETE ON albums
+        BEGIN INSERT OR IGNORE INTO metadata_dirty SELECT asset_id FROM album_assets WHERE album_id = old.id; END;
+      CREATE TRIGGER trg_meta_face_ins AFTER INSERT ON faces
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      CREATE TRIGGER trg_meta_face_upd AFTER UPDATE OF person_id ON faces
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      CREATE TRIGGER trg_meta_face_del AFTER DELETE ON faces
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (old.asset_id); END;
+      CREATE TRIGGER trg_meta_person AFTER UPDATE OF name, hidden ON persons
+        BEGIN INSERT OR IGNORE INTO metadata_dirty SELECT asset_id FROM faces WHERE person_id = new.id; END;
+      CREATE TRIGGER trg_meta_caption_ins AFTER INSERT ON asset_captions
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      CREATE TRIGGER trg_meta_caption_upd AFTER UPDATE ON asset_captions
+        BEGIN INSERT OR IGNORE INTO metadata_dirty VALUES (new.asset_id); END;
+      -- Existing libraries: every item gets its sidecar on the first run.
+      INSERT OR IGNORE INTO metadata_dirty SELECT DISTINCT asset_id FROM files WHERE role = 'original';
+    `
   }
 ]
 
