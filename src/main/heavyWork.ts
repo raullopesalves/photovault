@@ -17,6 +17,9 @@ export class HeavyWork {
   private nextId = 1
   private pending = new Map<number, Pending>()
   private offline = false
+  private stopping = false
+  /** Called when the thread dies on its own (not by stop()): the controller logs it and restarts what was running. */
+  onCrash: ((reason: string) => void) | null = null
 
   constructor() {
     onOfflineChange((on) => {
@@ -27,6 +30,7 @@ export class HeavyWork {
 
   private get(): Worker {
     if (this.worker) return this.worker
+    this.stopping = false
     const w = new Worker(join(__dirname, 'worker.js'), { workerData: { offline: this.offline } })
     w.on('message', (m: WorkerMessage) => {
       const p = this.pending.get(m.id)
@@ -36,13 +40,21 @@ export class HeavyWork {
       if (m.kind === 'done') p.resolve(m.result)
       else p.reject(new Error(m.error))
     })
+    let crashed: string | null = null
     const failAll = (error: string): void => {
       for (const p of this.pending.values()) p.reject(new Error(error))
       this.pending.clear()
-      this.worker = null
+      if (this.worker === w) this.worker = null
     }
-    w.on('error', (err) => failAll(err.message))
-    w.on('exit', () => failAll('worker exited'))
+    w.on('error', (err) => {
+      crashed = err.message
+      failAll(err.message)
+    })
+    w.on('exit', (code) => {
+      failAll('worker exited')
+      // The next call starts a fresh thread; tell the controller so it can log it and restart the jobs that stopped.
+      if (!this.stopping && (crashed !== null || code !== 0)) this.onCrash?.(crashed ?? `exit code ${code}`)
+    })
     w.unref()
     this.worker = w
     return w
@@ -108,7 +120,13 @@ export class HeavyWork {
     return this.call({ task: 'faceCluster', dbFile })
   }
 
+  /** Tests only: crashes the thread (see worker.ts). */
+  testCrash(): Promise<void> {
+    return this.call({ task: 'testCrash' })
+  }
+
   stop(): void {
+    this.stopping = true
     void this.worker?.terminate()
     this.worker = null
   }

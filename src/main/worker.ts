@@ -13,6 +13,8 @@ import { loadClusterContext, loadClusterFaces } from '@core/repo/people'
 
 export type WorkerTask =
   | { task: 'setOffline'; offline: boolean }
+  /** Tests only: an uncaught error that kills this thread. */
+  | { task: 'testCrash' }
   | { task: 'nearDuplicateGroups'; dbFile: string }
   | { task: 'clipLoad'; cacheDir: string; allowDownload: boolean }
   | { task: 'clipEmbed'; cacheDir: string; paths: string[] }
@@ -68,6 +70,11 @@ function loadVectors(dbFile: string): NonNullable<typeof vectors> {
 
 async function run(id: number, t: WorkerTask): Promise<unknown> {
   switch (t.task) {
+    case 'testCrash':
+      setTimeout(() => {
+        throw new Error('test: worker crash')
+      })
+      return true
     case 'nearDuplicateGroups': {
       const raw = new DatabaseSync(t.dbFile, { readOnly: true })
       try {

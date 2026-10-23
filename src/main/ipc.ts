@@ -672,6 +672,30 @@ export function registerIpc(controller: LibraryController, getWindow: () => Brow
     showScreenshots: settings.showScreenshots === true
   })
   ipcMain.handle('settings:get', (): Settings => settingsOut())
+
+  // Errors from the window: a page that crashed (error boundary) or an uncaught error / rejection. Capped, never trusted.
+  ipcMain.handle('log:renderer', (_e, entry: unknown) => {
+    const o = (entry ?? {}) as Record<string, unknown>
+    const s = (v: unknown, max: number): string | null => (typeof v === 'string' ? v.slice(0, max) : null)
+    controller.log('error', 'renderer.error', {
+      kind: s(o.kind, 40),
+      message: s(o.message, 2000),
+      stack: s(o.stack, 8000),
+      componentStack: s(o.componentStack, 8000),
+      view: s(o.view, 40)
+    })
+  })
+  // Deliberate crashes for the end-to-end test only; refused unless the test environment variable is set.
+  const testHooks = process.env.PHOTOVAULT_TEST_HOOKS === '1'
+  ipcMain.handle('test:hooks', () => testHooks)
+  ipcMain.handle('test:crash', async (_e, kind: unknown) => {
+    if (!testHooks) throw new Error('Test hooks are off')
+    if (kind === 'main')
+      setTimeout(() => {
+        throw new Error('test: main process crash')
+      })
+    else if (kind === 'worker') await controller.testCrashWorker()
+  })
   ipcMain.handle('settings:set', (_e, patch: unknown): Settings => {
     const p = (patch ?? {}) as Partial<Settings>
     if (p.theme === 'system' || p.theme === 'light' || p.theme === 'dark') settings = { ...settings, theme: p.theme }

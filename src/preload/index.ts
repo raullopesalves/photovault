@@ -170,6 +170,9 @@ const api: PhotoVaultApi = {
   openSnapshotsFolder: () => ipcRenderer.invoke('db:openSnapshots'),
 
   getSettings: () => ipcRenderer.invoke('settings:get'),
+  logRendererError: (entry) => ipcRenderer.invoke('log:renderer', entry),
+  testHooks: () => ipcRenderer.invoke('test:hooks'),
+  testCrash: (kind) => ipcRenderer.invoke('test:crash', kind),
   setSettings: (patch) => ipcRenderer.invoke('settings:set', patch),
 
   pathForFile: (file) => webUtils.getPathForFile(file),

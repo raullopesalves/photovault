@@ -18,11 +18,11 @@ These change the scope below, so they come first.
 
 Today nothing catches an unexpected error: a bug in a page leaves a blank window until the app is restarted, and a crashed background process leaves no trace.
 
-- [ ] A "Something went wrong" screen with Reload instead of a blank window, for any page.
-- [ ] Main-process errors and crashed windows or workers are written to the log with what was happening.
-- [ ] Background work (imports, backups, checks, smart search, descriptions, people) resumes after a crash or restart without losing progress.
+- [x] A "Something went wrong" screen with Reload instead of a blank window, for any page.
+- [x] Main-process errors and crashed windows or workers are written to the log with what was happening.
+- [x] Background work (imports, backups, checks, smart search, descriptions, people) resumes after a crash or restart without losing progress.
 
-**Done when** a deliberately thrown error in a page, in the main process and in a worker each produce a log entry and a recoverable app, checked by a test.
+**Done when** a deliberately thrown error in a page, in the main process and in a worker each produce a log entry and a recoverable app, checked by a test. *Done 2026-10-23: the smoke test crashes all three and checks the log and the recovery (D95).*
 
 ### 2. Your data outside the app
 

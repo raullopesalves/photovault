@@ -19,6 +19,7 @@ import { FavoritesView } from './views/FavoritesView'
 import { CleanupView, type TidyTarget } from './views/CleanupView'
 import { ScreenshotsView } from './views/ScreenshotsView'
 import { VideosView } from './views/VideosView'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { BinView, HiddenView } from './views/HiddenBinViews'
 import { t } from './lib/i18n'
 
@@ -35,6 +36,14 @@ export default function App() {
   const [theme, setTheme] = useState<ThemePreference>('system')
   const [showScreenshots, setShowScreenshots] = useState(false)
   const [aiFocus, setAiFocus] = useState(0)
+  // End-to-end tests only (PHOTOVAULT_TEST_HOOKS=1): window.__pvTest.crashPage() makes the current page throw.
+  const [crashTest, setCrashTest] = useState(false)
+  useEffect(() => {
+    void api.testHooks().then((on) => {
+      if (on) (window as unknown as { __pvTest: unknown }).__pvTest = { crashPage: () => setCrashTest(true) }
+    })
+  }, [])
+  useEffect(() => setCrashTest(false), [view])
   const [duplicatesTab, setDuplicatesTab] = useState<'exact' | 'probable' | 'similar'>('exact')
   const [progress, setProgress] = useState<ImportProgress | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -183,47 +192,51 @@ export default function App() {
         }}
       />
       <main className="relative min-w-0 flex-1">
-        {view === 'photos' && (
-          <PhotosView
-            version={version}
-            library={library}
-            showScreenshots={showScreenshots}
-            onImport={(kind) => void startImport(kind)}
-            onShowScreenshots={() => setView('screenshots')}
-          />
-        )}
-        {view === 'imports' && (
-          <ImportsView version={version} onImport={(kind) => void startImport(kind)} onResume={(id) => void resumeImport(id)} busy={importRunning} />
-        )}
-        {view === 'duplicates' && <DuplicatesView key={duplicatesTab} version={version} initialTab={duplicatesTab} />}
-        {view === 'storage' && <StorageView library={library} version={version} />}
-        {view === 'settings' && (
-          <SettingsView
-            focusAi={aiFocus}
-            library={library}
-            theme={theme}
-            onTheme={changeTheme}
-            onOpenLibrary={async () => setState(await api.openLibrary())}
-            onCreateLibrary={async () => setState(await api.createLibrary())}
-          />
-        )}
-        {view === 'favorites' && <FavoritesView version={version} />}
-        {view === 'albums' && <AlbumsView version={version} />}
-        {view === 'map' && <MapView version={version} />}
-        {view === 'people' && <PeopleView version={version} />}
-        {view === 'memories' && <MemoriesView version={version} />}
-        {view === 'videos' && <VideosView version={version} showScreenshots={showScreenshots} />}
-        {view === 'screenshots' && <ScreenshotsView version={version} showInPhotos={showScreenshots} onShowInPhotos={(s) => void changeShowScreenshots(s)} />}
-        {view === 'cleanup' && <CleanupView
-            version={version}
-            showScreenshots={showScreenshots}
-            onOpenView={(target: TidyTarget) => {
-              if (target.view === 'duplicates') setDuplicatesTab(target.tab)
-              setView(target.view)
-            }}
-          />}
-        {view === 'hidden' && <HiddenView version={version} library={library} />}
-        {view === 'bin' && <BinView version={version} library={library} />}
+        {/* A page that crashes shows "Something went wrong" here; the sidebar stays usable. A new page starts fresh. */}
+        <ErrorBoundary key={view} view={view} onHome={() => (setCrashTest(false), setView('photos'))}>
+          {crashTest && <CrashProbe />}
+          {view === 'photos' && (
+            <PhotosView
+              version={version}
+              library={library}
+              showScreenshots={showScreenshots}
+              onImport={(kind) => void startImport(kind)}
+              onShowScreenshots={() => setView('screenshots')}
+            />
+          )}
+          {view === 'imports' && (
+            <ImportsView version={version} onImport={(kind) => void startImport(kind)} onResume={(id) => void resumeImport(id)} busy={importRunning} />
+          )}
+          {view === 'duplicates' && <DuplicatesView key={duplicatesTab} version={version} initialTab={duplicatesTab} />}
+          {view === 'storage' && <StorageView library={library} version={version} />}
+          {view === 'settings' && (
+            <SettingsView
+              focusAi={aiFocus}
+              library={library}
+              theme={theme}
+              onTheme={changeTheme}
+              onOpenLibrary={async () => setState(await api.openLibrary())}
+              onCreateLibrary={async () => setState(await api.createLibrary())}
+            />
+          )}
+          {view === 'favorites' && <FavoritesView version={version} />}
+          {view === 'albums' && <AlbumsView version={version} />}
+          {view === 'map' && <MapView version={version} />}
+          {view === 'people' && <PeopleView version={version} />}
+          {view === 'memories' && <MemoriesView version={version} />}
+          {view === 'videos' && <VideosView version={version} showScreenshots={showScreenshots} />}
+          {view === 'screenshots' && <ScreenshotsView version={version} showInPhotos={showScreenshots} onShowInPhotos={(s) => void changeShowScreenshots(s)} />}
+          {view === 'cleanup' && <CleanupView
+              version={version}
+              showScreenshots={showScreenshots}
+              onOpenView={(target: TidyTarget) => {
+                if (target.view === 'duplicates') setDuplicatesTab(target.tab)
+                setView(target.view)
+              }}
+            />}
+          {view === 'hidden' && <HiddenView version={version} library={library} />}
+          {view === 'bin' && <BinView version={version} library={library} />}
+        </ErrorBoundary>
       </main>
 
       {phoneOpen && (
@@ -260,4 +273,9 @@ export default function App() {
       )}
     </div>
   )
+}
+
+/** Tests only: a component that throws while rendering, to exercise the page's error boundary. */
+function CrashProbe(): null {
+  throw new Error('test: page crash')
 }

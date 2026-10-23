@@ -75,7 +75,8 @@ if (process.env.PV_FACE_MODELS) cpSync(process.env.PV_FACE_MODELS, join(userData
 const watchAdds = 2 + (process.env.PV_HEIC ? 1 : 0) + (process.env.PV_FACE ? 1 : 0)
 
 // Editors such as VS Code export ELECTRON_RUN_AS_NODE=1, which would start Electron as plain Node.
-const env = { ...process.env, PHOTOVAULT_USER_DATA: userData }
+// PHOTOVAULT_TEST_HOOKS turns on the deliberate crash triggers used by the crash-recovery section.
+const env = { ...process.env, PHOTOVAULT_USER_DATA: userData, PHOTOVAULT_TEST_HOOKS: '1' }
 delete env.ELECTRON_RUN_AS_NODE
 delete env.ELECTRON_RENDERER_URL
 // PV_EXE=<path to packaged Photo Vault.exe> tests the shipped build instead of the dev bundle.
@@ -637,12 +638,50 @@ if (process.env.PV_HEIC) {
 }
 console.log('0.7:', { rotation, exported, pins, smart: smartIds?.length ?? 'skipped', heic: heicThumb ?? 'skipped', faces: faces ?? 'skipped', captions: captions ?? 'skipped' })
 
+// --- Crash recovery (1.0): a page, the main process and the worker thread each crash, are logged and recover ------
+const logText = (root) => {
+  const dir = join(root, 'logs')
+  return readdirSync(dir).map((f) => readFileSync(join(dir, f), 'utf8')).join('\n')
+}
+const libRoot = (await page.evaluate(() => window.photoVault.getState())).library.path
+await page.click('nav >> text=Favourites')
+await page.waitForTimeout(400)
+await page.evaluate(() => window.__pvTest.crashPage())
+await page.waitForSelector('text=Something went wrong')
+await page.screenshot({ path: join(shots, '40-page-crash.png') })
+const sidebarAlive = await page.locator('nav >> text=Tidy up').isVisible()
+await page.click('button:has-text("Go to Photos")')
+await page.waitForSelector('main >> text=/^\\d+ items?$/')
+const pageRecovered = (await page.locator('text=Something went wrong').count()) === 0
+await page.evaluate(() => window.photoVault.testCrash('main'))
+await page.waitForTimeout(800)
+const mainAlive = (await page.evaluate(() => window.photoVault.getState())).kind === 'ready'
+await page.evaluate(() => window.photoVault.testCrash('worker')).catch(() => {})
+await page.waitForTimeout(1500)
+// The next job starts a fresh worker thread.
+const workerAgain = await page.evaluate(() => window.photoVault.nearDuplicates(0, 1).then(() => true, () => false))
+await page.waitForTimeout(500)
+const log = logText(libRoot)
+const crashes = {
+  pageLogged: log.includes('"renderer.error"') && log.includes('test: page crash'),
+  mainLogged: log.includes('"main.uncaught"') && log.includes('test: main process crash'),
+  workerLogged: log.includes('"worker.crashed"') && log.includes('test: worker crash'),
+  sidebarAlive,
+  pageRecovered,
+  mainAlive,
+  workerAgain
+}
+console.log('crash recovery:', crashes)
+// The deliberate crashes above print errors of their own; anything else is still a failure.
+for (let i = errors.length - 1; i >= 0; i--) if (/test: (page|main process|worker) crash|The above error occurred in/.test(errors[i])) errors.splice(i, 1)
+
 const state = await page.evaluate(() => window.photoVault.getState())
 console.log('library:', state.library)
 console.log('renderer errors:', errors.length ? errors : 'none')
 await app.close()
 
 const ok =
+  Object.values(crashes).every(Boolean) &&
   edited.edited === true &&
   edited.fullView === 'preview' &&
   shared.files === 1 &&

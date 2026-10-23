@@ -479,3 +479,10 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 
 **D94. Filter counts follow the view (0.15.1).** `facets(library, base)` counts within the view's own constraints, which each page passes to its filter bar as `base`: Photos (no hidden items, no screenshots unless shown), Favourites, Screenshots, Videos, an album, a person or pet. Picking a value then shows exactly the number beside it. Tidy up still counts the whole library. The Photos grid itself is unchanged: a search still finds screenshots.
 
+**D95. Crash recovery (1.0 must-have 1).**
+- **Pages:** an error boundary around each page (`ErrorBoundary.tsx`, keyed by the page so switching pages starts fresh) shows "Something went wrong" with Go to Photos and Reload; the sidebar stays usable. A second boundary around the whole app offers Reload. Errors outside rendering (handlers, timers, promises) are logged without interrupting the page.
+- **Main process:** uncaught errors and unhandled rejections are written to the library's log (`main.uncaught`, `main.unhandled_rejection`) instead of an error dialog; the app keeps running (catalogue writes are transactions). A crashed window is logged (`window.gone`) and reloaded; crashed helper processes are logged.
+- **Workers:** a worker thread that dies on its own is logged (`worker.crashed`); the next job starts a fresh thread, and smart search, descriptions and people are restarted after 5 s. More than three crashes in ten minutes counts as a crash loop: they then stay stopped, with their error shown, until restarted.
+- **Restarts:** the AI jobs resume on their own, an interrupted import is offered for resuming, and backups copy only what is missing, so a restart loses no finished work.
+- **Tests:** with `PHOTOVAULT_TEST_HOOKS=1` (the smoke test sets it; never set in normal use) the app accepts deliberate crashes of a page, the main process and the worker; the smoke test checks each is logged and recovered.
+

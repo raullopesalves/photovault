@@ -899,6 +899,12 @@ export interface PhotoVaultApi {
   openSnapshotsFolder(): Promise<void>
 
   getSettings(): Promise<Settings>
+  /** Writes an error from the window (a page that crashed, an uncaught error) to the library's log. */
+  logRendererError(entry: { kind: string; message: string; stack: string | null; componentStack: string | null; view: string | null }): Promise<void>
+  /** True only in automated tests (PHOTOVAULT_TEST_HOOKS=1): enables the deliberate crash triggers below. */
+  testHooks(): Promise<boolean>
+  /** Tests only: throws an uncaught error in the main process, or crashes the worker thread. */
+  testCrash(kind: 'main' | 'worker'): Promise<void>
   setSettings(patch: Partial<Settings>): Promise<Settings>
 
   pathForFile(file: File): string

@@ -12,10 +12,15 @@ void (async () => {
   } catch {
     setLanguage('en')
   }
-  const { default: App } = await import('./App')
+  const [{ default: App }, { ErrorBoundary, reportError }] = await Promise.all([import('./App'), import('./components/ErrorBoundary')])
+  // Errors outside React's rendering (event handlers, timers, promises) are logged; the page keeps working.
+  window.addEventListener('error', (e) => reportError('uncaught', e.error ?? e.message))
+  window.addEventListener('unhandledrejection', (e) => reportError('unhandled_rejection', e.reason))
   createRoot(document.getElementById('root') as HTMLElement).render(
     <StrictMode>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </StrictMode>
   )
 })()

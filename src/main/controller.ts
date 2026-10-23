@@ -69,7 +69,41 @@ export class LibraryController {
   private pendingReason: LibraryChangeReason | null = null
   lastError: string | null = null
 
-  constructor(private readonly events: ControllerEvents) {}
+  constructor(private readonly events: ControllerEvents) {
+    this.heavy.onCrash = (reason) => this.workerCrashed('heavy', reason)
+    this.captionWorker.onCrash = (reason) => this.workerCrashed('captions', reason)
+  }
+
+  /** Writes to the open library's log, or to the console when no library is open (errors from outside the library). */
+  log(level: 'info' | 'warn' | 'error', event: string, data?: Record<string, unknown>): void {
+    if (this.library) this.library.logger.log(level, event, data)
+    else console[level === 'info' ? 'log' : level](JSON.stringify({ ts: new Date().toISOString(), level, event, ...data }))
+  }
+
+  private workerCrashes: number[] = []
+  /**
+   * A worker thread died on its own. The next call starts a fresh one, but the jobs that were using it (smart search,
+   * descriptions, people) stopped with an error: restart them shortly. More than three crashes in ten minutes is a
+   * crash loop, so they then stay stopped (with their error on screen) until the app is restarted or they are turned
+   * on again.
+   */
+  private workerCrashed(worker: string, reason: string): void {
+    const now = Date.now()
+    this.workerCrashes = [...this.workerCrashes.filter((t) => now - t < 10 * 60_000), now]
+    const restart = this.workerCrashes.length <= 3
+    this.log('error', 'worker.crashed', { worker, reason, restart })
+    if (!restart) return
+    setTimeout(() => {
+      this.smart?.kick()
+      this.people?.kick()
+      this.captions?.kick()
+    }, 5_000).unref()
+  }
+
+  /** Tests only: crash the shared worker thread. */
+  testCrashWorker(): Promise<void> {
+    return this.heavy.testCrash()
+  }
 
   private makeLogger(root: string): Logger {
     this.logStream?.end()

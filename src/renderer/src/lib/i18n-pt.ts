@@ -1,5 +1,10 @@
 /** European Portuguese (pt-PT). Keys are the English interface text; see i18n.ts. Missing keys show in English. */
 export const PT: Record<string, string> = {
+  "Something went wrong": "Algo correu mal",
+  "This page hit a problem and stopped. Your photos and your library are not affected, and the problem has been written to the log.":
+    "Esta página encontrou um problema e parou. As suas fotografias e a biblioteca não foram afetadas, e o problema ficou registado.",
+  "Go to Photos": "Ir para Fotografias",
+  "Reload": "Recarregar",
   "Find photos by what they show — “beach at sunset”, “dog”, “birthday cake”, “receipt”: type it in the search box and pick “Photos that look like…”. It runs entirely on this computer: your photos are never uploaded. Turning it on downloads the AI model (about 150 MB, once) from Hugging Face, then looks at every photo in the background (roughly 1–2 minutes per 1,000 photos).":
     "Encontre fotografias pelo que mostram — “pôr do sol na praia”, “cão”, “bolo de anos”, “recibo”: escreva na caixa de pesquisa e escolha “Fotografias que parecem…”. Funciona totalmente neste computador: as suas fotografias nunca são enviadas. Ao ativar, transfere o modelo de IA (cerca de 150 MB, uma vez) do Hugging Face e depois analisa cada fotografia em segundo plano (cerca de 1–2 minutos por cada 1000 fotografias).",
   "{loaded} of {total} MB": "{loaded} de {total} MB",

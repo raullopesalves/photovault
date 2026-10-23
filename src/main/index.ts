@@ -33,6 +33,14 @@ const controller = new LibraryController({
   captionStatus: (s) => mainWindow?.webContents.send('captions:status', s)
 })
 
+// An unexpected error anywhere in the main process is written to the library's log instead of ending in an error
+// dialog; the app keeps running (catalogue writes are transactions, so nothing is left half-written).
+process.on('uncaughtException', (err) => controller.log('error', 'main.uncaught', { error: err.message, stack: err.stack }))
+process.on('unhandledRejection', (reason) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason))
+  controller.log('error', 'main.unhandled_rejection', { error: err.message, stack: err.stack })
+})
+
 function isDark(): boolean {
   return nativeTheme.shouldUseDarkColors
 }
@@ -41,9 +49,9 @@ function applyTheme(s: StoredSettings): void {
   nativeTheme.themeSource = s.theme
   const dark = isDark()
   if (mainWindow && process.platform !== 'darwin') {
-    mainWindow.setTitleBarOverlay?.({ color: '#00000000', symbolColor: dark ? '#e7e5e4' : '#292524', height: 44 })
+    mainWindow.setTitleBarOverlay?.({ color: '#00000000', symbolColor: dark ? '#ecede7' : '#1a1e1b', height: 44 })
   }
-  mainWindow?.setBackgroundColor(dark ? '#0c0a09' : '#fafaf9')
+  mainWindow?.setBackgroundColor(dark ? '#121412' : '#f4f4f0')
 }
 
 function createWindow(): void {
@@ -56,11 +64,11 @@ function createWindow(): void {
     minHeight: 560,
     show: false,
     title: 'Photo Vault',
-    backgroundColor: isDark() ? '#0c0a09' : '#fafaf9',
+    backgroundColor: isDark() ? '#121412' : '#f4f4f0',
     titleBarStyle: 'hidden',
     ...(process.platform === 'darwin'
       ? { trafficLightPosition: { x: 16, y: 14 } }
-      : { titleBarOverlay: { color: '#00000000', symbolColor: isDark() ? '#e7e5e4' : '#292524', height: 44 } }),
+      : { titleBarOverlay: { color: '#00000000', symbolColor: isDark() ? '#ecede7' : '#1a1e1b', height: 44 } }),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -72,6 +80,12 @@ function createWindow(): void {
   })
 
   mainWindow.once('ready-to-show', () => mainWindow?.show())
+  // A crashed page (renderer process) is logged and reloaded, so the window never stays blank.
+  mainWindow.webContents.on('render-process-gone', (_e, details) => {
+    controller.log('error', 'window.gone', { reason: details.reason, exitCode: details.exitCode })
+    if (details.reason !== 'clean-exit' && details.reason !== 'killed') setTimeout(() => mainWindow?.webContents.reload(), 500)
+  })
+  mainWindow.webContents.on('unresponsive', () => controller.log('warn', 'window.unresponsive'))
   mainWindow.on('closed', () => {
     mainWindow = null
   })
@@ -114,6 +128,10 @@ if (!gotLock) {
     if (settings.libraryPath) controller.tryOpen(settings.libraryPath)
     handleMediaProtocol(controller)
     registerIpc(controller, () => mainWindow, applyTheme)
+    // GPU, network or utility processes that die are logged (Electron restarts them itself).
+    app.on('child-process-gone', (_e, details) => {
+      if (details.reason !== 'clean-exit') controller.log('error', 'process.gone', { type: details.type, reason: details.reason, name: details.name ?? null })
+    })
     createWindow()
     void startUpdater((st) => mainWindow?.webContents.send('update:status', st))
     app.on('activate', () => {
