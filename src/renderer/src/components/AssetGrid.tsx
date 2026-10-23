@@ -448,7 +448,7 @@ export function AssetGrid(props: {
                 >
                   <Play className="size-3.5 fill-current" />{' '}{t('Slideshow')}</button>
               )}
-              {groups !== null && total > 0 && <span className="text-xs tabular-nums text-stone-500 dark:text-stone-400">{plural(total, 'item')}</span>}
+              {groups !== null && total > 0 && <span className="text-xs tabular-nums text-ink-muted">{plural(total, 'item')}</span>}
               <div className="flex items-center rounded-lg bg-stone-200/60 p-0.5 dark:bg-stone-800/80">
                 <button
                   aria-label={t('Smaller thumbnails')}
@@ -522,7 +522,7 @@ export function AssetGrid(props: {
                     </span>
                     <span className="ml-2.5 font-mono text-[13px] tabular-nums text-ink-muted">{n(row.count)}</span>
                     {row.month === 'undated' && (
-                      <span className="ml-3 truncate text-xs text-stone-500 dark:text-stone-400">{t('No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.')}</span>
+                      <span className="ml-3 truncate text-xs text-ink-muted">{t('No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.')}</span>
                     )}
                     </div>
                   </div>
@@ -1002,7 +1002,7 @@ function AlbumPicker(props: { excludeId?: number; onPick: (a: AlbumSummary) => v
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13.5px] text-stone-900 dark:text-stone-100">{a.name}</span>
-              <span className="block text-[11.5px] text-stone-500 dark:text-stone-400">{plural(a.count, 'item')}</span>
+              <span className="block text-[11.5px] text-ink-muted">{plural(a.count, 'item')}</span>
             </span>
           </button>
         ))}

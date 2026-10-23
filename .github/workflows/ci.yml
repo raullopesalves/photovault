@@ -41,8 +41,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:e2e -- "${{ runner.temp }}/photovault-e2e-shots"
-      # Keyboard and screen reader checks (axe-core on every page, plus the grid, viewer, dialogs and menus by keyboard).
+      # Keyboard, screen reader and colour contrast checks (axe-core on every page in both themes, plus the grid,
+      # viewer, dialogs and menus by keyboard).
       - run: node scripts/a11y-audit.mjs
+      - run: node scripts/a11y-audit.mjs --theme dark
       # Screenshots only when the test fails, and never failing the job: the account's artifact storage can be full.
       - uses: actions/upload-artifact@v4
         if: failure()

@@ -1014,5 +1014,6 @@ export const PT: Record<string, string> = {
   "Live Photo": "Live Photo",
   "Photo viewer": "Visualizador de fotografias",
   "Selection": "Seleção",
-  "Skip to content": "Saltar para o conteúdo"
+  "Skip to content": "Saltar para o conteúdo",
+  "Adjustments": "Ajustes"
 }

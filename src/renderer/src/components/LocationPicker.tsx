@@ -96,9 +96,9 @@ export function LocationPicker(props: {
     <div className="no-drag fixed inset-0 z-[60] flex items-center justify-center bg-stone-950/50 backdrop-blur-sm animate-fade-in" onClick={props.onClose}>
       <ModalPanel className="flex h-[78vh] w-[860px] max-w-[92vw] flex-col overflow-hidden rounded-2xl bg-white text-stone-900 shadow-2xl dark:bg-stone-900 dark:text-stone-100" onClick={(e) => e.stopPropagation()} aria-label={props.title}>
         <div className="flex items-center gap-3 border-b border-stone-100 px-5 py-3.5 dark:border-stone-800">
-          <MapPin className="size-4 text-stone-400" />
+          <MapPin className="size-4 text-ink-faint" />
           <div className="flex-1 text-[15px] font-semibold">{props.title}</div>
-          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" aria-label={t('Close')}>
+          <button onClick={props.onClose} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-stone-100 dark:hover:bg-stone-800" aria-label={t('Close')}>
             <X className="size-4" />
           </button>
         </div>
@@ -133,7 +133,7 @@ export function LocationPicker(props: {
           <button
             disabled={!pos}
             onClick={() => pos && props.onPick(pos)}
-            className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900"
+            className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
           >{t('Save location')}</button>
         </div>
       </ModalPanel>

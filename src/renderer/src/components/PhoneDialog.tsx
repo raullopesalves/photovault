@@ -71,7 +71,7 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
         <div className="flex items-center justify-between">
           <h2 className="text-[17px] font-semibold">{t('Import from a phone or camera')}</h2>
           {!copying && (
-            <button onClick={() => void refresh()} title={t('Look again')} className="rounded-md p-1.5 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">
+            <button onClick={() => void refresh()} title={t('Look again')} className="rounded-md p-1.5 text-ink-muted hover:bg-stone-100 dark:hover:bg-stone-800">
               <RefreshCw className={`size-4 ${devices === null ? 'animate-spin' : ''}`} />
             </button>
           )}
@@ -80,18 +80,18 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
 
         {!copying && (
           <div className="mt-4 space-y-1.5">
-            {devices === null && <p className="px-3 py-2 text-[13px] text-stone-500">{t('Looking for devices…')}</p>}
-            {devices?.length === 0 && !error && <p className="px-3 py-2 text-[13px] text-stone-500">{t('No phone or camera found.')}</p>}
+            {devices === null && <p className="px-3 py-2 text-[13px] text-ink-muted">{t('Looking for devices…')}</p>}
+            {devices?.length === 0 && !error && <p className="px-3 py-2 text-[13px] text-ink-muted">{t('No phone or camera found.')}</p>}
             {devices?.map((d) => (
               <label
                 key={d.name}
                 className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 ${chosen === d.name ? 'bg-stone-100 dark:bg-stone-800' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50'}`}
               >
                 <input type="radio" checked={chosen === d.name} onChange={() => setChosen(d.name)} className="mt-1 accent-accent-500" />
-                <Smartphone className="mt-0.5 size-4 shrink-0 text-stone-500" />
+                <Smartphone className="mt-0.5 size-4 shrink-0 text-ink-muted" />
                 <span className="min-w-0">
                   <span className="block truncate text-[13.5px] font-medium">{d.name}</span>
-                  <span className="block truncate text-xs text-stone-500 dark:text-stone-400">
+                  <span className="block truncate text-xs text-ink-muted">
                     {d.folders.length ? d.folders.join(' · ') : t('No photos visible — unlock it and allow access, then look again')}
                   </span>
                 </span>
@@ -110,8 +110,8 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
                 ? t('Reading the phone…')
                 : t('Copying {v0} of {v1} · {v2}{v3}', { v0: n(progress.done), v1: n(progress.total), v2: mb(progress.bytes), v3: progress.skipped ? t(' · {v0} already copied', { v0: n(progress.skipped) }) : '' })}
             </p>
-            {progress?.current && <p className="mt-0.5 truncate text-xs text-stone-500">{progress.current}</p>}
-            <p className="mt-3 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Keep the phone unlocked and connected. When the copy finishes the import starts and you review it as usual.')}</p>
+            {progress?.current && <p className="mt-0.5 truncate text-xs text-ink-muted">{progress.current}</p>}
+            <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('Keep the phone unlocked and connected. When the copy finishes the import starts and you review it as usual.')}</p>
           </div>
         )}
 

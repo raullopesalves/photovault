@@ -28,7 +28,7 @@ export function Welcome(props: { error?: string; onCreate: () => void; onOpen: (
           </div>
         )}
 
-        <div className="mt-12 flex items-center justify-center gap-2 text-xs text-stone-500 dark:text-stone-500">
+        <div className="mt-12 flex items-center justify-center gap-2 text-xs text-ink-muted">
           <ShieldCheck className="size-3.5" />{t('Imports copy files. Your source folders are never modified or deleted.')}</div>
       </main>
     </div>

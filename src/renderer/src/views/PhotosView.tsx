@@ -48,11 +48,11 @@ export function PhotosView(props: {
 export function NoMatches(props: { onClear?: () => void; title?: string; body?: string }) {
   return (
     <div className="mx-auto mt-16 max-w-sm text-center animate-fade-in">
-      <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+      <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
         <SearchX className="size-6" strokeWidth={1.5} />
       </div>
       <div className="text-[16px] font-semibold">{props.title ?? t('No matches')}</div>
-      <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{props.body ?? t('Nothing in your library matches these filters.')}</p>
+      <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-muted">{props.body ?? t('Nothing in your library matches these filters.')}</p>
       {props.onClear && (
         <button onClick={props.onClear} className="mt-4 h-9 rounded-lg bg-stone-200/70 px-4 text-[13px] font-medium hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700">{t('Clear filters')}</button>
       )}
@@ -64,7 +64,7 @@ function EmptyLibrary(props: { onImport: (kind: ImportKind) => void }) {
   return (
     <div className="drag flex h-full items-center justify-center">
       <div className="no-drag w-[560px] text-center animate-rise-in">
-        <div className="mx-auto mb-7 grid size-20 place-items-center rounded-3xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+        <div className="mx-auto mb-7 grid size-20 place-items-center rounded-3xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
           <ImagePlus className="size-9" strokeWidth={1.4} />
         </div>
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight">{t('Start your archive')}</h1>
@@ -90,7 +90,7 @@ function EmptyLibrary(props: { onImport: (kind: ImportKind) => void }) {
             <div key={f.title} className="rounded-[14px] border border-line bg-card p-3.5">
               <div className="mb-2 text-accent-600 dark:text-accent-400">{f.icon}</div>
               <div className="text-[13px] font-medium">{f.title}</div>
-              <div className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{f.body}</div>
+              <div className="mt-1 text-xs leading-relaxed text-ink-muted">{f.body}</div>
             </div>
           ))}
         </div>

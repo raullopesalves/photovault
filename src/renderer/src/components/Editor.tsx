@@ -138,7 +138,7 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
         )}
       </div>
 
-      <aside className="flex w-80 shrink-0 flex-col border-l border-white/10 bg-stone-900">
+      <aside aria-label={t('Adjustments')} className="flex w-80 shrink-0 flex-col border-l border-white/10 bg-stone-900">
         <div className="flex items-center justify-between px-5 pb-2 pt-5">
           <div className="text-[15px] font-semibold">{t('Edit')}</div>
           <button onClick={() => props.onClose(false)} className="grid size-8 place-items-center rounded-full hover:bg-white/10" aria-label={t('Cancel')}>

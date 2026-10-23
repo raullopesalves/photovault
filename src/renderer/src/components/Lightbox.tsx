@@ -540,7 +540,7 @@ export function Lightbox(props: {
         )}
 
       {showInfo && (
-        <aside className="scroll-page w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.08] bg-[#151715] px-6 pb-8 pt-16 animate-fade-in">
+        <aside aria-label={t('Details')} className="scroll-page w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.08] bg-[#151715] px-6 pb-8 pt-16 animate-fade-in">
           {detail ? <InfoPanel d={detail} onChanged={() => void api.asset(detail.id).then(setDetail)} /> : <div className="skeleton h-6 w-40 rounded" />}
         </aside>
       )}

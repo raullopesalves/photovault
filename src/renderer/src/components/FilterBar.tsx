@@ -123,13 +123,13 @@ export function FilterBar(props: {
         </button>
 
         {!props.hideFavorite && (
-          <button onClick={() => set({ favorite: q.favorite ? undefined : true })} className={`${chipBase} ${q.favorite ? chipOn : chipOff}`}>
+          <button onClick={() => set({ favorite: q.favorite ? undefined : true })} aria-pressed={!!q.favorite} className={`${chipBase} ${q.favorite ? chipOn : chipOff}`}>
             <Heart className={`size-3.5 ${q.favorite ? 'fill-current' : ''}`} />{t('Favourites')}{facets ? ` ${n(facets.favorites)}` : ''}
           </button>
         )}
 
         {!q.types?.length || (q.types.length === 1 && q.types[0] === 'video') ? (
-          <button onClick={() => set({ types: q.types?.includes('video') ? undefined : ['video'] })} className={`${chipBase} ${q.types?.includes('video') ? chipOn : chipOff}`}>
+          <button onClick={() => set({ types: q.types?.includes('video') ? undefined : ['video'] })} aria-pressed={!!q.types?.includes('video')} className={`${chipBase} ${q.types?.includes('video') ? chipOn : chipOff}`}>
             <Play className={`size-3.5 ${q.types?.includes('video') ? 'fill-current' : ''}`} />
             {t('Videos')}
             {facets ? <span className="font-mono text-[12px] opacity-75">{n(facets.videos)}</span> : null}
@@ -238,7 +238,7 @@ export function FilterBar(props: {
           {badges.length > 1 && (
             <button
               onClick={clearAll}
-              className="ml-1 h-7 rounded-full px-2.5 text-[12.5px] font-medium text-stone-500 hover:bg-stone-200/60 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+              className="ml-1 h-7 rounded-full px-2.5 text-[12.5px] font-medium text-ink-muted hover:bg-stone-200/60 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200"
             >{t('Clear all')}</button>
           )}
         </div>

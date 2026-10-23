@@ -27,11 +27,11 @@ export function HiddenView(props: { version: number; library: LibraryInfo }) {
         }
         empty={
           <div className="mx-auto mt-16 max-w-sm text-center">
-            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
               <EyeOff className="size-6" strokeWidth={1.6} />
             </div>
             <div className="text-[16px] font-semibold">{t('Nothing hidden')}</div>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{t('Hide clutter from the Photos timeline with “Hide” on a selection, in Cleanup or in Duplicates. It stays in your library and shows up here.')}</p>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-muted">{t('Hide clutter from the Photos timeline with “Hide” on a selection, in Cleanup or in Duplicates. It stays in your library and shows up here.')}</p>
           </div>
         }
       />
@@ -80,11 +80,11 @@ export function BinView(props: { version: number; library: LibraryInfo }) {
         }
         empty={
           <div className="mx-auto mt-16 max-w-sm text-center">
-            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
               <Trash2 className="size-6" strokeWidth={1.6} />
             </div>
             <div className="text-[16px] font-semibold">{t('The Bin is empty')}</div>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{t('Select photos anywhere and choose “Bin”. They stay here — out of every other view — until you restore them or delete them permanently.')}</p>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-muted">{t('Select photos anywhere and choose “Bin”. They stay here — out of every other view — until you restore them or delete them permanently.')}</p>
           </div>
         }
       />

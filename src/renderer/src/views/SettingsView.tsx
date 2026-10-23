@@ -93,7 +93,7 @@ export function SettingsView(props: {
         <UpdatesGroup onWhatsNew={props.onWhatsNew} />
 
         <Group title={t('Library')}>
-          <div className="text-[13px] text-stone-500 dark:text-stone-400">{t('Location')}</div>
+          <div className="text-[13px] text-ink-muted">{t('Location')}</div>
           <div className="mt-0.5 break-all text-[14px]">{props.library.path}</div>
           <div className="mt-4 flex flex-wrap gap-2">
             <Btn onClick={() => void api.openLibraryFolder()}>{t('Show in Explorer')}</Btn>
@@ -140,7 +140,7 @@ function OfflineGroup() {
   return (
     <Group title={t('Offline mode')}>
       <div className="flex items-start gap-4">
-        <div className={`grid size-10 shrink-0 place-items-center rounded-xl ${offline ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-stone-100 text-stone-500 dark:bg-stone-800'}`}>
+        <div className={`grid size-10 shrink-0 place-items-center rounded-xl ${offline ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-stone-100 text-ink-muted dark:bg-stone-800'}`}>
           {offline ? <WifiOff className="size-5" /> : <Wifi className="size-5" />}
         </div>
         <div className="min-w-0 flex-1">
@@ -190,7 +190,7 @@ function ModelsGroup() {
         {models.map((m) => (
           <li key={m.id} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2 text-[13px] dark:bg-stone-800/60">
             <span>{MODEL_NAMES[m.id]}</span>
-            <span className={m.installed ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400'}>
+            <span className={m.installed ? 'text-emerald-600 dark:text-emerald-400' : 'text-ink-faint'}>
               {m.installed ? t('Installed · {size}', { size: bytes(m.bytes) }) : t('Not installed')}
             </span>
           </li>
@@ -271,7 +271,7 @@ function UpdatesGroup(props: { onWhatsNew: () => void }) {
       {s.canUpdate && (
         <div className="mt-5 border-t border-stone-100 pt-4 dark:border-stone-800">
           <div className="text-[13px] font-medium">{t('GitHub access')}{' '}{s.tokenSet && <span className="ml-1 text-emerald-600 dark:text-emerald-400">{t('· saved')}</span>}</div>
-          <p className="mt-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Your code repository is private, so the app needs a read-only token to see new versions. On github.com: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate. Repository access: only')}{' '}<b>{t('photovault')}</b>{t('; Permissions → Contents:')}{' '}<b>{t('Read-only')}</b>{t('. The token is stored encrypted on this computer.')}</p>
+          <p className="mt-1 text-xs leading-relaxed text-ink-muted">{t('Your code repository is private, so the app needs a read-only token to see new versions. On github.com: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate. Repository access: only')}{' '}<b>{t('photovault')}</b>{t('; Permissions → Contents:')}{' '}<b>{t('Read-only')}</b>{t('. The token is stored encrypted on this computer.')}</p>
           <div className="mt-2 flex gap-2">
             <input
               type="password"
@@ -352,7 +352,7 @@ function SmartSearchGroup() {
             ) : (
               <button
                 onClick={() => void api.setSmartSearch(true)}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
               >
                 <Sparkles className="size-4" />{' '}{t('Turn on smart search')}</button>
             )}
@@ -415,7 +415,7 @@ function CaptionsGroup() {
             ) : (
               <button
                 onClick={() => void api.setCaptionsEnabled(true)}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
               >
                 <MessageSquareText className="size-4" />
                 {s.described > 0 ? t('Continue describing') : t('Turn on automatic descriptions')}
@@ -431,7 +431,7 @@ function CaptionsGroup() {
 function Group(props: { title: string; children: ReactNode }) {
   return (
     <section className="rounded-[14px] border border-line bg-card p-5">
-      <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">{props.title}</h2>
+      <h2 className="mb-4 text-[13px] font-semibold uppercase tracking-wider text-ink-muted">{props.title}</h2>
       {props.children}
     </section>
   )

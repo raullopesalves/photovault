@@ -32,11 +32,11 @@ export function AlbumsView(props: { version: number }) {
       <div className="drag sticky top-0 z-10 flex items-end justify-between bg-stone-50/80 px-7 pb-4 pr-40 pt-5 backdrop-blur-xl dark:bg-stone-950/75">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-8 tracking-[-0.015em]">{t('Albums')}</h1>
-          <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{t('Albums only reference photos — removing or deleting never touches your files.')}</div>
+          <div className="mt-0.5 text-xs text-ink-muted">{t('Albums only reference photos — removing or deleting never touches your files.')}</div>
         </div>
         <button
           onClick={() => setCreating(true)}
-          className="no-drag inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:text-stone-900"
+          className="no-drag inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
         >
           <Plus className="size-4" />{' '}{t('New album')}</button>
       </div>
@@ -44,16 +44,16 @@ export function AlbumsView(props: { version: number }) {
       <div className="px-7 pb-12">
         {albums?.length === 0 && smart.length === 0 && (
           <div className="mx-auto mt-20 max-w-sm text-center">
-            <div className="mx-auto mb-5 grid size-16 place-items-center rounded-3xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+            <div className="mx-auto mb-5 grid size-16 place-items-center rounded-3xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
               <Album className="size-7" strokeWidth={1.5} />
             </div>
             <div className="text-[17px] font-semibold">{t('No albums yet')}</div>
-            <p className="mt-2 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{t('Select photos in the timeline and choose “Add to album”, or create an empty one. Albums from a Google Takeout appear here automatically.')}</p>
+            <p className="mt-2 text-[13.5px] leading-relaxed text-ink-muted">{t('Select photos in the timeline and choose “Add to album”, or create an empty one. Albums from a Google Takeout appear here automatically.')}</p>
           </div>
         )}
         {smart.length > 0 && (
           <section className="mt-4">
-            <h2 className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+            <h2 className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold uppercase tracking-wider text-ink-muted">
               <Wand2 className="size-3.5" />{' '}{t('Smart albums')}</h2>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-6">
               {smart.map((a) => (
@@ -62,7 +62,7 @@ export function AlbumsView(props: { version: number }) {
                     {a.coverId ? (
                       <img src={mediaUrl('thumb', a.coverId)} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                     ) : (
-                      <div className="grid size-full place-items-center text-stone-400">
+                      <div className="grid size-full place-items-center text-ink-faint">
                         <Wand2 className="size-8" strokeWidth={1.3} />
                       </div>
                     )}
@@ -71,7 +71,7 @@ export function AlbumsView(props: { version: number }) {
                     </span>
                   </div>
                   <div className="mt-2 truncate text-[13.5px] font-medium">{a.name}</div>
-                  <div className="text-xs text-stone-500 dark:text-stone-400">{plural(a.count, 'item')}{' '}{t('· updates itself')}</div>
+                  <div className="text-xs text-ink-muted">{plural(a.count, 'item')}{' '}{t('· updates itself')}</div>
                 </button>
               ))}
             </div>
@@ -103,7 +103,7 @@ function SmartAlbumPage(props: { album: SmartAlbum; version: number; onBack: () 
   const [renaming, setRenaming] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const iconBtn =
-    'grid size-8 place-items-center rounded-lg text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100'
+    'grid size-8 place-items-center rounded-lg text-ink-muted transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100'
   return (
     <>
       <AssetGrid
@@ -177,7 +177,7 @@ function describeQuery(q: AssetQuery): string {
 function AlbumSection(props: { title: string; albums: AlbumSummary[]; onOpen: (id: number) => void }) {
   return (
     <section className="mt-4">
-      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">{props.title}</h2>
+      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wider text-ink-muted">{props.title}</h2>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-x-5 gap-y-6">
         {props.albums.map((a) => (
           <button key={a.id} onClick={() => props.onOpen(a.id)} className="group text-left outline-none">
@@ -185,13 +185,13 @@ function AlbumSection(props: { title: string; albums: AlbumSummary[]; onOpen: (i
               {a.coverAssetId && a.coverThumb === 'ready' ? (
                 <img src={mediaUrl('thumb', a.coverAssetId)} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
               ) : (
-                <div className="grid size-full place-items-center text-stone-400 dark:text-stone-600">
+                <div className="grid size-full place-items-center text-ink-faint">
                   <Album className="size-8" strokeWidth={1.3} />
                 </div>
               )}
             </div>
             <div className="mt-2 truncate text-[13.5px] font-medium">{a.name}</div>
-            <div className="text-xs text-stone-500 dark:text-stone-400">{plural(a.count, 'item')}</div>
+            <div className="text-xs text-ink-muted">{plural(a.count, 'item')}</div>
           </button>
         ))}
       </div>
@@ -215,7 +215,7 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
   if (!album) return <div className="h-full" />
 
   const iconBtn =
-    'grid size-8 place-items-center rounded-lg text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100'
+    'grid size-8 place-items-center rounded-lg text-ink-muted transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100'
 
   return (
     <>

@@ -258,7 +258,7 @@ function GroupDetail(props: { group: Group & { query: AssetQuery }; version: num
           <span className="flex items-center gap-2">
             <button
               onClick={props.onBack}
-              className="no-drag grid size-8 place-items-center rounded-lg text-stone-500 hover:bg-stone-200/70 hover:text-stone-900 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+              className="no-drag grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-stone-200/70 hover:text-stone-900 dark:hover:bg-stone-800 dark:hover:text-stone-100"
               aria-label={t('Back to Tidy up')}
             >
               <ArrowLeft className="size-4" />
@@ -281,7 +281,7 @@ function GroupDetail(props: { group: Group & { query: AssetQuery }; version: num
               <button
                 disabled={!counts || visible === 0}
                 onClick={() => setConfirm('hide')}
-                className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900`}
+                className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900`}
               >
                 <EyeOff className="size-3.5" />{' '}{t('Hide all from Photos')}</button>
             )}

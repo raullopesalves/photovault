@@ -56,7 +56,7 @@
     "dist:dir": "node scripts/electron-vite.mjs build && electron-builder --win --dir",
     "test:e2e:packaged": "node scripts/electron-vite.mjs build && electron-builder --win --dir && node scripts/e2e-smoke.mjs --packaged",
     "test:perf": "node scripts/perf.mjs",
-    "test:a11y": "node scripts/electron-vite.mjs build && node scripts/a11y-audit.mjs",
+    "test:a11y": "node scripts/electron-vite.mjs build && node scripts/a11y-audit.mjs && node scripts/a11y-audit.mjs --theme dark",
     "release": "node scripts/release.mjs"
   },
   "productName": "Photo Vault",

@@ -117,7 +117,7 @@ export function Sidebar(props: {
   const current: View = props.view === 'duplicates' || props.view === 'hidden' ? 'cleanup' : props.view
 
   return (
-    <aside className="drag flex w-[232px] shrink-0 flex-col gap-[18px] border-r border-line bg-shelf px-3 pb-3">
+    <aside aria-label={t('Photo Vault')} className="drag flex w-[232px] shrink-0 flex-col gap-[18px] border-r border-line bg-shelf px-3 pb-3">
       <div className="h-7 shrink-0" />
       <div className="flex items-center gap-2.5 px-2">
         <Mark size={24} />

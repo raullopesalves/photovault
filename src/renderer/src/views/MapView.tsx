@@ -229,9 +229,9 @@ export function MapView(props: { version: number }) {
         {located === 0 && (
           <div className="pointer-events-none absolute inset-0 z-[500] grid place-items-center">
             <div className="rounded-2xl bg-white/95 px-6 py-5 text-center shadow-xl dark:bg-stone-900/95">
-              <MapPin className="mx-auto mb-2 size-6 text-stone-400" />
+              <MapPin className="mx-auto mb-2 size-6 text-ink-faint" />
               <div className="text-[14px] font-medium">{t('No photos with a location yet')}</div>
-              <div className="mt-1 max-w-xs text-xs text-stone-500 dark:text-stone-400">{t('Photos taken with location on, and Google Takeout or iCloud exports, appear here.')}</div>
+              <div className="mt-1 max-w-xs text-xs text-ink-muted">{t('Photos taken with location on, and Google Takeout or iCloud exports, appear here.')}</div>
             </div>
           </div>
         )}

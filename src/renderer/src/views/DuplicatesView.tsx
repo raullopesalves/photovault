@@ -74,7 +74,7 @@ function ExactList(props: { version: number }) {
   return (
     <>
       {groups?.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">{t('No duplicates found yet. Import the same photos from another folder or export and they will appear here.')}</div>
+        <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-ink-muted dark:border-stone-700 dark:text-stone-400">{t('No duplicates found yet. Import the same photos from another folder or export and they will appear here.')}</div>
       )}
       <div className="space-y-3">
         {groups?.map((g) => (
@@ -83,7 +83,7 @@ function ExactList(props: { version: number }) {
               {g.asset.thumb === 'ready' ? (
                 <img src={mediaUrl('thumb', g.asset.id, g.asset.rev)} alt="" className="size-full object-cover" />
               ) : (
-                <div className="grid size-full place-items-center text-stone-400">
+                <div className="grid size-full place-items-center text-ink-faint">
                   <ImageOff className="size-5" />
                 </div>
               )}
@@ -91,17 +91,17 @@ function ExactList(props: { version: number }) {
             <div className="min-w-0 flex-1">
               <div className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
                 <Copy className="size-3" />{' '}{t('Byte-for-byte identical')}</div>
-              <div className="font-mono text-[11px] text-stone-500 dark:text-stone-400" title={g.sha256}>{t('SHA-256')}{' '}{g.sha256.slice(0, 16)}…
+              <div className="font-mono text-[11px] text-ink-muted" title={g.sha256}>{t('SHA-256')}{' '}{g.sha256.slice(0, 16)}…
               </div>
               <div className="mt-3 space-y-1.5">
                 {g.sources.map((s) => (
                   <div key={s.id} className="flex items-baseline gap-3 text-[12.5px]">
                     <span className="min-w-0 flex-1 truncate" title={s.sourcePath}>
                       <span className="font-medium">{s.originalFilename}</span>
-                      <span className="text-stone-400"> — {s.sourcePath.slice(0, s.sourcePath.length - basename(s.sourcePath).length - 1)}</span>
+                      <span className="text-ink-faint"> — {s.sourcePath.slice(0, s.sourcePath.length - basename(s.sourcePath).length - 1)}</span>
                     </span>
-                    <span className="shrink-0 text-stone-400">{bytes(s.sizeBytes)}</span>
-                    <span className="w-28 shrink-0 text-right text-stone-400">{isoLocal(s.firstSeenAt)}</span>
+                    <span className="shrink-0 text-ink-faint">{bytes(s.sizeBytes)}</span>
+                    <span className="w-28 shrink-0 text-right text-ink-faint">{isoLocal(s.firstSeenAt)}</span>
                   </div>
                 ))}
               </div>
@@ -153,7 +153,7 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
                     ? t('No similar photos found')
                     : t('No probable duplicates found')}
           </div>
-          <div className="mt-0.5 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+          <div className="mt-0.5 text-xs leading-relaxed text-ink-muted">
             {analysing ? (
               <span className="inline-flex items-center gap-1.5">
                 <LoaderCircle className="size-3 animate-spin" />{' '}{t('Comparing visual fingerprints:')}{' '}{n(data.hashed)}{' '}{t('of')}{' '}{n(data.hashable)}{' '}{t('items analysed — more groups may appear.')}</span>
@@ -167,7 +167,7 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
         {!similar && data.unresolvedGroups > 0 && (
           <button
             onClick={() => setConfirmAll(true)}
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:text-stone-900"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
           >
             <Sparkles className="size-4" />{' '}{t('Keep the best of each, hide')}{' '}{n(data.extraCopies)}
           </button>
@@ -234,7 +234,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
               <Copy className="size-3" />{' '}{t('Looks the same')}</>
           )}
         </span>
-        <span className="text-xs text-stone-500 dark:text-stone-400">
+        <span className="text-xs text-ink-muted">
           {props.similar
             ? `${plural(g.members.length, 'shot')} · ${g.members[0] ? sortTimeLabel(g.members[0].asset.sortTime) : ''}`
             : t('{length} · different files', { length: plural(g.members.length, 'copy', 'copies') })}
@@ -248,6 +248,8 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
             <div key={m.asset.id} className="w-40 shrink-0">
               <button
                 onClick={() => setKeep(m.asset.id)}
+                aria-pressed={selected}
+                aria-label={`${t('Keep this copy')}: ${m.originalFilename}`}
                 className={`group relative block size-40 overflow-hidden rounded-lg bg-stone-200 outline-none transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-brass-ink dark:bg-stone-800 ${
                   selected ? 'ring-[3px] ring-accent-500' : 'ring-1 ring-stone-200 hover:ring-stone-300 dark:ring-stone-800'
                 }`}
@@ -256,7 +258,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                 {m.asset.thumb === 'ready' ? (
                   <img src={mediaUrl('thumb', m.asset.id, m.asset.rev)} alt="" className={`size-full object-cover ${m.asset.hidden ? 'opacity-50' : ''}`} />
                 ) : (
-                  <div className="grid size-full place-items-center text-stone-400">
+                  <div className="grid size-full place-items-center text-ink-faint">
                     <ImageOff className="size-5" />
                   </div>
                 )}
@@ -270,8 +272,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                   </span>
                 )}
                 <span
-                  role="button"
-                  tabIndex={-1}
+                  aria-hidden="true"
                   onClick={(e) => {
                     e.stopPropagation()
                     props.onPreview(m.asset.id)
@@ -286,10 +287,10 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                 <div className="truncate font-medium" title={m.originalFilename}>
                   {m.originalFilename}
                 </div>
-                <div className="text-stone-500 dark:text-stone-400">
+                <div className="text-ink-muted">
                   {m.asset.width && m.asset.height ? `${m.asset.width}×${m.asset.height}` : '?'} · {bytes(m.sizeBytes)}
                 </div>
-                <div className="truncate text-stone-500 dark:text-stone-400">
+                <div className="truncate text-ink-muted">
                   {m.camera ?? (m.origin ? `${originLabel(m.origin)}${m.originConfidence === 'probable' ? t(' (probable)') : ''}` : t('No camera data'))}
                 </div>
                 {m.asset.id === g.bestId && <div className="font-medium text-emerald-600 dark:text-emerald-400">{t('Suggested:')}{' '}{g.bestReason}</div>}
@@ -340,7 +341,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
             await api.setHidden(others.map((o) => o.asset.id), true)
             setBusy(false)
           }}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
         >
           <EyeOff className="size-3.5" />{' '}{t('Keep selected, hide')}{' '}{others.length === 1 ? t('the other') : t('the other {length}', { length: others.length })}
         </button>
@@ -363,9 +364,9 @@ function Card(props: { label: string; value: string; note?: string; active?: boo
             : 'bg-stone-100 dark:bg-stone-900/50'
       }`}
     >
-      <div className={`font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums ${clickable ? '' : 'text-stone-400 dark:text-stone-600'}`}>{props.value}</div>
-      <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{props.label}</div>
-      {props.note && <div className="mt-1 text-[10.5px] uppercase tracking-wider text-stone-400 dark:text-stone-500">{props.note}</div>}
+      <div className={`font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums ${clickable ? '' : 'text-ink-faint'}`}>{props.value}</div>
+      <div className="mt-0.5 text-xs text-ink-muted">{props.label}</div>
+      {props.note && <div className="mt-1 text-[10.5px] uppercase tracking-wider text-ink-faint">{props.note}</div>}
     </button>
   )
 }

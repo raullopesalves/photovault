@@ -1,8 +1,8 @@
 // Accessibility audit: launches the built app (node scripts/electron-vite.mjs build first) on a small throwaway
 // library, opens every page and the viewer, menus and dialogs, runs axe-core (WCAG 2.1 A/AA and best practice) on
 // each, and walks the app with the keyboard. Exits 1 on any violation.
-// Usage: node scripts/a11y-audit.mjs [--report <file.json>] [--shots <dir>] [--contrast] [--theme dark]
-//   --contrast  also fail on colour contrast (reported either way)
+// Usage: node scripts/a11y-audit.mjs [--report <file.json>] [--shots <dir>] [--no-contrast] [--theme dark]
+//   --no-contrast  report colour contrast without failing on it
 import { _electron as electron } from 'playwright-core'
 import { mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -16,7 +16,7 @@ const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8')
 
 const args = process.argv.slice(2)
 const opt = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined)
-const failOnContrast = args.includes('--contrast')
+const failOnContrast = !args.includes('--no-contrast')
 const theme = opt('--theme') ?? 'light'
 const shots = opt('--shots')
 if (shots) mkdirSync(shots, { recursive: true })
@@ -49,6 +49,7 @@ await page.waitForSelector('text=Your photos, permanently yours.')
 const results = []
 async function audit(name) {
   await page.waitForTimeout(350)
+  await shot(`page-${name.replace(/\W+/g, '-')}`)
   const r = await page.evaluate(async (src) => {
     if (!window.axe) (0, eval)(src)
     const out = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] }, resultTypes: ['violations'] })
@@ -98,6 +99,27 @@ for (const label of ['Photos', 'Memories', 'People', 'Places', 'Albums', 'Favour
 }
 await page.click('aside button[aria-label^="Safety"]')
 await audit('Safety')
+// A backup drive, so the Safety page shows a drive, its progress and its verified state.
+await app.evaluate(async ({ dialog }, dir) => {
+  dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [dir] })
+}, join(root, 'Backup'))
+mkdirSync(join(root, 'Backup'))
+await page.click('text=Add backup location')
+await page.waitForSelector('text=/All \\d+ items have a verified second copy/', { timeout: 60000 })
+await audit('Safety with a backup')
+await page.click('aside button[aria-haspopup="menu"]')
+await page.click('text=Past imports')
+await audit('Past imports')
+await page.click('nav >> text=Tidy up')
+await audit('Tidy up')
+for (const card of ['Probable duplicates', 'Hidden']) {
+  await page.click('nav >> text=Tidy up')
+  const button = page.getByRole('button', { name: new RegExp(`^${card}`) })
+  if (await button.count()) {
+    await button.first().click()
+    await audit(card)
+  }
+}
 await page.click('aside button[aria-label="Settings"]')
 await audit('Settings')
 await page.click('aside button[aria-label="Guide"]')
@@ -119,6 +141,9 @@ await page.keyboard.press('Escape')
 await page.locator('main [data-index="0"]').click()
 await page.waitForTimeout(600)
 await audit('viewer')
+await page.keyboard.press('i')
+await audit('viewer details')
+await page.keyboard.press('i')
 await page.keyboard.press('Escape')
 await page.waitForTimeout(500)
 await nav('Albums')

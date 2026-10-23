@@ -45,7 +45,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
               <input type="checkbox" checked={skipRecycleBin} onChange={(e) => setSkip(e.target.checked)} className="mt-0.5 size-4 accent-red-600" />
               <span>
                 <span className="font-medium">{t('Skip the Windows Recycle Bin')}</span>
-                <span className="block text-xs text-stone-500 dark:text-stone-400">
+                <span className="block text-xs text-ink-muted">
                   {skipRecycleBin ? t('Space is freed immediately. This cannot be undone.') : t('Off: files go to the Recycle Bin first, so you can still recover them until you empty it.')}
                 </span>
               </span>
@@ -63,7 +63,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
               <div className="h-full rounded-full bg-red-500 transition-[width] duration-300" style={{ width: `${progress ? (progress.done / Math.max(1, progress.total)) * 100 : 0}%` }} />
             </div>
-            <div className="mt-2 text-xs tabular-nums text-stone-500 dark:text-stone-400">
+            <div className="mt-2 text-xs tabular-nums text-ink-muted">
               {progress ? t('{done} of {total} · {v2}', { done: n(progress.done), total: n(progress.total), v2: bytes(progress.bytes) }) : t('Starting…')}
               {!skipRecycleBin && t(' · moving files to the Recycle Bin')}
             </div>

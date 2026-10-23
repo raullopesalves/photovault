@@ -37,11 +37,11 @@ export function ScreenshotsView(props: { version: number; showInPhotos: boolean;
           <NoMatches onClear={() => setQuery({})} />
         ) : (
           <div className="mx-auto mt-16 max-w-sm text-center">
-            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-stone-200/70 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
               <MonitorSmartphone className="size-6" strokeWidth={1.6} />
             </div>
             <div className="text-[16px] font-semibold">{t('No screenshots')}</div>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{t('Screenshots from phones and computers are recognised by their file name and folder, and collected here.')}</p>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-muted">{t('Screenshots from phones and computers are recognised by their file name and folder, and collected here.')}</p>
           </div>
         )
       }

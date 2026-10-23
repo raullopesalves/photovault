@@ -88,7 +88,7 @@ export const Tile = memo(function Tile(props: {
         ) : asset.thumb === 'pending' ? (
           <div className="skeleton size-full" />
         ) : (
-          <div className="flex size-full flex-col items-center justify-center gap-1.5 text-stone-400 dark:text-stone-500">
+          <div className="flex size-full flex-col items-center justify-center gap-1.5 text-ink-faint">
             <ImageOff className="size-5" strokeWidth={1.5} />
             <span className="text-[10px] font-medium uppercase tracking-wider">{mimeLabel(asset.mimeType)}</span>
           </div>

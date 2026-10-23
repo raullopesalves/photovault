@@ -34,7 +34,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
         <WatchFolders version={props.version} />
         {list?.length === 0 && (
           <div className="mt-10 flex flex-col items-center rounded-2xl border border-dashed border-stone-300 py-16 text-center dark:border-stone-700">
-            <FolderInput className="mb-3 size-8 text-stone-400" strokeWidth={1.5} />
+            <FolderInput className="mb-3 size-8 text-ink-faint" strokeWidth={1.5} />
             <div className="font-medium">{t('No imports yet')}</div>
             <div className="mt-4 flex gap-2">
               <button onClick={() => props.onImport('folder')} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">{t('Import a folder')}</button>
@@ -56,7 +56,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
                 onKeyDown={(e) => e.key === 'Enter' && setSelected(s)}
                 className="flex w-full cursor-default items-center gap-5 rounded-[14px] border border-line bg-card px-5 py-4 text-left transition hover:border-line-strong dark:hover:bg-stone-800/80"
               >
-                <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-stone-100 text-ink-muted dark:bg-stone-800 dark:text-stone-400">
                   {archive ? <FileArchive className="size-5" strokeWidth={1.6} /> : <FolderInput className="size-5" strokeWidth={1.6} />}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -68,7 +68,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
                         <FolderSync className="size-3" />{' '}{t('Automatic')}</span>
                     )}
                   </div>
-                  <div className="mt-0.5 truncate text-xs text-stone-500 dark:text-stone-400">
+                  <div className="mt-0.5 truncate text-xs text-ink-muted">
                     {isoLocal(s.startedAt)} · {sourceTypeLabel(s.sourceType)} · {s.sourcePath}
                   </div>
                 </div>
@@ -80,7 +80,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
                       props.onResume(s.importId)
                     }}
                     title={props.busy ? t('Finish the current import first') : t('Review and continue this import')}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
                   >
                     <Play className="size-3 fill-current" />{' '}{t('Resume')}</button>
                 )}
@@ -119,10 +119,10 @@ function WatchFolders(props: { version: number }) {
   return (
     <div className="mb-6 rounded-[14px] border border-line bg-card px-5 py-4">
       <div className="flex items-center gap-3">
-        <FolderSync className="size-5 shrink-0 text-stone-400" strokeWidth={1.6} />
+        <FolderSync className="size-5 shrink-0 text-ink-faint" strokeWidth={1.6} />
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium">{t('Watched folders')}</div>
-          <div className="text-xs text-stone-500 dark:text-stone-400">{t('New photos in these folders are imported automatically — copied, checked and de-duplicated like any import. The folders are never changed.')}</div>
+          <div className="text-xs text-ink-muted">{t('New photos in these folders are imported automatically — copied, checked and de-duplicated like any import. The folders are never changed.')}</div>
         </div>
         {(folders?.length ?? 0) > 0 && (
           <button
@@ -139,7 +139,7 @@ function WatchFolders(props: { version: number }) {
         )}
         <button
           onClick={add}
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900"
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
         >
           <Eye className="size-3.5" />{' '}{t('Watch a folder')}</button>
       </div>
@@ -160,10 +160,10 @@ function WatchFolders(props: { version: number }) {
                 />
               </label>
               <div className="min-w-0 flex-1">
-                <div className={`truncate text-[13px] ${f.enabled ? '' : 'text-stone-400'}`} title={f.path}>
+                <div className={`truncate text-[13px] ${f.enabled ? '' : 'text-ink-faint'}`} title={f.path}>
                   {f.path}
                 </div>
-                <div className={`truncate text-[11.5px] ${f.lastError ? 'text-amber-600 dark:text-amber-400' : 'text-stone-500 dark:text-stone-400'}`}>
+                <div className={`truncate text-[11.5px] ${f.lastError ? 'text-amber-600 dark:text-amber-400' : 'text-ink-muted'}`}>
                   {f.lastError
                     ? f.lastError
                     : !f.enabled
@@ -178,7 +178,7 @@ function WatchFolders(props: { version: number }) {
                   await api.removeWatchFolder(f.id)
                   await reload()
                 }}
-                className="grid size-7 shrink-0 place-items-center rounded-md text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                className="grid size-7 shrink-0 place-items-center rounded-md text-ink-faint hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
                 aria-label={t('Stop watching')}
                 title={t('Stop watching (nothing already imported is removed)')}
               >
@@ -195,8 +195,8 @@ function WatchFolders(props: { version: number }) {
 function Metric(props: { value: number; label: string; muted?: boolean }) {
   return (
     <div className="w-16">
-      <div className={`text-[15px] font-semibold tabular-nums ${props.muted ? 'text-stone-400' : ''}`}>{n(props.value)}</div>
-      <div className="text-[11px] text-stone-500 dark:text-stone-400">{props.label}</div>
+      <div className={`text-[15px] font-semibold tabular-nums ${props.muted ? 'text-ink-faint' : ''}`}>{n(props.value)}</div>
+      <div className="text-[11px] text-ink-muted">{props.label}</div>
     </div>
   )
 }
@@ -223,13 +223,13 @@ function ImportDetail({ s, onBack }: { s: ImportSummary; onBack: () => void }) {
     <div className="scroll-page h-full overflow-y-auto">
       <div className="drag h-11" />
       <div className="mx-auto max-w-3xl px-8 pb-12">
-        <button onClick={onBack} className="no-drag mb-4 inline-flex items-center gap-1.5 text-[13px] text-stone-500 transition hover:text-stone-900 dark:hover:text-stone-100">
+        <button onClick={onBack} className="no-drag mb-4 inline-flex items-center gap-1.5 text-[13px] text-ink-muted transition hover:text-stone-900 dark:hover:text-stone-100">
           <ArrowLeft className="size-4" />{' '}{t('Imports')}</button>
         <h1 className="font-[family-name:var(--font-display)] text-[26px] font-semibold tracking-tight">{sourcesLabel(s.sources)}</h1>
         <div className="mt-6 overflow-hidden rounded-[14px] border border-line bg-card">
           {rows.map(([k, v]) => (
             <div key={k} className="flex gap-4 border-b border-stone-100 px-5 py-2.5 text-[13px] last:border-0 dark:border-stone-800">
-              <div className="w-48 shrink-0 text-stone-500 dark:text-stone-400">{k}</div>
+              <div className="w-48 shrink-0 text-ink-muted">{k}</div>
               <div className="min-w-0 break-all">{v}</div>
             </div>
           ))}

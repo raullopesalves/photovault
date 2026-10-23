@@ -22,7 +22,7 @@ export function ImportSheet(props: {
       <ModalPanel className="relative flex max-h-full w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-stone-950/20 animate-rise-in dark:bg-stone-900 dark:ring-1 dark:ring-white/10" aria-label={t('Import')}>
         <button
           onClick={working || p?.phase === 'ready' ? props.onHide : props.onClose}
-          className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-full text-ink-faint transition hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
           aria-label={working ? t('Hide') : t('Close')}
           title={working ? t('Continue in background') : t('Close')}
         >
@@ -66,7 +66,7 @@ function Header(props: { icon: ReactNode; title: string; subtitle?: string; badg
           <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[11px] font-medium text-accent-600 dark:bg-accent-500/15 dark:text-accent-400">{props.badge}</span>
         )}
       </div>
-      {props.subtitle && <p className="mt-1 truncate text-[13px] text-stone-500 dark:text-stone-400" title={props.subtitle}>{props.subtitle}</p>}
+      {props.subtitle && <p className="mt-1 truncate text-[13px] text-ink-muted" title={props.subtitle}>{props.subtitle}</p>}
     </div>
   )
 }
@@ -87,10 +87,10 @@ function Bar(props: { value: number; total: number; indeterminate?: boolean }) {
 function Stat(props: { label: string; value: number; muted?: boolean }) {
   return (
     <div>
-      <div className={`font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums tracking-tight ${props.muted ? 'text-stone-400 dark:text-stone-500' : ''}`}>
+      <div className={`font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums tracking-tight ${props.muted ? 'text-ink-faint' : ''}`}>
         {n(props.value)}
       </div>
-      <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{props.label}</div>
+      <div className="mt-0.5 text-xs text-ink-muted">{props.label}</div>
     </div>
   )
 }
@@ -107,8 +107,8 @@ function Step(props: { state: 'done' | 'active' | 'todo'; label: string; detail?
           <div className="size-1.5 rounded-full bg-stone-300 dark:bg-stone-600" />
         )}
       </div>
-      <span className={props.state === 'todo' ? 'text-stone-400 dark:text-stone-500' : ''}>{props.label}</span>
-      {props.detail && <span className="ml-auto text-xs tabular-nums text-stone-500 dark:text-stone-400">{props.detail}</span>}
+      <span className={props.state === 'todo' ? 'text-ink-faint' : ''}>{props.label}</span>
+      {props.detail && <span className="ml-auto text-xs tabular-nums text-ink-muted">{props.detail}</span>}
     </div>
   )
 }
@@ -144,7 +144,7 @@ function Analyzing({ p }: { p: ImportProgress }) {
         <Step state={st(3)} label={t('Checking for duplicates')} />
       </div>
       {p.phase === 'scanning' && (
-        <div className="mx-8 mt-5 flex justify-between text-xs text-stone-500 dark:text-stone-400">
+        <div className="mx-8 mt-5 flex justify-between text-xs text-ink-muted">
           <span>{t('Counting files — the time estimate starts once the total is known')}</span>
           <span className="tabular-nums">{clockLabel(p.elapsedSeconds)}</span>
         </div>
@@ -153,16 +153,16 @@ function Analyzing({ p }: { p: ImportProgress }) {
       {p.phase === 'analyzing' && (
         <div className="mx-8 mt-2">
           <Bar value={p.analyzed} total={p.analyzeTotal} />
-          <div className="mt-2 flex justify-between gap-4 text-xs text-stone-500 dark:text-stone-400">
+          <div className="mt-2 flex justify-between gap-4 text-xs text-ink-muted">
             <span className="truncate">{p.currentFile ? basename(p.currentFile) : ''}</span>
             <span className="shrink-0 tabular-nums">{bytes(p.bytesProcessed)}</span>
           </div>
           {p.hashesReused > 0 && (
-            <div className="mt-1 text-xs text-stone-500 dark:text-stone-400">{plural(p.hashesReused, 'unchanged file')}{' '}{t('recognised from earlier imports')}</div>
+            <div className="mt-1 text-xs text-ink-muted">{plural(p.hashesReused, 'unchanged file')}{' '}{t('recognised from earlier imports')}</div>
           )}
         </div>
       )}
-      <p className="mx-8 mt-6 flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
+      <p className="mx-8 mt-6 flex items-center gap-2 text-xs text-ink-muted">
         <ShieldCheck className="size-3.5" />{' '}{t('Read-only: nothing is copied until you confirm.')}</p>
       <div className="mx-8 mt-5 flex justify-end">
         <button
@@ -246,14 +246,14 @@ function Ready({ p, s }: { p: ImportProgress; s: ImportSummary }) {
           {s.errors > 0 && <ItemList importId={p.importId} classification="error" title={t('Could not be read')} count={s.errors} />}
         </div>
 
-        <div className="mx-8 mt-4 text-xs text-stone-500 dark:text-stone-400">
+        <div className="mx-8 mt-4 text-xs text-ink-muted">
           {n(s.filesScanned)}{' '}{t('files scanned')}{s.archivesFound > 0 && t(' in {archivesFound}', { archivesFound: plural(s.archivesFound, 'ZIP archive') })} ·{' '}
           {n(s.ignoredFound + s.sidecarsFound)}{' '}{t('non-media files')}{s.hashesReused > 0 && t(' · {hashesReused} unchanged since an earlier import', { hashesReused: n(s.hashesReused) })}
         </div>
       </div>
 
       <div className="mt-2 flex items-center justify-between gap-3 border-t border-stone-100 px-8 py-5 dark:border-stone-800">
-        <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+        <div className="flex items-center gap-1.5 text-xs text-ink-muted">
           <ShieldCheck className="size-3.5 shrink-0" />{t('Files are copied and verified. Your sources stay untouched.')}</div>
         <div className="flex shrink-0 gap-2">
           <button
@@ -289,7 +289,7 @@ function SummaryRow(props: { value: number; label: string; detail?: string; stro
       </div>
       <div className="min-w-0">
         <div className={`text-[14px] ${props.strong ? 'font-medium' : ''}`}>{props.label}</div>
-        {props.detail && <div className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{props.detail}</div>}
+        {props.detail && <div className="mt-0.5 text-xs text-ink-muted">{props.detail}</div>}
       </div>
     </div>
   )
@@ -318,7 +318,7 @@ export function ItemList(props: {
       >
         <ChevronDown className={`size-4 transition-transform ${open ? '' : '-rotate-90'}`} />
         {props.title}
-        <span className="font-normal text-stone-400">{n(props.count)}</span>
+        <span className="font-normal text-ink-faint">{n(props.count)}</span>
       </button>
       {open && (
         <div className="scroll-thin mb-2 ml-6 max-h-56 space-y-1.5 overflow-y-auto pr-2">
@@ -328,17 +328,17 @@ export function ItemList(props: {
               <div className="truncate text-stone-800 dark:text-stone-200" title={it.relativePath}>
                 {it.relativePath}
               </div>
-              <div className="truncate text-stone-500 dark:text-stone-400">
+              <div className="truncate text-ink-muted">
                 {it.classification === 'duplicate_library' || it.classification === 'duplicate_batch'
                   ? t('Identical to {v0}', { v0: it.matchRelativePath ?? it.matchFilename ?? t('another file in this import') })
                   : it.error ?? it.outcome ?? ''}
                 {it.sha256 && (it.classification === 'duplicate_library' || it.classification === 'duplicate_batch') && (
-                  <span className="font-mono text-[11px] text-stone-400"> · {it.sha256.slice(0, 12)}…</span>
+                  <span className="font-mono text-[11px] text-ink-faint"> · {it.sha256.slice(0, 12)}…</span>
                 )}
               </div>
             </div>
           ))}
-          {items && !props.onlyFailed && items.length < props.count && <div className="text-xs text-stone-400">{t('…and')}{' '}{n(props.count - items.length)}{' '}{t('more (see Imports)')}</div>}
+          {items && !props.onlyFailed && items.length < props.count && <div className="text-xs text-ink-faint">{t('…and')}{' '}{n(props.count - items.length)}{' '}{t('more (see Imports)')}</div>}
         </div>
       )}
     </div>
@@ -347,7 +347,7 @@ export function ItemList(props: {
 
 function EtaLine({ p }: { p: ImportProgress }) {
   return (
-    <div className="mx-8 mt-5 flex justify-between gap-4 text-xs text-stone-500 dark:text-stone-400">
+    <div className="mx-8 mt-5 flex justify-between gap-4 text-xs text-ink-muted">
       <span className="font-medium text-stone-700 dark:text-stone-300">{etaLabel(p.etaSeconds)}</span>
       <span className="shrink-0 tabular-nums">
         {[rateLabel(p.rate, p.rateUnit), t('{v0} elapsed', { v0: clockLabel(p.elapsedSeconds) })].filter(Boolean).join(' · ')}
@@ -364,24 +364,24 @@ function Importing({ p }: { p: ImportProgress }) {
       <div className="mx-8 mt-7">
         <div className="mb-2 flex items-baseline justify-between">
           <span className="font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums tracking-tight">
-            {n(p.committed)} <span className="text-base font-normal text-stone-400">{t('of')}{' '}{n(p.commitTotal)}</span>
+            {n(p.committed)} <span className="text-base font-normal text-ink-faint">{t('of')}{' '}{n(p.commitTotal)}</span>
           </span>
-          <span className="text-xs tabular-nums text-stone-500">{clockLabel(p.elapsedSeconds)}{' '}{t('elapsed')}</span>
+          <span className="text-xs tabular-nums text-ink-muted">{clockLabel(p.elapsedSeconds)}{' '}{t('elapsed')}</span>
         </div>
         <Bar value={linking ? 1 : p.bytesTotal > 0 ? p.bytesProcessed : p.committed} total={linking ? 1 : p.bytesTotal > 0 ? p.bytesTotal : p.commitTotal} />
         {!linking && (
-          <div className="mt-2 flex justify-between gap-4 text-xs text-stone-500 dark:text-stone-400">
+          <div className="mt-2 flex justify-between gap-4 text-xs text-ink-muted">
             <span className="font-medium text-stone-700 dark:text-stone-300">{etaLabel(p.etaSeconds)}</span>
             <span className="shrink-0 tabular-nums">
               {[rateLabel(p.rate, p.rateUnit), p.bytesTotal > 0 && t('{v0} of {v1}', { v0: bytes(p.bytesProcessed), v1: bytes(p.bytesTotal) })].filter(Boolean).join(' · ')}
             </span>
           </div>
         )}
-        <div className="mt-2 truncate text-xs text-stone-500 dark:text-stone-400">
+        <div className="mt-2 truncate text-xs text-ink-muted">
           {linking ? t('Remembering where duplicates were found') : p.currentFile ? t('Copying and verifying {v0}', { v0: basename(p.currentFile) }) : ''}
         </div>
       </div>
-      <p className="mx-8 mt-6 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Each file is copied, re-fingerprinted and only then added to the library. You can hide this window and keep browsing; thumbnails appear as they are ready.')}</p>
+      <p className="mx-8 mt-6 text-xs leading-relaxed text-ink-muted">{t('Each file is copied, re-fingerprinted and only then added to the library. You can hide this window and keep browsing; thumbnails appear as they are ready.')}</p>
       <div className="mx-8 mt-5 flex justify-end">
         <button
           onClick={() => void api.cancelImport(p.importId)}

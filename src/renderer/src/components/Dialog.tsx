@@ -53,7 +53,7 @@ export function PromptDialog(props: {
   return (
     <Shell onClose={props.onClose}>
       <h2 className="text-[17px] font-semibold">{props.title}</h2>
-      {props.label && <p className="mt-1 text-[13px] text-stone-500 dark:text-stone-400">{props.label}</p>}
+      {props.label && <p className="mt-1 text-[13px] text-ink-muted">{props.label}</p>}
       <input
         ref={input}
         value={value}
@@ -92,7 +92,7 @@ export function DateDialog(props: {
   return (
     <Shell onClose={props.onClose}>
       <h2 className="text-[17px] font-semibold">{props.title}</h2>
-      {props.label && <p className="mt-1 text-[13px] leading-relaxed text-stone-500 dark:text-stone-400">{props.label}</p>}
+      {props.label && <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{props.label}</p>}
       <div className="mt-4 flex gap-2">
         <input type="date" value={date} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} className={`${field} flex-1`} autoFocus />
         <input type="time" value={time} onChange={(e) => setTime(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} className={`${field} w-32`} />
@@ -141,7 +141,7 @@ export function ShareDialog(props: { count: number; onShare: (opts: ShareOptions
           <label key={s.id} className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 ${size === s.id ? 'bg-stone-100 dark:bg-stone-800' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50'}`}>
             <input type="radio" checked={size === s.id} onChange={() => setSize(s.id)} className="accent-accent-500" />
             <span className="text-[13.5px] font-medium">{s.label}</span>
-            <span className="text-xs text-stone-500 dark:text-stone-400">{s.hint}</span>
+            <span className="text-xs text-ink-muted">{s.hint}</span>
           </label>
         ))}
       </div>
@@ -183,7 +183,7 @@ export function PrintDialog(props: { count: number; title: string; onMake: (layo
             <input type="radio" checked={layout === l.id} onChange={() => setLayout(l.id)} className="mt-1 accent-accent-500" />
             <span>
               <span className="block text-[13.5px] font-medium">{l.label}</span>
-              <span className="block text-xs text-stone-500 dark:text-stone-400">{l.hint}</span>
+              <span className="block text-xs text-ink-muted">{l.hint}</span>
             </span>
           </label>
         ))}

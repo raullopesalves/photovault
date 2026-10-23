@@ -73,7 +73,7 @@ export function BackupPanel(props: { version: number }) {
             setError(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err))
           }
           refresh()
-        }} className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900`}>
+        }} className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900`}>
           <Plus className="size-3.5" />{' '}{t('Add backup location')}</button>
       </div>
       {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[13px] text-red-800 dark:bg-red-500/10 dark:text-red-300">{error}</div>}
@@ -104,8 +104,8 @@ export function BackupPanel(props: { version: number }) {
                       {plural(tg.missingAssets, 'item')}{' '}{t('not on it yet')}</span>
                   )}
                 </div>
-                {tg.label && <div className="truncate text-[11.5px] text-stone-400">{tg.path}</div>}
-                <div className="mt-0.5 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+                {tg.label && <div className="truncate text-[11.5px] text-ink-faint">{tg.path}</div>}
+                <div className="mt-0.5 text-xs leading-relaxed text-ink-muted">
                   {!tg.reachable
                     ? t('Not connected{v0}. Plug it in: it is brought up to date automatically.', { v0: tg.lastCompletedAt ? t(' — last updated {v0}', { v0: ago(tg.lastCompletedAt) }) : '' })
                     : t('{filesBackedUp} of {totalFiles} originals copied and verified · {v2}', { filesBackedUp: n(tg.filesBackedUp), totalFiles: n(status.totalFiles), v2: bytes(tg.bytesBackedUp) })}
@@ -115,7 +115,7 @@ export function BackupPanel(props: { version: number }) {
                 </div>
                 {tg.lastError && !running && <div className="mt-1 text-xs text-red-600 dark:text-red-400">{tg.lastError}</div>}
               </div>
-              <button onClick={() => setRemoving(tg.id)} className="grid size-8 shrink-0 place-items-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800" title={t('Remove this backup location')}>
+              <button onClick={() => setRemoving(tg.id)} className="grid size-8 shrink-0 place-items-center rounded-lg text-ink-faint hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800" title={t('Remove this backup location')}>
                 <X className="size-4" />
               </button>
             </div>
@@ -126,7 +126,7 @@ export function BackupPanel(props: { version: number }) {
               />
             </div>
             {running && (
-              <div className="mt-2 flex justify-between gap-4 text-xs text-stone-500 dark:text-stone-400">
+              <div className="mt-2 flex justify-between gap-4 text-xs text-ink-muted">
                 <span className="font-medium text-stone-700 dark:text-stone-300">
                   {running.mode === 'verify' ? t('Verifying') : t('Copying')} {n(running.filesDone)}{' '}{t('of')}{' '}{n(running.filesTotal)} · {etaLabel(running.etaSeconds)}
                 </span>
@@ -141,11 +141,11 @@ export function BackupPanel(props: { version: number }) {
                 <button onClick={() => void api.cancelBackup()} className={soft}>{t('Stop')}</button>
               ) : (
                 <>
-                  <button disabled={!!progress || !tg.reachable} onClick={() => void run(tg.id, false)} className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900`}>{t('Back up now')}</button>
+                  <button disabled={!!progress || !tg.reachable} onClick={() => void run(tg.id, false)} className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900`}>{t('Back up now')}</button>
                   <button disabled={!!progress || !tg.reachable} onClick={() => void run(tg.id, true)} className={soft} title={t('Re-read every copy and compare its fingerprint; repairs missing or damaged copies')}>{t('Verify all copies')}</button>
                 </>
               )}
-              <label className="ml-auto flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
+              <label className="ml-auto flex items-center gap-2 text-xs text-ink-muted">
                 <input
                   type="checkbox"
                   checked={tg.auto}
@@ -161,7 +161,7 @@ export function BackupPanel(props: { version: number }) {
       })}
 
       {status.targets.length > 0 && (
-        <div className="rounded-[14px] border border-line bg-card px-5 py-4 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+        <div className="rounded-[14px] border border-line bg-card px-5 py-4 text-xs leading-relaxed text-ink-muted">
           <span className="font-medium text-stone-700 dark:text-stone-300">{t('Keep a copy away from home.')}</span>{' '}{t('A fire or theft takes a backup drive that sits next to the computer too. With two drives, keep one elsewhere (work, family) and swap them every month or so — each is brought up to date the moment it is plugged in.')}{' '}{status.targets.length === 1 && t('Add a second drive here to start rotating.')}
           <div className="mt-2">{t('Checks: your library\'s files are re-read and compared with their fingerprints automatically every month')}{status.lastLibraryCheck ? t(' (last complete check {v0})', { v0: ago(status.lastLibraryCheck) }) : t(' (first check soon)')}{t('; connected backup drives are verified on the same schedule.')}</div>
         </div>
@@ -216,7 +216,7 @@ function SnapshotsCard(props: { version: number }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="text-[14px] font-medium">{t('Catalogue snapshots')}</div>
-        <p className="mt-0.5 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Albums, labels, dates and history live in the catalogue database. Photo Vault snapshots it daily, after every import, before permanent deletes and before upgrades.')}{' '}
+        <p className="mt-0.5 text-xs leading-relaxed text-ink-muted">{t('Albums, labels, dates and history live in the catalogue database. Photo Vault snapshots it daily, after every import, before permanent deletes and before upgrades.')}{' '}
           {latest ? t('{count} kept · latest {date} ({reason}).', { count: plural(snaps?.length ?? 0, 'snapshot'), date: isoLocal(latest.createdAt), reason: (REASONS[latest.reason] ?? latest.reason).toLowerCase() }) : t('No snapshot yet.')}
         </p>
         {snaps && snaps.length > 0 && (
@@ -224,8 +224,8 @@ function SnapshotsCard(props: { version: number }) {
             {snaps.map((s) => (
               <div key={s.name} className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-[12.5px] hover:bg-stone-50 dark:hover:bg-stone-800/60">
                 <span className="w-40 shrink-0 tabular-nums">{isoLocal(s.createdAt)}</span>
-                <span className="flex-1 text-stone-500 dark:text-stone-400">{REASONS[s.reason] ?? s.reason}</span>
-                <span className="text-stone-400">{bytes(s.sizeBytes)}</span>
+                <span className="flex-1 text-ink-muted">{REASONS[s.reason] ?? s.reason}</span>
+                <span className="text-ink-faint">{bytes(s.sizeBytes)}</span>
                 <button onClick={() => setRestoring(s)} className="rounded-md px-2 py-0.5 font-medium text-accent-600 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-500/10">{t('Restore')}</button>
               </div>
             ))}

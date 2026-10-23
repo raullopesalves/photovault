@@ -102,7 +102,7 @@
   --line-strong: #7c827b;
   --ink: #1a1e1b;
   --ink-muted: #565d57;
-  --ink-faint: #7d847d;
+  --ink-faint: #646a63; /* 4.6:1 on the shelf, 5.0:1 on the mat */
   --on-ink: #f4f4f0;
   --brass: #ad7e25;
   --brass-ink: #7a5612;
@@ -125,7 +125,7 @@
   --line-strong: #737a72;
   --ink: #ecede7;
   --ink-muted: #a2a9a1;
-  --ink-faint: #7b827a;
+  --ink-faint: #8f968e; /* 4.5:1 on stone-800, 5.1:1 on a card */
   --on-ink: #121412;
   --brass: #d8a94f;
   --brass-ink: #e3b968;

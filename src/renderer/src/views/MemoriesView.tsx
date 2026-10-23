@@ -29,7 +29,7 @@ export function MemoriesView(props: { version: number }) {
           <span className="flex items-center gap-2">
             <button
               onClick={() => setOpen(null)}
-              className="no-drag grid size-8 place-items-center rounded-lg text-stone-500 transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+              className="no-drag grid size-8 place-items-center rounded-lg text-ink-muted transition hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
               aria-label={t('All memories')}
             >
               <ArrowLeft className="size-4" />
@@ -38,7 +38,7 @@ export function MemoriesView(props: { version: number }) {
           </span>
         }
         subtitle={open.subtitle}
-        empty={<div className="mt-16 text-center text-stone-500">{t('These photos are no longer in the library.')}</div>}
+        empty={<div className="mt-16 text-center text-ink-muted">{t('These photos are no longer in the library.')}</div>}
       />
     )
   }
@@ -49,7 +49,7 @@ export function MemoriesView(props: { version: number }) {
       <div className="mx-auto max-w-5xl space-y-10 px-8 pb-12">
         {list === null && <div className="skeleton h-48 rounded-2xl" />}
         {list?.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-stone-500 dark:border-stone-700 dark:text-stone-400">
+          <div className="rounded-2xl border border-dashed border-stone-300 py-14 text-center text-[13.5px] text-ink-muted dark:border-stone-700 dark:text-stone-400">
             <Sparkles className="mx-auto mb-2 size-6" />{t('Memories appear once the library has photos with dates (and, for trips, locations).')}</div>
         )}
         {list &&
@@ -63,7 +63,7 @@ export function MemoriesView(props: { version: number }) {
                   {s.icon} {s.title}
                 </h2>
                 {items.length === 0 ? (
-                  <div className="text-[13px] text-stone-500 dark:text-stone-400">{s.empty}</div>
+                  <div className="text-[13px] text-ink-muted">{s.empty}</div>
                 ) : (
                   <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
                     {items.map((m) => (
@@ -94,9 +94,9 @@ function MemoryCard(props: { memory: Memory; onOpen: () => void }) {
       </div>
       <div className="px-4 py-3">
         <div className="truncate text-[14px] font-semibold">{m.title}</div>
-        <div className="truncate text-xs text-stone-500 dark:text-stone-400">
+        <div className="truncate text-xs text-ink-muted">
           {m.subtitle} · {n(m.count)}{' '}{t('photos')}</div>
-        {m.places && m.places.length > 1 && <div className="truncate text-xs text-stone-400 dark:text-stone-500">{m.places.join(' · ')}</div>}
+        {m.places && m.places.length > 1 && <div className="truncate text-xs text-ink-faint">{m.places.join(' · ')}</div>}
       </div>
     </button>
   )

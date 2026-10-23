@@ -22,12 +22,12 @@ export function StorageView({ library, version }: { library: LibraryInfo; versio
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[14px] font-medium">{t('Photo Vault library')}</div>
-            <div className="truncate text-xs text-stone-500 dark:text-stone-400">{library.path}</div>
+            <div className="truncate text-xs text-ink-muted">{library.path}</div>
           </div>
           <div className="text-right">
             <div className="text-[17px] font-semibold tabular-nums">{bytes(library.totalBytes)}</div>
-            {library.binCount > 0 && <div className="text-xs text-stone-500 dark:text-stone-400">{t('incl.')}{' '}{bytes(library.binBytes)}{' '}{t('in the Bin')}</div>}
-            <div className="text-xs text-stone-500 dark:text-stone-400">
+            {library.binCount > 0 && <div className="text-xs text-ink-muted">{t('incl.')}{' '}{bytes(library.binBytes)}{' '}{t('in the Bin')}</div>}
+            <div className="text-xs text-ink-muted">
               {n(library.photoCount)}{' '}{t('photos ·')}{' '}{n(library.videoCount)}{' '}{t('videos')}</div>
           </div>
           <button
@@ -101,7 +101,7 @@ function VerifyCard() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium">{t('Verify originals')}</div>
-          <div className="mt-0.5 text-[13px] leading-relaxed text-stone-500 dark:text-stone-400">
+          <div className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">
             {!v && t('Re-reads every original and compares it with the SHA-256 fingerprint recorded at import. Nothing is changed.')}
             {running && v && t('Checking {filesChecked} of {filesTotal} files · {v2}{v3}', { filesChecked: n(v.filesChecked), filesTotal: n(v.filesTotal), v2: etaLabel(v.etaSeconds), v3: v.rate ? ` · ${bytes(v.rate)}/s` : '' })}
             {v && v.status === 'completed' && problems === 0 && t('All {ok} verified intact · {v1}', { ok: plural(v.ok, 'original'), v1: isoLocal(v.completedAt) })}
@@ -124,7 +124,7 @@ function VerifyCard() {
         ) : (
           <button
             onClick={() => void api.startVerify().then(setV)}
-            className="h-9 shrink-0 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:text-stone-900"
+            className="h-9 shrink-0 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
           >
             {v ? t('Verify again') : t('Verify library')}
           </button>
@@ -147,7 +147,7 @@ function VerifyCard() {
               </span>
             </div>
           ))}
-          <p className="pt-2 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{t('Photo Vault never repairs or deletes files on its own. Restore these from a backup, or re-import them from the original source — identical bytes will be recognised.')}</p>
+          <p className="pt-2 text-xs leading-relaxed text-ink-muted">{t('Photo Vault never repairs or deletes files on its own. Restore these from a backup, or re-import them from the original source — identical bytes will be recognised.')}</p>
         </div>
       )}
     </div>

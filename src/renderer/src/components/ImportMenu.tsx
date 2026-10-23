@@ -80,7 +80,7 @@ function MenuItem(props: { icon: ReactNode; title: string; body: string; onClick
       <span className="mt-0.5 text-accent-600 dark:text-accent-400">{props.icon}</span>
       <span>
         <span className="block text-[13.5px] font-medium text-stone-900 dark:text-stone-100">{props.title}</span>
-        <span className="block text-xs leading-snug text-stone-500 dark:text-stone-400">{props.body}</span>
+        <span className="block text-xs leading-snug text-ink-muted">{props.body}</span>
       </span>
     </button>
   )

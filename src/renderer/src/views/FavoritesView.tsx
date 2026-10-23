@@ -24,7 +24,7 @@ export function FavoritesView(props: { version: number }) {
               <Heart className="size-6" strokeWidth={1.6} />
             </div>
             <div className="text-[16px] font-semibold">{t('No favourites yet')}</div>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400">{t('Tap the heart on a photo, or select several and choose “Favourite”. Favourites from Google Takeout are kept too.')}</p>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-muted">{t('Tap the heart on a photo, or select several and choose “Favourite”. Favourites from Google Takeout are kept too.')}</p>
           </div>
         )
       }

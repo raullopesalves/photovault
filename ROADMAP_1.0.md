@@ -61,7 +61,7 @@ Backups and catalogue snapshots are well tested in code (`tests/backup.test.ts`,
 
 - [x] **Keyboard and screen reader pass.** The whole app is usable without a mouse, and Windows Narrator reads the main views sensibly. *Done 2026-10-23 (D99): `npm run test:a11y` checks every page with axe-core and the grid, viewer, dialogs and menus by keyboard, in CI. Still to do: listen to the main views with Narrator once (you); the audit checks names and roles, not how they sound.*
 - [ ] **People, Memories and Albums design pass.** They have the new colours and fonts but not the layout care given to Photos and Tidy up.
-- [ ] **Accessibility of colour.** Every status (safe, attention, damaged) also has an icon and a word, and every text colour meets 4.5:1 in both themes (the design system already specifies this; it needs checking in the app).
+- [x] **Accessibility of colour.** Every status (safe, attention, damaged) also has an icon and a word, and every text colour meets 4.5:1 in both themes (the design system already specifies this; it needs checking in the app). *Done 2026-10-23 (D100): the audit fails on any contrast problem, in both themes, in CI.*
 
 ## Not in 1.0
 
