@@ -1076,7 +1076,7 @@ It is trust.
 The user must be able to give Photo Vault irreplaceable personal photographs and understand exactly what the application has done with them.
 ---
 
-# 29. Implementation Status (updated 2026-10-23, version 0.14.0)
+# 29. Implementation Status (updated 2026-10-23, version 0.15.0)
 
 Milestones 0–5 are implemented, and most of Milestone 6:
 - **Import and safety:** resumable imports, library verification, catalogue snapshots and mirror backups.
@@ -1138,6 +1138,10 @@ See `DECISIONS.md` (D1–D88) for reasoning and `readme.md` for commands.
   - Map: offline country outlines, optional OpenStreetMap, clustering, photos by place.
 - **Search:** full-text search via FTS5 trigrams (accent-insensitive, includes folders and albums); **smart search** with CLIP on the device, opt-in, model downloaded once, results best match first.
 - **Scale:** a 100k-item performance test (`npm run test:perf`).
+
+### Added in 0.15
+
+- **Working on your photos:** a sidebar card with a bar for smart search, descriptions and people while they run; it opens their Settings sections. The viewer closes back into its tile; the smoke test runs in CI (D93).
 
 ### Added in 0.14
 

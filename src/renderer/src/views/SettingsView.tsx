@@ -18,6 +18,8 @@ async function changeLanguage(lang: Language): Promise<void> {
 }
 
 export function SettingsView(props: {
+  /** Changes each time the sidebar's progress card is clicked: scroll to the AI sections. */
+  focusAi?: number
   library: LibraryInfo
   theme: ThemePreference
   onTheme: (t: ThemePreference) => void
@@ -29,6 +31,13 @@ export function SettingsView(props: {
     { id: 'light', label: t('Light'), icon: <Sun className="size-4" /> },
     { id: 'dark', label: t('Dark'), icon: <Moon className="size-4" /> }
   ]
+  // Opened from the sidebar's "Working on your photos" card: go straight to the AI sections.
+  useEffect(() => {
+    // After the sections above have loaded their status (their height changes), or the jump lands short.
+    if (!props.focusAi) return
+    const timer = setTimeout(() => document.getElementById('ai-progress')?.scrollIntoView({ block: 'start' }), 250)
+    return () => clearTimeout(timer)
+  }, [props.focusAi])
   return (
     <div className="scroll-page h-full overflow-y-auto">
       <PageHeader title={t('Settings')} />
@@ -74,6 +83,7 @@ export function SettingsView(props: {
           </div>
         </Group>
 
+        <div id="ai-progress" className="scroll-mt-20" />
         <SmartSearchGroup />
 
         <CaptionsGroup />
@@ -319,7 +329,7 @@ function SmartSearchGroup() {
           <Sparkles className="size-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Find photos by what they show — “beach at sunset”, “dog”, “birthday cake”, “receipt” — with the')}{' '}<Sparkles className="inline size-3.5" />{' '}{t('button in the search box. It runs entirely on this computer: your photos are never uploaded. Turning it on downloads the AI model (about 150 MB, once) from Hugging Face, then looks at every photo in the background (roughly 1–2 minutes per 1,000 photos).')}</p>
+          <p className="text-[13px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Find photos by what they show — “beach at sunset”, “dog”, “birthday cake”, “receipt”: type it in the search box and pick “Photos that look like…”. It runs entirely on this computer: your photos are never uploaded. Turning it on downloads the AI model (about 150 MB, once) from Hugging Face, then looks at every photo in the background (roughly 1–2 minutes per 1,000 photos).')}</p>
           {status && (
             <div className={`mt-3 flex items-center gap-2 text-[13px] ${s.phase === 'error' ? 'text-red-600 dark:text-red-400' : 'text-stone-700 dark:text-stone-300'}`}>
               {(s.phase === 'downloading' || s.phase === 'indexing' || s.phase === 'loading') && <LoaderCircle className="size-3.5 animate-spin" />}

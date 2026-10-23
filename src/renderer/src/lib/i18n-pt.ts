@@ -1,5 +1,14 @@
 /** European Portuguese (pt-PT). Keys are the English interface text; see i18n.ts. Missing keys show in English. */
 export const PT: Record<string, string> = {
+  "Find photos by what they show — “beach at sunset”, “dog”, “birthday cake”, “receipt”: type it in the search box and pick “Photos that look like…”. It runs entirely on this computer: your photos are never uploaded. Turning it on downloads the AI model (about 150 MB, once) from Hugging Face, then looks at every photo in the background (roughly 1–2 minutes per 1,000 photos).":
+    "Encontre fotografias pelo que mostram — “pôr do sol na praia”, “cão”, “bolo de anos”, “recibo”: escreva na caixa de pesquisa e escolha “Fotografias que parecem…”. Funciona totalmente neste computador: as suas fotografias nunca são enviadas. Ao ativar, transfere o modelo de IA (cerca de 150 MB, uma vez) do Hugging Face e depois analisa cada fotografia em segundo plano (cerca de 1–2 minutos por cada 1000 fotografias).",
+  "{loaded} of {total} MB": "{loaded} de {total} MB",
+  "Getting ready…": "A preparar…",
+  "{done} of {total}": "{done} de {total}",
+  "Descriptions": "Descrições",
+  "Grouping faces…": "A agrupar rostos…",
+  "Working on your photos: {jobs}": "A trabalhar nas suas fotografias: {jobs}",
+  "Working on your photos": "A trabalhar nas fotografias",
   "Nearby photos": "Fotografias próximas",
   "Photo {n}": "Fotografia {n}",
   "Nothing to review. Exact duplicates and reviewed groups are listed here.": "Nada para rever. Os duplicados exatos e os grupos revistos estão aqui.",
@@ -271,8 +280,6 @@ export const PT: Record<string, string> = {
   "Bin": "Lixo",
   "Bin the other": "Mover a outra para o Lixo",
   "bursts to review": "sequências por rever",
-  "button in the search box. It runs entirely on this computer: your photos are never uploaded. Turning it on downloads the AI model (about 150 MB, once) from Hugging Face, then looks at every photo in the background (roughly 1–2 minutes per 1,000 photos).":
-    "na caixa de pesquisa. Funciona totalmente neste computador: as suas fotografias nunca são enviadas. Ao ativar, transfere o modelo de IA (cerca de 150 MB, uma vez) do Hugging Face e depois analisa cada fotografia em segundo plano (cerca de 1–2 minutos por cada 1000 fotografias).",
   "by you": "por si",
   "Byte-for-byte identical": "Idênticos byte a byte",
   "Camera": "Câmara",
@@ -436,8 +443,6 @@ export const PT: Record<string, string> = {
   "Filter by name": "Filtrar por nome",
   "Filters": "Filtros",
   "Find people in my photos": "Encontrar pessoas nas minhas fotografias",
-  "Find photos by what they show — “beach at sunset”, “dog”, “birthday cake”, “receipt” — with the":
-    "Encontre fotografias pelo que mostram — “praia ao pôr do sol”, “cão”, “bolo de anos”, “recibo” — com o botão",
   "Finding photos and videos": "A procurar fotografias e vídeos",
   "Finding photos and videos (inside ZIPs too)": "A procurar fotografias e vídeos (também dentro de ZIPs)",
   "Finish the current import first": "Termine primeiro a importação atual",

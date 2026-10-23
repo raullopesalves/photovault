@@ -263,6 +263,15 @@ try {
     await page.screenshot({ path: join(shots, 'screens-photos-search.png') })
   }
 
+  if (process.argv.includes('--ai-progress')) {
+    // The sidebar's "Working on your photos" card while smart search and descriptions run (pass --models=).
+    await page.waitForTimeout(20_000)
+    await page.screenshot({ path: join(shots, 'ai-card.png') })
+    await page.click('aside button[aria-label^="Working on your photos"]')
+    await page.waitForTimeout(1500)
+    await page.screenshot({ path: join(shots, 'ai-settings.png') })
+  }
+
   if (process.argv.includes('--redesign')) {
     // The Mount redesign: date rail, one search box, mount selection, Tidy up, Safety, viewer.
     const shot = (name) => page.screenshot({ path: join(shots, `mount-${name}.png`) })

@@ -20,6 +20,7 @@ import type { ImportProgress, LibraryInfo } from '@shared/types'
 import { etaLabel, n } from '../lib/format'
 import { ImportMenu, type ImportKind } from './ImportMenu'
 import { Mark } from './Mark'
+import { BackgroundWork } from './BackgroundWork'
 import { t } from '../lib/i18n'
 
 export type View =
@@ -99,6 +100,8 @@ export function Sidebar(props: {
   progress: ImportProgress | null
   onImport: (kind: ImportKind) => void
   onShowImport: () => void
+  /** Opens Settings at the AI sections (smart search, descriptions). */
+  onShowAi: () => void
 }) {
   const { progress, library } = props
   const pct =
@@ -148,6 +151,7 @@ export function Sidebar(props: {
       <div className="flex-1" />
 
       <div className="no-drag flex flex-col gap-2">
+        <BackgroundWork onOpen={props.onShowAi} />
         {library.assetCount > 0 && <SafetyStatus library={library} active={props.view === 'storage'} onClick={() => props.onView('storage')} />}
         {props.importRunning && progress && (
           <button onClick={props.onShowImport} className="w-full rounded-[14px] border border-line bg-card p-3 text-left transition-colors hover:border-line-strong">

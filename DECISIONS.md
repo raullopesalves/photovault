@@ -475,3 +475,5 @@ The People page shows people in order of photo count, with unnamed ones as "Add 
 - **Look-alikes** stay in Tidy up after everything is reviewed, so the Duplicates page (exact duplicates, reviewed groups) is always reachable.
 - **Tests:** the end-to-end smoke test follows the new navigation (Import menu, Tidy up cards, Places, the safety card, the search box, the Filters panel) and passes; it is not run in CI.
 
+**D93. Background work is visible (0.15).** Smart search, descriptions and people run for hours on a large library, and their progress lived only deep in Settings. A "Working on your photos" card at the foot of the sidebar (`BackgroundWork.tsx`) shows one bar per running job (percentage on the card, exact counts on hover), disappears when nothing runs, and opens Settings scrolled to the AI sections. Also in 0.15: the viewer closes back into its tile, the smoke test runs in CI (temp paths resolved with `realpathSync.native`; artifact uploads cannot fail a job), and the 100k performance test covers the redesign's queries.
+

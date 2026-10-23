@@ -34,6 +34,7 @@ export default function App() {
   const [view, setView] = useState<View>('photos')
   const [theme, setTheme] = useState<ThemePreference>('system')
   const [showScreenshots, setShowScreenshots] = useState(false)
+  const [aiFocus, setAiFocus] = useState(0)
   const [duplicatesTab, setDuplicatesTab] = useState<'exact' | 'probable' | 'similar'>('exact')
   const [progress, setProgress] = useState<ImportProgress | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -176,6 +177,10 @@ export default function App() {
         progress={progress}
         onShowImport={() => setSheetOpen(true)}
         onImport={(kind) => void startImport(kind)}
+        onShowAi={() => {
+          setView('settings')
+          setAiFocus((f) => f + 1)
+        }}
       />
       <main className="relative min-w-0 flex-1">
         {view === 'photos' && (
@@ -194,6 +199,7 @@ export default function App() {
         {view === 'storage' && <StorageView library={library} version={version} />}
         {view === 'settings' && (
           <SettingsView
+            focusAi={aiFocus}
             library={library}
             theme={theme}
             onTheme={changeTheme}
