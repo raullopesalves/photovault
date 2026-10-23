@@ -4,7 +4,7 @@
 // Usage: node scripts/e2e-smoke.mjs [screenshotDir] [--packaged]
 import { _electron as electron } from 'playwright-core'
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdtempSync, mkdirSync, copyFileSync, cpSync, readdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, copyFileSync, cpSync, readdirSync, readFileSync, realpathSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createRequire } from 'node:module'
@@ -18,7 +18,8 @@ const shots = resolve(args.find((a) => !a.startsWith('--')) ?? join(tmpdir(), 'p
 // --packaged tests dist/win-unpacked/Photo Vault.exe (built by `electron-builder --dir`) instead of the dev bundle.
 if (args.includes('--packaged') && !process.env.PV_EXE) process.env.PV_EXE = resolve('dist/win-unpacked/Photo Vault.exe')
 mkdirSync(shots, { recursive: true })
-const root = mkdtempSync(join(tmpdir(), 'photovault-e2e-'))
+// The full path, as the app shows it: CI runners' temp folder is an 8.3 short name (C:\Users\RUNNER~1\…).
+const root = realpathSync.native(mkdtempSync(join(tmpdir(), 'photovault-e2e-')))
 const photos = join(root, 'My Photos')
 const userData = join(root, 'userdata')
 mkdirSync(userData, { recursive: true })

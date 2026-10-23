@@ -41,8 +41,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:e2e -- "${{ runner.temp }}/photovault-e2e-shots"
+      # Screenshots only when the test fails, and never failing the job: the account's artifact storage can be full.
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
+        continue-on-error: true
         with:
           name: e2e-screenshots
           path: ${{ runner.temp }}/photovault-e2e-shots
@@ -71,7 +73,9 @@ jobs:
       - run: npm test
       - run: node scripts/electron-vite.mjs build
       - run: npx electron-builder ${{ matrix.target }} --publish never
+      # A full artifact storage quota must not fail an otherwise good build.
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: photo-vault-${{ matrix.os }}
           path: |
