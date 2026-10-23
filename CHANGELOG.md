@@ -2,6 +2,16 @@
 
 Each version's notes are shown on its release page and in the app (Guide → What's new). The release script refuses to publish a version that has no section here.
 
+## 0.16.0 (2026-10-23)
+
+- **If something goes wrong, the app recovers.** A page that fails shows "Something went wrong" with a way back instead of a blank window, and the rest of the app keeps working. Crashes are written to the library's log, and background work (smart search, descriptions, people) restarts on its own.
+- **Your edits live outside the app too.** Dates, places, favourites, descriptions, tags, albums and people are written next to each photo in a small `.xmp` file that other photo programs (digiKam, Lightroom, darktable) can read, and the whole catalogue is saved as one file in `metadata/catalogue.json`. Backups carry both. The first start writes them for every photo, which takes a few minutes on a large library.
+- **Recovery is proven.** Every change is now tested by deleting a library and opening its backup drive in a fresh install. That found and fixed two problems: thumbnails did not come back in a recovered library, and a library opened from its backup drive said it was protected by itself.
+- **A guide in the app.** The ? button next to Settings explains importing, backups, hiding and the Bin, moving to a new computer and the AI features, with What's new for each version.
+- **Works without a mouse.** Arrow keys move through photos, Enter opens one, Space selects. Dialogs and the viewer keep the keyboard inside them and return you where you were. Every photo and button has a name for screen readers such as Narrator. Fixed on the way: opening a photo with Enter closed it again at once.
+- **Easier to read.** Grey text is darker in light theme and every text colour meets the 4.5:1 contrast standard in both themes. Buttons no longer turn dark on dark when hovered in dark theme.
+- **People, Memories and Albums tidied up.** They line up with Photos; People is split into Named and Not named yet; a person's page says Rename, Merge and Hide in words; trip cards no longer cut off their photo counts.
+
 ## 0.15.1 (2026-10-23)
 
 - **Filter counts match the page you are on.** Counts in the Filters panel now count only what that page shows (Photos without screenshots and hidden items, one album, one person…), so "2026: 620" no longer sits over a Photos view showing 4.
