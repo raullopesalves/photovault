@@ -60,5 +60,6 @@
     "release": "node scripts/release.mjs"
   },
   "productName": "Photo Vault",
-  "author": "Photo Vault"
+  "author": "Photo Vault",
+  "license": "MIT"
 }
