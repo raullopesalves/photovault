@@ -166,9 +166,7 @@ export const PT: Record<string, string> = {
     ", a melhor cópia sugerida fica visível e as outras são ocultadas da cronologia de Fotografias. Nada é eliminado — as cópias ocultas ficam na biblioteca, em Limpeza e aqui, e podem voltar a ser mostradas.",
   "; connected backup drives are verified on the same schedule.": "; os discos de cópia ligados são verificados com a mesma frequência.",
   "; on Android choose": "; no Android escolha",
-  "; Permissions → Contents:": "; Permissões → Contents:",
   ". The phone is only read — nothing on it is changed or deleted.": ". O telemóvel só é lido — nada nele é alterado ou eliminado.",
-  ". The token is stored encrypted on this computer.": ". O token é guardado encriptado neste computador.",
   "… groups update as it goes.": "… os grupos atualizam-se à medida que avança.",
   "…and": "…e",
   "· saved": "· guardado",
@@ -217,7 +215,6 @@ export const PT: Record<string, string> = {
   "Add a caption…": "Adicionar uma legenda…",
   "Add a description": "Adicionar uma descrição",
   "Add a face": "Adicionar um rosto",
-  "Add a GitHub token below to get updates from your private repository.": "Adicione um token do GitHub abaixo para receber atualizações do seu repositório privado.",
   "Add a name": "Adicionar um nome",
   "Add a second drive here to start rotating.": "Adicione aqui um segundo disco para começar a alternar.",
   "Add a tag…": "Adicionar uma etiqueta…",
@@ -470,7 +467,6 @@ export const PT: Record<string, string> = {
   "Full size": "Tamanho completo",
   "GIF-like loop": "Ciclo tipo GIF",
   "GIF-like loops": "Ciclos tipo GIF",
-  "GitHub access": "Acesso ao GitHub",
   "Go": "Ir",
   "Google metadata attached": "Metadados do Google associados",
   "Google metadata found for": "Metadados do Google encontrados para",
@@ -749,7 +745,6 @@ export const PT: Record<string, string> = {
   "Re-read every copy and compare its fingerprint; repairs missing or damaged copies": "Reler cada cópia e comparar a sua impressão digital; repara cópias em falta ou danificadas",
   "Re-reads every original and compares it with the SHA-256 fingerprint recorded at import. Nothing is changed.":
     "Relê cada original e compara-o com a impressão digital SHA-256 registada na importação. Nada é alterado.",
-  "Read-only": "Só leitura",
   "Read-only: nothing is copied until you confirm.": "Só leitura: nada é copiado até confirmar.",
   "Reading export metadata (Google Takeout JSON)": "A ler os metadados da exportação (JSON do Google Takeout)",
   "Reading Google metadata…": "A ler os metadados do Google…",
@@ -992,8 +987,6 @@ export const PT: Record<string, string> = {
   "You have the latest version.": "Tem a versão mais recente.",
   "you permanently deleted, so importing the same files again (e.g. from an old ZIP) skips them.":
     "que eliminou definitivamente, por isso importar de novo os mesmos ficheiros (p. ex. de um ZIP antigo) ignora-os.",
-  "Your code repository is private, so the app needs a read-only token to see new versions. On github.com: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate. Repository access: only":
-    "O seu repositório de código é privado, por isso a aplicação precisa de um token só de leitura para ver novas versões. Em github.com: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate. Repository access: only",
   "Your original file is never changed.": "O seu ficheiro original nunca é alterado.",
   "Your own photos": "As suas fotografias",
   "Your photos, permanently yours.": "As suas fotografias, suas para sempre.",
@@ -1020,5 +1013,7 @@ export const PT: Record<string, string> = {
   "Not named yet": "Ainda sem nome",
   "Found in your photos": "Encontradas nas suas fotografias",
   "Name the people you know, and they can be found by name. Strangers can stay unnamed, or be hidden from their page.": "Dê nome às pessoas que conhece e passa a encontrá-las pelo nome. Desconhecidos podem ficar sem nome, ou ser ocultados na página deles.",
-  "Albums that fill themselves: search for something in Photos, then choose “Save as smart album”.": "Álbuns que se enchem sozinhos: pesquise algo em Fotografias e escolha “Guardar como álbum inteligente”."
+  "Albums that fill themselves: search for something in Photos, then choose “Save as smart album”.": "Álbuns que se enchem sozinhos: pesquise algo em Fotografias e escolha “Guardar como álbum inteligente”.",
+  "GitHub token (optional)": "Token do GitHub (opcional)",
+  "Not needed: updates come from the public repository. A saved token is still used for update checks and stored encrypted on this computer; remove it if checks start failing (tokens expire).": "Não é necessário: as atualizações vêm do repositório público. Um token guardado continua a ser usado nas verificações e fica encriptado neste computador; remova-o se as verificações começarem a falhar (os tokens expiram)."
 }

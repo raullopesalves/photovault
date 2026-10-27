@@ -25,7 +25,6 @@ publish:
   provider: github
   owner: raullopesalves
   repo: photovault
-  private: true
   releaseType: release
 win:
   files:

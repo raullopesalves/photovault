@@ -252,9 +252,7 @@ function UpdatesGroup(props: { onWhatsNew: () => void }) {
               ? t('You have the latest version.')
               : s.state === 'error'
                 ? t('Could not check: {error}', { error: s.error })
-                : !s.tokenSet
-                  ? t('Add a GitHub token below to get updates from your private repository.')
-                  : t('Updates are checked automatically.')
+                : t('Updates are checked automatically.')
   return (
     <Group title={t('Updates')}>
       <div className="text-[13px] text-stone-600 dark:text-stone-400">{t('Photo Vault')}{' '}{s.version}. {line}
@@ -270,8 +268,8 @@ function UpdatesGroup(props: { onWhatsNew: () => void }) {
       </div>
       {s.canUpdate && (
         <div className="mt-5 border-t border-stone-100 pt-4 dark:border-stone-800">
-          <div className="text-[13px] font-medium">{t('GitHub access')}{' '}{s.tokenSet && <span className="ml-1 text-emerald-600 dark:text-emerald-400">{t('· saved')}</span>}</div>
-          <p className="mt-1 text-xs leading-relaxed text-ink-muted">{t('Your code repository is private, so the app needs a read-only token to see new versions. On github.com: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate. Repository access: only')}{' '}<b>{t('photovault')}</b>{t('; Permissions → Contents:')}{' '}<b>{t('Read-only')}</b>{t('. The token is stored encrypted on this computer.')}</p>
+          <div className="text-[13px] font-medium">{t('GitHub token (optional)')}{' '}{s.tokenSet && <span className="ml-1 text-emerald-600 dark:text-emerald-400">{t('· saved')}</span>}</div>
+          <p className="mt-1 text-xs leading-relaxed text-ink-muted">{t('Not needed: updates come from the public repository. A saved token is still used for update checks and stored encrypted on this computer; remove it if checks start failing (tokens expire).')}</p>
           <div className="mt-2 flex gap-2">
             <input
               type="password"

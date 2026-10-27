@@ -76,7 +76,7 @@ Cada fotografia é identificada com a origem mais provável, a partir de pistas 
 2. Copie a pasta da biblioteca inteira para o computador novo, ou para um disco que leve consigo. Copie a pasta toda, não só `originals`. O catálogo em `database` guarda os seus álbuns, pessoas e datas.
 3. Instale o Photo Vault no computador novo, escolha **Abrir uma biblioteca existente** e escolha a pasta copiada.
 4. Na página **Segurança**, confira os discos de cópia. Se um disco tiver agora outra letra, remova-o e adicione-o de novo com **Adicionar local de cópia**. É reconhecido e só é copiado o que for novo.
-5. No computador novo, adicione de novo o token de atualizações em **Definições → Atualizações**, e ligue de novo a pesquisa inteligente e as descrições se as usava. Voltam a transferir os modelos, ou carregam-nos de uma pasta guardada com **Definições → Modelos de IA → Guardar uma cópia numa pasta…**.
+5. No computador novo, ligue de novo a pesquisa inteligente e as descrições se as usava. Voltam a transferir os modelos, ou carregam-nos de uma pasta guardada com **Definições → Modelos de IA → Guardar uma cópia numa pasta…**.
 
 Também pode abrir um disco de cópia (ver "Se perder a biblioteca") se o computador antigo não estiver disponível.
 

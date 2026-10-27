@@ -5,10 +5,10 @@ import type { UpdateStatus } from '@shared/types'
 import { isOffline } from './network'
 
 /**
- * Auto-update from the private GitHub repository's Releases (electron-updater). The app needs a read-only
- * GitHub token to see a private repo; the user pastes one in Settings and it is stored encrypted with the OS
- * key store (DPAPI on Windows). Checks shortly after start and every 6 hours, downloads in the background and
- * installs on quit (or "Restart now"). Only the installed (NSIS) build can update itself.
+ * Auto-update from the public GitHub repository's Releases (electron-updater). No token is needed; one saved in
+ * Settings (from when the repository was private) is still used, stored encrypted with the OS key store (DPAPI on
+ * Windows). Checks shortly after start and every 6 hours, downloads in the background and installs on quit (or
+ * "Restart now"). Only the installed (NSIS) build can update itself.
  */
 const OWNER = 'raullopesalves'
 const REPO = 'photovault'
@@ -54,13 +54,9 @@ export async function checkForUpdates(): Promise<UpdateStatus> {
     set({ state: 'offline' })
     return updateStatus()
   }
-  if (!token) {
-    set({ state: 'needs-token' })
-    return updateStatus()
-  }
   try {
     const u = await updater()
-    u.setFeedURL({ provider: 'github', owner: OWNER, repo: REPO, private: true, token })
+    u.setFeedURL(token ? { provider: 'github', owner: OWNER, repo: REPO, private: true, token } : { provider: 'github', owner: OWNER, repo: REPO })
     set({ state: 'checking', error: undefined })
     await u.checkForUpdates()
   } catch (err) {
@@ -90,7 +86,7 @@ export async function startUpdater(onStatus: (s: UpdateStatus) => void): Promise
 export async function setUpdateToken(token: string | null): Promise<UpdateStatus> {
   if (!token) {
     rmSync(tokenFile(), { force: true })
-    set({ state: 'needs-token' })
+    void checkForUpdates()
     return updateStatus()
   }
   const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: { authorization: `token ${token}`, 'user-agent': 'PhotoVault' } })

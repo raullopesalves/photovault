@@ -76,7 +76,7 @@ Every photo is labelled with where it most likely came from, based on clues in t
 2. Copy the whole library folder to the new computer, or to a drive you take with you. Copy the folder itself, not just `originals`. The catalogue in `database` holds your albums, people and dates.
 3. Install Photo Vault on the new computer, choose **Open an existing library** and pick the copied folder.
 4. On the **Safety** page, check your backup drives. If a drive now has a different letter, remove it and add it again with **Add backup location**. It is recognised, and only what is new is copied.
-5. On the new computer, add the update token again in **Settings → Updates**, and turn on smart search and descriptions again if you used them. They download their models again, or load them from a folder saved with **Settings → AI models → Save a copy to a folder…**.
+5. On the new computer, turn on smart search and descriptions again if you used them. They download their models again, or load them from a folder saved with **Settings → AI models → Save a copy to a folder…**.
 
 Opening a backup drive (see "If the library is lost") also works, if the old computer is not available.
 

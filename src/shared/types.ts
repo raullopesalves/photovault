@@ -560,7 +560,7 @@ export interface PhoneCopyProgress {
 }
 
 export interface UpdateStatus {
-  state: 'idle' | 'offline' | 'needs-token' | 'checking' | 'up-to-date' | 'downloading' | 'ready' | 'error'
+  state: 'idle' | 'offline' | 'checking' | 'up-to-date' | 'downloading' | 'ready' | 'error'
   /** Running version. */
   version: string
   /** Newer version found / downloaded. */
@@ -791,7 +791,7 @@ export interface PhotoVaultApi {
   onPhoneProgress(cb: (p: PhoneCopyProgress) => void): () => void
   updateStatus(): Promise<UpdateStatus>
   checkForUpdates(): Promise<UpdateStatus>
-  /** Saves the read-only GitHub token used to fetch updates from the private repository (null removes it). */
+  /** Saves an optional read-only GitHub token for update checks (null removes it). */
   setUpdateToken(token: string | null): Promise<UpdateStatus>
   installUpdate(): Promise<void>
   onUpdateStatus(cb: (s: UpdateStatus) => void): () => void
