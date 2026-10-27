@@ -51,6 +51,8 @@ run('node', [join('node_modules', 'electron-builder', 'cli.js'), '--win', 'nsis'
 
 const files = [`PhotoVault-Setup-${version}.exe`, `PhotoVault-Setup-${version}.exe.blockmap`, 'latest.yml'].map((f) => join('dist', f))
 for (const f of files) if (!existsSync(f)) throw new Error(`${f} was not built`)
+// The installed app must be able to update itself: check the packaged build's updater before publishing.
+run('node', ['scripts/check-packaged-updater.mjs'])
 
 // GitHub only publishes a release for an existing tag: tag the current commit (once) and push it.
 if (!execFileSync('git', ['tag', '--list', tag], { encoding: 'utf8' }).trim()) execFileSync('git', ['tag', tag])

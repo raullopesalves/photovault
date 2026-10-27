@@ -40,7 +40,9 @@ function canSelfUpdate(): boolean {
 }
 
 async function updater(): Promise<typeof import('electron-updater').autoUpdater> {
-  return (await import('electron-updater')).autoUpdater
+  const m = await import('electron-updater')
+  // CommonJS with a lazy getter: the bundled import() only sees it on the default export (named one is undefined).
+  return m.autoUpdater ?? (m as unknown as { default: typeof m }).default.autoUpdater
 }
 
 export function updateStatus(): UpdateStatus {

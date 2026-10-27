@@ -2,6 +2,10 @@
 
 Each version's notes are shown on its release page and in the app (Guide → What's new). The release script refuses to publish a version that has no section here.
 
+## 0.16.2 (2026-10-27)
+
+- Fixed: installed copies could not check for updates at all, because the update module failed to load. Copies that seemed stuck on an older version were affected. From this version on, Settings → Updates → Check now works, and the release process checks it before publishing.
+
 ## 0.16.1 (2026-10-27)
 
 - **Updates need no token.** Photo Vault is now open source (MIT licence) and its releases are public, so installed copies find new versions on their own. A token saved in Settings → Updates is still used, but no longer needed.
