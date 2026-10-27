@@ -121,7 +121,7 @@ export function Sidebar(props: {
       <div className="h-7 shrink-0" />
       <div className="flex items-center gap-2.5 px-2">
         <Mark size={24} />
-        <span className="font-[family-name:var(--font-display)] text-[17px] font-[750] tracking-[-0.02em] text-ink">{t('Photo Vault')}</span>
+        <span className="font-[family-name:var(--font-display)] text-[17px] font-bold tracking-[-0.02em] text-ink">{t('Photo Vault')}</span>
       </div>
 
       <nav className="no-drag flex flex-col gap-[18px]" aria-label={t('Library')}>
@@ -142,7 +142,7 @@ export function Sidebar(props: {
                 >
                   <span className={active ? 'text-brass-ink' : 'text-ink-muted'}>{item.icon}</span>
                   <span className="flex-1">{item.label}</span>
-                  {count ? <span className="font-mono text-[12px] tabular-nums text-ink-muted">{n(count)}</span> : null}
+                  {count ? <span className="text-[12px] tabular-nums text-ink-muted">{n(count)}</span> : null}
                 </button>
               )
             })}
@@ -224,7 +224,7 @@ function SafetyStatus(props: { library: LibraryInfo; active: boolean; onClick: (
       aria-label={`${t('Safety')}: ${title}. ${detail}`}
       className={`flex w-full items-start gap-2.5 rounded-[14px] border bg-card px-3 py-2.5 text-left transition-colors ${props.active ? 'border-brass' : 'border-line hover:border-line-strong'}`}
     >
-      <span className={`grid size-7 shrink-0 place-items-center rounded-lg ${safe ? 'bg-safe-soft text-safe' : 'bg-brass-soft text-brass-ink'}`}>
+      <span className={`grid size-7 shrink-0 place-items-center rounded-lg ${safe ? 'bg-safe-soft text-safe' : 'bg-warn-soft text-warn'}`}>
         {safe ? <ShieldCheck className="size-4" strokeWidth={1.75} /> : <ShieldAlert className="size-4" strokeWidth={1.75} />}
       </span>
       <span className="min-w-0 flex-1">

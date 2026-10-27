@@ -29,7 +29,7 @@ function Shell(props: { children: ReactNode; onClose: () => void }) {
 
 const btn = 'h-9 rounded-lg px-4 text-[13.5px] font-medium transition'
 const secondary = `${btn} text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800`
-const primary = `${btn} bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200`
+const primary = `${btn} bg-brass text-on-accent hover:bg-brass-hover disabled:opacity-40`
 const danger = `${btn} bg-red-600 text-white hover:bg-red-700`
 
 export function PromptDialog(props: {

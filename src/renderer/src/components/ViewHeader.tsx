@@ -25,7 +25,7 @@ export function SectionTitle(props: { title: string; icon?: ReactNode; count?: n
       <h2 className="flex items-center gap-2 font-[family-name:var(--font-display)] text-[19px] font-[650] leading-6 tracking-[-0.01em]">
         {props.icon && <span className="text-ink-muted">{props.icon}</span>}
         {props.title}
-        {props.count !== undefined && <span className="ml-0.5 font-mono text-[13px] font-normal tabular-nums text-ink-muted">{n(props.count)}</span>}
+        {props.count !== undefined && <span className="ml-0.5 text-[13px] font-normal tabular-nums text-ink-muted">{n(props.count)}</span>}
       </h2>
       {props.subtitle && <p className="mt-1 max-w-2xl text-[12.5px] leading-[18px] text-ink-muted">{props.subtitle}</p>}
     </div>

@@ -173,7 +173,7 @@ export function SearchBox(props: { query: AssetQuery; onChange: (q: AssetQuery) 
     <div ref={box} className="relative w-[340px] max-w-full">
       <label
         className={`flex h-9 items-center gap-2 rounded-lg border px-3 text-ink-muted transition-[background-color,border-color,box-shadow] duration-[var(--dur-quick)] ${
-          showPanel ? 'border-line-strong bg-card shadow-[0_6px_20px_rgba(26,30,27,0.10)]' : 'border-transparent bg-shelf focus-within:border-brass-ink focus-within:bg-card'
+          showPanel ? 'border-line-strong bg-card shadow-[0_6px_20px_rgba(32,33,36,0.10)]' : 'border-transparent bg-shelf focus-within:border-brass-ink focus-within:bg-card'
         }`}
       >
         {mode === 'smart' ? <Sparkles className="size-4 shrink-0 text-brass-ink" /> : <Search className="size-4 shrink-0" />}
@@ -207,14 +207,14 @@ export function SearchBox(props: { query: AssetQuery; onChange: (q: AssetQuery) 
             <X className="size-3.5" />
           </button>
         ) : (
-          <span className="rounded-[4px] border border-line px-1.5 py-[3px] font-mono text-[11px] leading-none">Ctrl K</span>
+          <span className="rounded-[4px] border border-line px-1.5 py-[3px] tabular-nums text-[11px] leading-none">Ctrl K</span>
         )}
       </label>
       {showPanel && (
         <div
           id="search-results"
           role="listbox"
-          className="absolute left-0 top-full z-30 mt-1.5 w-[420px] max-w-[calc(100vw-300px)] rounded-[14px] border border-line bg-card p-1.5 shadow-[0_6px_20px_rgba(26,30,27,0.12)] animate-pop"
+          className="absolute left-0 top-full z-30 mt-1.5 w-[420px] max-w-[calc(100vw-300px)] rounded-[14px] border border-line bg-card p-1.5 shadow-[0_6px_20px_rgba(32,33,36,0.12)] animate-pop"
         >
           {rows.map((r, i) => (
             <div key={r.key}>
@@ -230,7 +230,7 @@ export function SearchBox(props: { query: AssetQuery; onChange: (q: AssetQuery) 
               >
                 <span className="grid size-6 shrink-0 place-items-center text-ink-muted">{r.icon}</span>
                 <span className="min-w-0 flex-1 truncate">{r.title}</span>
-                {r.meta && <span className="font-mono text-[12px] tabular-nums text-ink-muted">{r.meta}</span>}
+                {r.meta && <span className="text-[12px] tabular-nums text-ink-muted">{r.meta}</span>}
               </button>
             </div>
           ))}

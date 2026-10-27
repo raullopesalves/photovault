@@ -37,7 +37,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
             <FolderInput className="mb-3 size-8 text-ink-faint" strokeWidth={1.5} />
             <div className="font-medium">{t('No imports yet')}</div>
             <div className="mt-4 flex gap-2">
-              <button onClick={() => props.onImport('folder')} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">{t('Import a folder')}</button>
+              <button onClick={() => props.onImport('folder')} className="h-9 rounded-lg bg-brass px-4 text-[13.5px] font-medium text-on-accent hover:bg-brass-hover">{t('Import a folder')}</button>
               <button onClick={() => props.onImport('zip')} className="h-9 rounded-lg bg-stone-200/70 px-4 text-[13.5px] font-medium dark:bg-stone-800">{t('Google Takeout / ZIP')}</button>
               <button onClick={() => props.onImport('phone')} className="h-9 rounded-lg bg-stone-200/70 px-4 text-[13.5px] font-medium dark:bg-stone-800">{t('Phone or camera')}</button>
             </div>
@@ -80,7 +80,7 @@ export function ImportsView(props: { version: number; onImport: (kind: ImportKin
                       props.onResume(s.importId)
                     }}
                     title={props.busy ? t('Finish the current import first') : t('Review and continue this import')}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-brass px-3 text-[12.5px] font-medium text-on-accent hover:bg-brass-hover transition disabled:opacity-40"
                   >
                     <Play className="size-3 fill-current" />{' '}{t('Resume')}</button>
                 )}
@@ -139,7 +139,7 @@ function WatchFolders(props: { version: number }) {
         )}
         <button
           onClick={add}
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-brass px-3 text-[12.5px] font-medium text-on-accent hover:bg-brass-hover"
         >
           <Eye className="size-3.5" />{' '}{t('Watch a folder')}</button>
       </div>

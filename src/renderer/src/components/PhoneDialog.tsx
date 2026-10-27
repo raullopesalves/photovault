@@ -7,7 +7,7 @@ import { t } from '../lib/i18n'
 
 const btn = 'h-9 rounded-lg px-4 text-[13.5px] font-medium transition'
 const secondary = `${btn} text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800`
-const primary = `${btn} bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200`
+const primary = `${btn} bg-brass text-on-accent hover:bg-brass-hover disabled:opacity-40`
 
 const mb = (b: number): string => (b >= 1e9 ? `${(b / 1e9).toFixed(1)} GB` : `${Math.round(b / 1e6)} MB`)
 
@@ -103,7 +103,7 @@ export function PhoneDialog(props: { onImport: (folder: string) => void; onClose
         {copying && (
           <div className="mt-5">
             <div className="h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
-              <div className="h-full bg-accent-500 transition-all" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-brass transition-all" style={{ width: `${pct}%` }} />
             </div>
             <p className="mt-2 text-[13px] tabular-nums text-stone-600 dark:text-stone-400">
               {!progress || !progress.total

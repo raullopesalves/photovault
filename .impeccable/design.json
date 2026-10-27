@@ -1,0 +1,852 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T16:08:26.055Z",
+  "title": "Design System: Photo Vault",
+  "extensions": {
+    "colorMeta": {
+      "mat": {
+        "role": "neutral",
+        "displayName": "Page Ground",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "mat-dark": {
+        "role": "neutral",
+        "displayName": "Page Ground (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "shelf": {
+        "role": "neutral",
+        "displayName": "Sidebar Grey",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "shelf-dark": {
+        "role": "neutral",
+        "displayName": "Sidebar Grey (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "card-dark": {
+        "role": "neutral",
+        "displayName": "Card White (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Hairline (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "line-strong-dark": {
+        "role": "neutral",
+        "displayName": "Strong Hairline (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "ink-muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Ink (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "ink-faint-dark": {
+        "role": "neutral",
+        "displayName": "Faint Ink (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "on-ink": {
+        "role": "neutral",
+        "displayName": "On Ink",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "on-ink-dark": {
+        "role": "neutral",
+        "displayName": "On Ink (dark theme)",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      },
+      "brass": {
+        "role": "primary",
+        "displayName": "Vault Blue",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-dark": {
+        "role": "primary",
+        "displayName": "Vault Blue (dark theme)",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-hover": {
+        "role": "primary",
+        "displayName": "Vault Blue Hover",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-hover-dark": {
+        "role": "primary",
+        "displayName": "Vault Blue Hover (dark theme)",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-ink": {
+        "role": "primary",
+        "displayName": "Accent Ink",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-ink-dark": {
+        "role": "primary",
+        "displayName": "Accent Ink (dark theme)",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-soft": {
+        "role": "primary",
+        "displayName": "Soft Accent Ground",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "brass-soft-dark": {
+        "role": "primary",
+        "displayName": "Soft Accent Ground (dark theme)",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "On Accent",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "on-accent-dark": {
+        "role": "primary",
+        "displayName": "On Accent (dark theme)",
+        "tonalRamp": [
+          "#0b1d3a",
+          "#1c2b45",
+          "#1a56c7",
+          "#1a5fd6",
+          "#8ab4f8",
+          "#a8c7fa",
+          "#d2e3fc",
+          "#e8f0fe"
+        ]
+      },
+      "safe": {
+        "role": "status",
+        "displayName": "Safe",
+        "tonalRamp": [
+          "#083d1c",
+          "#0b5226",
+          "#0d652d",
+          "#137333",
+          "#1e8e3e",
+          "#81c995",
+          "#ceead6",
+          "#e6f4ea"
+        ]
+      },
+      "safe-dark": {
+        "role": "status",
+        "displayName": "Safe (dark theme)",
+        "tonalRamp": [
+          "#083d1c",
+          "#0b5226",
+          "#0d652d",
+          "#137333",
+          "#1e8e3e",
+          "#81c995",
+          "#ceead6",
+          "#e6f4ea"
+        ]
+      },
+      "safe-soft": {
+        "role": "status",
+        "displayName": "Safe Ground",
+        "tonalRamp": [
+          "#083d1c",
+          "#0b5226",
+          "#0d652d",
+          "#137333",
+          "#1e8e3e",
+          "#81c995",
+          "#ceead6",
+          "#e6f4ea"
+        ]
+      },
+      "safe-soft-dark": {
+        "role": "status",
+        "displayName": "Safe Ground (dark theme)",
+        "tonalRamp": [
+          "#083d1c",
+          "#0b5226",
+          "#0d652d",
+          "#137333",
+          "#1e8e3e",
+          "#81c995",
+          "#ceead6",
+          "#e6f4ea"
+        ]
+      },
+      "risk": {
+        "role": "status",
+        "displayName": "Damage",
+        "tonalRamp": [
+          "#5c0808",
+          "#8a0b0b",
+          "#a50e0e",
+          "#c5221f",
+          "#d93025",
+          "#f28b82",
+          "#fad2cf",
+          "#fce8e6"
+        ]
+      },
+      "risk-dark": {
+        "role": "status",
+        "displayName": "Damage (dark theme)",
+        "tonalRamp": [
+          "#5c0808",
+          "#8a0b0b",
+          "#a50e0e",
+          "#c5221f",
+          "#d93025",
+          "#f28b82",
+          "#fad2cf",
+          "#fce8e6"
+        ]
+      },
+      "risk-soft": {
+        "role": "status",
+        "displayName": "Damage Ground",
+        "tonalRamp": [
+          "#5c0808",
+          "#8a0b0b",
+          "#a50e0e",
+          "#c5221f",
+          "#d93025",
+          "#f28b82",
+          "#fad2cf",
+          "#fce8e6"
+        ]
+      },
+      "risk-soft-dark": {
+        "role": "status",
+        "displayName": "Damage Ground (dark theme)",
+        "tonalRamp": [
+          "#5c0808",
+          "#8a0b0b",
+          "#a50e0e",
+          "#c5221f",
+          "#d93025",
+          "#f28b82",
+          "#fad2cf",
+          "#fce8e6"
+        ]
+      },
+      "warn": {
+        "role": "status",
+        "displayName": "Needs Attention",
+        "tonalRamp": [
+          "#522900",
+          "#7a3d00",
+          "#a35200",
+          "#e37400",
+          "#f9ab00",
+          "#fdd663",
+          "#feefc3",
+          "#fef7e0"
+        ]
+      },
+      "warn-dark": {
+        "role": "status",
+        "displayName": "Needs Attention (dark theme)",
+        "tonalRamp": [
+          "#522900",
+          "#7a3d00",
+          "#a35200",
+          "#e37400",
+          "#f9ab00",
+          "#fdd663",
+          "#feefc3",
+          "#fef7e0"
+        ]
+      },
+      "warn-soft": {
+        "role": "status",
+        "displayName": "Needs Attention Ground",
+        "tonalRamp": [
+          "#522900",
+          "#7a3d00",
+          "#a35200",
+          "#e37400",
+          "#f9ab00",
+          "#fdd663",
+          "#feefc3",
+          "#fef7e0"
+        ]
+      },
+      "warn-soft-dark": {
+        "role": "status",
+        "displayName": "Needs Attention Ground (dark theme)",
+        "tonalRamp": [
+          "#522900",
+          "#7a3d00",
+          "#a35200",
+          "#e37400",
+          "#f9ab00",
+          "#fdd663",
+          "#feefc3",
+          "#fef7e0"
+        ]
+      },
+      "control-fill-dark": {
+        "role": "neutral",
+        "displayName": "Dark Control Fill",
+        "tonalRamp": [
+          "#131314",
+          "#202124",
+          "#3c4043",
+          "#5f6368",
+          "#80868b",
+          "#bdc1c6",
+          "#dadce0",
+          "#f8f9fa"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The Welcome screen's one sentence. Nowhere else."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles, in the same position on every page."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Month headers, section titles on browsing pages, the safety statement."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "\"Photo Vault\" beside the mark in the sidebar."
+      },
+      "dialog-title": {
+        "displayName": "Dialog title",
+        "purpose": "The title of a modal."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Navigation rows (650 when current), buttons, segments."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanatory text in cards and dialogs."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Page subtitles and filter chips, in muted ink."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase navigation group names and Filters panel section names only."
+      },
+      "count": {
+        "displayName": "Count",
+        "purpose": "Tabular figures for every count, size and progress number."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Hashes, file paths, inline code, error text."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover",
+        "value": "0 6px 20px rgba(32,33,36,0.12)",
+        "purpose": "Filter panel, open search panel, menus anchored to a control."
+      },
+      {
+        "name": "floating",
+        "value": "0 25px 50px -12px rgb(19 19 20 / 0.2)",
+        "purpose": "Dialogs and the selection bar (Tailwind shadow-2xl, near-black tint)."
+      },
+      {
+        "name": "lift",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "The large primary button on an empty state (Tailwind shadow-sm)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "dur-instant",
+        "value": "80ms",
+        "purpose": "Navigation hover washes."
+      },
+      {
+        "name": "dur-quick",
+        "value": "140ms",
+        "purpose": "Small control state changes."
+      },
+      {
+        "name": "dur-base",
+        "value": "220ms",
+        "purpose": "Menus popping in, tile selection inset, page fades."
+      },
+      {
+        "name": "dur-gentle",
+        "value": "320ms",
+        "purpose": "Dialog rise-in, tile ground colour, viewer fade."
+      },
+      {
+        "name": "dur-develop",
+        "value": "420ms",
+        "purpose": "Thumbnail \"develop\": blur and scale settle as the image loads."
+      },
+      {
+        "name": "ease-out-soft",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default for entrances and settling motion."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Position changes such as the date-rail tick."
+      },
+      {
+        "name": "ease-exit",
+        "value": "cubic-bezier(0.4, 0, 1, 1)",
+        "purpose": "Exits."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "120ms",
+        "purpose": "With prefers-reduced-motion every animation and transition is clamped to 120 ms and thumbnails only fade."
+      }
+    ],
+    "focus": {
+      "default": "2px solid outline in brass-ink, offset 2px, on :focus-visible",
+      "darkSurface": ".dark-surface :focus-visible uses #a8c7fa (viewer, editor, slideshow are dark in both themes)"
+    },
+    "themes": {
+      "mechanism": ".dark class on the root swaps the semantic custom properties; the -dark keys in the frontmatter are those values."
+    },
+    "accessibility": {
+      "contrast": "WCAG 2.1 AA for every text pair in both themes, enforced in CI by scripts/a11y-audit.mjs (npm run test:a11y)."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The view's one solid blue action (and the sidebar's Import).",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5v14\"/></svg>Import</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border:none;border-radius:8px;background:var(--brass,#1a5fd6);color:var(--on-accent,#fff);font:500 13.5px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;transition:background-color 140ms cubic-bezier(0.2,0,0,1),transform 140ms cubic-bezier(0.2,0,0,1);}.ds-btn-primary:hover{background:var(--brass-hover,#1a56c7);}.ds-btn-primary:active{transform:scale(0.97);}.ds-btn-primary:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Neutral grey action; every action that is not the primary.",
+      "html": "<button class=\"ds-btn-secondary\">Verify library</button>",
+      "css": ".ds-btn-secondary{height:36px;padding:0 14px;border:none;border-radius:8px;background:var(--shelf,#f1f3f4);color:var(--ink,#1f1f1f);font:500 13px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;transition:background-color 140ms cubic-bezier(0.2,0,0,1);}.ds-btn-secondary:hover{background:var(--line,#dadce0);}.ds-btn-secondary:active{transform:scale(0.98);}.ds-btn-secondary:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "No fill, muted ink; Cancel in dialogs and low-weight actions.",
+      "html": "<button class=\"ds-btn-ghost\">Cancel</button>",
+      "css": ".ds-btn-ghost{height:36px;padding:0 16px;border:none;border-radius:8px;background:transparent;color:var(--ink-muted,#5f6368);font:500 13.5px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;transition:background-color 140ms cubic-bezier(0.2,0,0,1);}.ds-btn-ghost:hover{background:var(--shelf,#f1f3f4);color:var(--ink,#1f1f1f);}.ds-btn-ghost:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sidebar rows; the current page takes the soft accent.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-nav-label\">Library</div><button class=\"ds-nav-item\" aria-current=\"page\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"9\" cy=\"9\" r=\"2\"/><path d=\"m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21\"/></svg><span>Photos</span></button><button class=\"ds-nav-item\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>Favourites</span><span class=\"ds-nav-count\">1,204</span></button></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:1px;width:208px;padding:12px;background:var(--shelf,#f1f3f4);}.ds-nav-label{padding:0 10px 6px;font:650 11px/14px 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-muted,#5f6368);}.ds-nav-item{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border:none;border-radius:8px;background:transparent;color:var(--ink,#1f1f1f);font:500 13.5px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;text-align:left;transition:background-color 80ms;}.ds-nav-item svg{color:var(--ink-muted,#5f6368);}.ds-nav-item span:first-of-type{flex:1;}.ds-nav-item:hover{background:rgb(218 220 224 / 0.6);}.ds-nav-item[aria-current=page]{background:var(--brass-soft,#e8f0fe);color:var(--brass-ink,#1a56c7);font-weight:650;}.ds-nav-item[aria-current=page] svg{color:var(--brass-ink,#1a56c7);}.ds-nav-item:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}.ds-nav-count{font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink-muted,#5f6368);}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Rests on the sidebar grey; on focus turns card white with an accent-ink border.",
+      "html": "<label class=\"ds-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input placeholder=\"Search photos, people, places\"><kbd>Ctrl K</kbd></label>",
+      "css": ".ds-search{display:flex;align-items:center;gap:8px;width:320px;height:36px;padding:0 10px 0 12px;border:1px solid transparent;border-radius:8px;background:var(--shelf,#f1f3f4);color:var(--ink-muted,#5f6368);transition:background-color 140ms,border-color 140ms;}.ds-search:focus-within{background:var(--card,#fff);border-color:var(--brass-ink,#1a56c7);}.ds-search input{flex:1;min-width:0;border:none;background:transparent;outline:none;color:var(--ink,#1f1f1f);font:400 13.5px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;}.ds-search kbd{padding:2px 5px;border:1px solid var(--line,#dadce0);border-radius:4px;font:400 11px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;color:var(--ink-muted,#5f6368);}"
+    },
+    {
+      "name": "Filter Chip and Badge",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "Neutral filter chip; active filters show beneath as soft-accent removable pills.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg>Favourites 12</button><span class=\"ds-badge\">2023<button aria-label=\"Remove filter\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18M6 6l12 12\"/></svg></button></span></div>",
+      "css": ".ds-chips{display:flex;align-items:center;gap:8px;}.ds-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:none;border-radius:8px;background:rgb(218 220 224 / 0.6);color:var(--ink,#1f1f1f);font:500 12.5px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;font-variant-numeric:tabular-nums;transition:background-color 140ms;}.ds-chip:hover{background:var(--line,#dadce0);}.ds-chip:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}.ds-badge{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 4px 0 12px;border-radius:9999px;background:var(--brass-soft,#e8f0fe);color:var(--brass-ink,#1a56c7);font:500 12.5px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;}.ds-badge button{display:grid;place-items:center;width:20px;height:20px;border:none;border-radius:9999px;background:transparent;color:inherit;}.ds-badge button:hover{background:rgb(26 95 214 / 0.12);}.ds-badge button:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}"
+    },
+    {
+      "name": "Safety Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A flat card with a hairline; the safety status in one line, green when protected, amber when not.",
+      "html": "<button class=\"ds-card\"><span class=\"ds-card-well\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"m9 12 2 2 4-4\"/></svg></span><span><span class=\"ds-card-title\">Protected</span><span class=\"ds-card-detail\">Every item has a backup copy</span></span></button>",
+      "css": ".ds-card{display:flex;align-items:flex-start;gap:10px;width:208px;padding:10px 12px;border:1px solid var(--line,#dadce0);border-radius:14px;background:var(--card,#fff);text-align:left;transition:border-color 140ms;}.ds-card:hover{border-color:var(--line-strong,#80868b);}.ds-card:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}.ds-card-well{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:8px;background:var(--safe-soft,#e6f4ea);color:var(--safe,#137333);}.ds-card-title{display:block;font:600 13px/18px 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;color:var(--ink,#1f1f1f);}.ds-card-detail{display:block;font:400 12px/16px 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;color:var(--ink-muted,#5f6368);}"
+    },
+    {
+      "name": "Photo Tile",
+      "kind": "custom",
+      "refersTo": "photo-tile",
+      "description": "Prints laid edge to edge; selected tiles inset on the soft accent with a solid check disk.",
+      "html": "<div class=\"ds-tiles\"><div class=\"ds-tile\"><div class=\"ds-tile-img\" style=\"background:#6fae8f\"></div><span class=\"ds-tile-check\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span></div><div class=\"ds-tile\" aria-selected=\"true\"><div class=\"ds-tile-img\" style=\"background:#c9a25a\"></div><span class=\"ds-tile-check\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span></div></div>",
+      "css": ".ds-tiles{display:flex;gap:2px;}.ds-tile{position:relative;width:120px;height:120px;overflow:hidden;border-radius:2px;background:var(--shelf,#f1f3f4);transition:background-color 320ms;}.ds-tile-img{width:100%;height:100%;transition:transform 220ms cubic-bezier(0.22,1,0.36,1),border-radius 220ms cubic-bezier(0.22,1,0.36,1);}.ds-tile-check{position:absolute;left:6px;top:6px;display:grid;place-items:center;width:22px;height:22px;box-sizing:border-box;border:2px solid rgb(255 255 255 / 0.9);border-radius:9999px;background:rgb(0 0 0 / 0.1);color:transparent;opacity:0;transition:opacity 140ms;}.ds-tile:hover .ds-tile-check{opacity:1;}.ds-tile[aria-selected=true]{background:var(--brass-soft,#e8f0fe);}.ds-tile[aria-selected=true] .ds-tile-img{transform:scale(0.86);border-radius:6px;}.ds-tile[aria-selected=true] .ds-tile-check{opacity:1;border:none;background:var(--brass,#1a5fd6);color:var(--on-accent,#fff);box-shadow:0 0 0 2px var(--mat,#f8f9fa);}"
+    },
+    {
+      "name": "Selection Bar",
+      "kind": "custom",
+      "refersTo": "selection-bar",
+      "description": "Floating inverted capsule with the count and ghost actions while photos are selected.",
+      "html": "<div class=\"ds-selbar\" role=\"group\" aria-label=\"Selection\"><button class=\"ds-selbar-x\" aria-label=\"Clear selection\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18M6 6l12 12\"/></svg></button><span class=\"ds-selbar-count\">3 selected</span><span class=\"ds-selbar-sep\"></span><button class=\"ds-selbar-btn\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg>Favourite</button><button class=\"ds-selbar-btn\">Share</button></div>",
+      "css": ".ds-selbar{display:inline-flex;align-items:center;gap:4px;padding:6px 6px 6px 8px;border-radius:14px;background:color-mix(in srgb,var(--ink,#1f1f1f) 95%,transparent);color:var(--on-ink,#fff);box-shadow:0 25px 50px -12px rgb(19 19 20 / 0.3);font:500 13px/1 'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;}.ds-selbar-x{display:grid;place-items:center;width:32px;height:32px;border:none;border-radius:9999px;background:transparent;color:inherit;opacity:0.7;}.ds-selbar-x:hover{opacity:1;background:rgb(255 255 255 / 0.15);}.ds-selbar-count{padding:0 8px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;}.ds-selbar-sep{width:1px;height:20px;margin:0 4px;background:currentColor;opacity:0.15;}.ds-selbar-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:none;border-radius:8px;background:transparent;color:inherit;font:inherit;opacity:0.9;transition:background-color 140ms;}.ds-selbar-btn:hover{opacity:1;background:rgb(255 255 255 / 0.15);}.ds-selbar-btn:focus-visible,.ds-selbar-x:focus-visible{outline:2px solid var(--brass-ink,#1a56c7);outline-offset:2px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Category Standard, Played Straight",
+    "overview": "Photo Vault looks like it belongs beside Google Photos, Apple Photos, Windows Photos and Lightroom, and is held to their craft. The visitor should recognise a photos app they already know how to use: a neutral grey sidebar, a near-white ground, photos laid edge to edge like a contact sheet, and one blue accent that only ever says \"this is selected\", \"you are here\" or \"this is the thing to do\". Nothing is themed. The photos are the colour; the interface stays out of their way.\n\nThe system is built from Windows 11's own materials: Segoe UI Variable for every word, cool neutral greys with no tint, white cards on a pale ground in light and lifted charcoal cards on near-black in dark. Density is desktop-comfortable (34 px navigation rows, 32 to 36 px controls, 13 to 13.5 px text) because sessions are long: importing, tidying, browsing years of photos. Status colour is reserved for the one question the product exists to answer, whether the photos are safe: green for protected, amber for needs attention, red for damage.\n\nThe earlier \"Mount\" look (mat-grey ground, brass accent, photo-mount logo) is retired. Its token names survive in code (`brass`, `mat`, `shelf`), but they now carry the blue accent and the neutral greys; read the name as a role, never as a colour.",
+    "keyCharacteristics": [
+      "Neutral cool greys, white cards, one confident blue accent; dark theme flips the accent to light blue with dark text.",
+      "System type only: Segoe UI Variable Display for titles, Segoe UI Variable Text for everything else, tabular figures for counts.",
+      "Photos edge to edge (2 px gaps, 2 px corners); chrome recedes, the library leads.",
+      "Flat surfaces separated by tone and hairlines; shadows only on things that float.",
+      "Every text pair meets WCAG 2.1 AA in both themes, enforced in CI."
+    ],
+    "rules": [
+      {
+        "name": "The One Fill Rule",
+        "body": "A view shows one solid blue fill: its primary action. The sidebar's Import button is the standing exception. Secondary actions are neutral (grey fill or ghost), never a second blue fill.",
+        "section": "colors"
+      },
+      {
+        "name": "The Soft Selection Rule",
+        "body": "Being chosen is shown with the soft accent: the current page, a selected segment, a selected tile, an active filter badge. Solid blue is for doing, soft blue is for being.",
+        "section": "colors"
+      },
+      {
+        "name": "The Amber Means Attention Rule",
+        "body": "Amber appears only when the user's photos need something (a missing backup, a missing file). It is never decoration, brand, hover or highlight.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Tint Rule",
+        "body": "Greys are cool and neutral (Google-grey family). No warm stone, no green-black, no brass.",
+        "section": "colors"
+      },
+      {
+        "name": "The Native Voice Rule",
+        "body": "Only system faces. No web fonts are bundled or loaded; the app works offline and looks like Windows.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Count Rule",
+        "body": "Numbers that can change or line up use tabular figures, so counts do not jitter as they update.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Means Machine Rule",
+        "body": "Monospace is for things a machine produced (hashes, paths, code, errors), never for labels, numbers or decoration.",
+        "section": "typography"
+      },
+      {
+        "name": "The Float Only Rule",
+        "body": "A surface casts a shadow only if it floats over content. Cards in the page flow are flat with a hairline.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the semantic tokens (mat, shelf, card, line, ink, brass, brass-ink, brass-soft, safe, warn, risk) in new work; they switch with the theme.",
+      "Do give each view exactly one solid blue fill, its primary action; make everything else neutral.",
+      "Do show selection and the current place with the soft accent ground and accent-ink text.",
+      "Do keep amber for \"needs attention\" and say plainly whether photos have a second copy.",
+      "Do set titles and the wordmark in Segoe UI Variable Display (17, 19, 26 or 44 px) and everything else in Segoe UI Variable Text.",
+      "Do use tabular figures for every count, size and progress number.",
+      "Do add dark-surface to any surface that stays dark in both themes.",
+      "Do run npm run test:a11y (axe-core, both themes) before shipping a colour or text change; every text pair must hold WCAG 2.1 AA.",
+      "Do use the Mark component for the logo; it picks the full icon at 48 px and up and the small drawing below."
+    ],
+    "donts": [
+      "Don't bring back the Mount look: no mat-and-brass palette, no brass or gold, no photo-mount frame logo.",
+      "Don't read brass as a colour; it is the blue accent's historical name. Never add anything brass- or gold-coloured.",
+      "Don't put a second solid blue button in a view, or use solid blue to show a selected state.",
+      "Don't use amber, green or red as decoration, brand colour or hover.",
+      "Don't tint the greys warm or green; no hardcoded Tailwind default stone values.",
+      "Don't bundle or load web fonts, and don't use monospace outside hashes, paths, code and errors.",
+      "Don't round photo tiles beyond 2 px or pad the grid; photos sit edge to edge.",
+      "Don't give in-flow cards a shadow.",
+      "Don't redraw the mark at small sizes from the large icon; 32 px and below use the separate small drawing."
+    ]
+  }
+}

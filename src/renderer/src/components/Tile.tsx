@@ -65,13 +65,13 @@ export const Tile = memo(function Tile(props: {
         }
       }}
       className={`group relative shrink-0 cursor-default overflow-hidden rounded-[2px] transition-colors duration-[var(--dur-gentle)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-brass-ink ${
-        selected ? 'bg-brass' : 'bg-shelf'
+        selected ? 'bg-brass-soft' : 'bg-shelf'
       }`}
       style={{ width: size, height: size }}
     >
       <div
-        className={`size-full overflow-hidden transition-[transform,box-shadow] duration-[var(--dur-gentle)] ${
-          selected ? 'scale-[0.84] rounded-[1px] shadow-[0_0_0_4px_var(--mat)] ease-[var(--ease-mount)]' : 'ease-[var(--ease-out-soft)]'
+        className={`size-full overflow-hidden transition-[transform,border-radius] duration-[var(--dur-base)] ease-[var(--ease-out-soft)] ${
+          selected ? 'scale-[0.86] rounded-[6px]' : ''
         }`}
       >
         {showImg ? (
@@ -111,7 +111,7 @@ export const Tile = memo(function Tile(props: {
         <Check className="size-3.5" strokeWidth={3} />
       </button>
       {(asset.mediaType === 'video' || asset.kind === 'animated') && (
-        <div className="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-1 rounded-[4px] bg-black/50 px-1.5 py-0.5 font-mono text-[10.5px] text-white backdrop-blur-sm">
+        <div className="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-1 rounded-[4px] bg-black/50 px-1.5 py-0.5 tabular-nums text-[10.5px] text-white backdrop-blur-sm">
           {asset.kind === 'loop' || asset.kind === 'animated' ? <Repeat className="size-2.5" /> : <Play className="size-2.5 fill-white" />}
           {asset.kind === 'animated' ? 'GIF' : duration(asset.durationMs)}
         </div>

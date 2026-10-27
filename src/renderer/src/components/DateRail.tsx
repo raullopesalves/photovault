@@ -108,7 +108,7 @@ export function DateRail(props: { groups: TimelineGroup[]; current: string | nul
       onPointerMove={(e) => (dragging.current ? jumpTo(e.clientY) : setHover(spanAt(e.clientY)))}
       onPointerUp={() => (dragging.current = false)}
       onPointerLeave={() => !dragging.current && setHover(null)}
-      className="no-drag relative h-full cursor-ns-resize select-none font-mono text-[11px] leading-none text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brass-ink"
+      className="no-drag relative h-full cursor-ns-resize select-none tabular-nums text-[11px] leading-none text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brass-ink"
       style={{ width: RAIL_W }}
     >
       {years.map((y) => (
@@ -131,11 +131,11 @@ export function DateRail(props: { groups: TimelineGroup[]; current: string | nul
       )}
       {hover && (
         <div
-          className="pointer-events-none absolute right-[calc(100%+6px)] z-20 -translate-y-1/2 whitespace-nowrap rounded-lg bg-ink px-2.5 py-[7px] font-sans text-[12px] font-semibold leading-none text-on-ink shadow-[0_6px_20px_rgba(26,30,27,0.18)]"
+          className="pointer-events-none absolute right-[calc(100%+6px)] z-20 -translate-y-1/2 whitespace-nowrap rounded-lg bg-ink px-2.5 py-[7px] font-sans text-[12px] font-semibold leading-none text-on-ink shadow-[0_6px_20px_rgba(32,33,36,0.18)]"
           style={{ top: hover.y }}
         >
           {hover.span.month === 'undated' ? t('No date') : monthLabel(hover.span.month)}
-          <span className="ml-1.5 font-mono font-normal opacity-75">{n(hover.span.count)}</span>
+          <span className="ml-1.5 tabular-nums font-normal opacity-75">{n(hover.span.count)}</span>
         </div>
       )}
     </div>

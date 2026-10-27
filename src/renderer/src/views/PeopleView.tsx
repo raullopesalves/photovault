@@ -107,7 +107,7 @@ function PeopleList(props: { version: number; onOpen: (id: number) => void; onOp
             </div>
             <button
               onClick={() => setReviewing(true)}
-              className="h-9 shrink-0 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+              className="h-9 shrink-0 rounded-lg bg-brass px-4 text-[13px] font-medium text-on-accent hover:bg-brass-hover"
             >{t('Review')}</button>
           </div>
         )}
@@ -264,7 +264,7 @@ function SamePersonReview(props: { suggestions: PeopleSuggestion[]; onClose: () 
           <button
             disabled={busy}
             onClick={() => void answer(true)}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-stone-900 px-5 text-[13.5px] font-medium text-white hover:bg-stone-800 disabled:opacity-50 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-brass px-5 text-[13.5px] font-medium text-on-accent hover:bg-brass-hover disabled:opacity-50"
           >
             <Check className="size-4" />{' '}{t('Same person')}{' '}<kbd className="ml-1 text-[11px] opacity-50">S</kbd>
           </button>
@@ -369,7 +369,7 @@ function TurnOn(props: { version: number; onOpenPet: (g: PetGroup) => void }) {
         </ul>
         <button
           onClick={() => void api.setPeopleEnabled(true)}
-          className="mt-8 inline-flex h-11 items-center gap-2 rounded-xl bg-stone-900 px-6 text-[14px] font-medium text-white shadow-sm transition hover:bg-stone-800 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
+          className="mt-8 inline-flex h-11 items-center gap-2 rounded-xl bg-brass px-6 text-[14px] font-medium text-on-accent hover:bg-brass-hover shadow-sm transition"
         >
           <Users className="size-4" />{' '}{t('Find people in my photos')}</button>
         {status?.phase === 'error' && <div className="mt-4 text-[13px] text-red-600 dark:text-red-400">{status.error}</div>}
@@ -626,7 +626,7 @@ function FacesPanel(props: { person: Person; version: number; title: ReactNode; 
             >
               <img src={faceUrl(f.id)} alt="" loading="lazy" className={`size-full object-cover transition ${on ? 'scale-90 rounded-lg' : ''}`} />
               {on && (
-                <span className="absolute left-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-accent-500 text-on-accent">
+                <span className="absolute left-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-brass text-on-accent">
                   <Check className="size-3" strokeWidth={3} />
                 </span>
               )}

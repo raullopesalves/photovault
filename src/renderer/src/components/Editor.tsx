@@ -125,7 +125,7 @@ export function Editor(props: { assetId: number; onClose: (saved: boolean) => vo
   )
 
   return (
-    <ModalPanel className="no-drag fixed inset-0 z-50 flex bg-stone-950 text-stone-100 animate-fade-in" aria-label={t('Edit photo')}>
+    <ModalPanel className="dark-surface no-drag fixed inset-0 z-50 flex bg-stone-950 text-stone-100 animate-fade-in" aria-label={t('Edit photo')}>
       <div className="relative flex min-w-0 flex-1 items-center justify-center overflow-hidden p-10">
         {preview ? (
           tab === 'crop' ? (
@@ -285,7 +285,7 @@ function ToolBtn(props: { onClick: () => void; label: string; active?: boolean; 
       onClick={props.onClick}
       title={props.label}
       aria-label={props.label}
-      className={`flex flex-1 flex-col items-center gap-1 rounded-lg py-2.5 text-[11px] transition ${props.active ? 'bg-accent-500 text-on-accent' : 'bg-white/10 hover:bg-white/15'}`}
+      className={`flex flex-1 flex-col items-center gap-1 rounded-lg py-2.5 text-[11px] transition ${props.active ? 'bg-brass text-on-accent' : 'bg-white/10 hover:bg-white/15'}`}
     >
       {props.children}
       {props.label}

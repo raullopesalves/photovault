@@ -52,7 +52,7 @@ export function SettingsView(props: {
                 onClick={() => props.onTheme(t.id)}
                 className={`flex h-10 flex-1 items-center justify-center gap-2 rounded-lg text-[13.5px] font-medium transition ${
                   props.theme === t.id
-                    ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900'
+                    ? 'bg-brass-soft font-semibold text-brass-ink'
                     : 'bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
                 }`}
               >
@@ -75,7 +75,7 @@ export function SettingsView(props: {
                 onClick={() => void changeLanguage(l.id)}
                 className={`flex h-10 flex-1 items-center justify-center rounded-lg text-[13.5px] font-medium transition ${
                   language() === l.id
-                    ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900'
+                    ? 'bg-brass-soft font-semibold text-brass-ink'
                     : 'bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700'
                 }`}
               >
@@ -150,7 +150,7 @@ function OfflineGroup() {
           <div className="mt-2 text-[13px] font-medium">{offline ? t('On — nothing connects to the internet.') : t('Off')}</div>
           <button
             onClick={() => void toggle()}
-            className={`mt-3 h-9 rounded-lg px-4 text-[13px] font-medium ${offline ? 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700' : 'bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:text-stone-900'}`}
+            className={`mt-3 h-9 rounded-lg px-4 text-[13px] font-medium bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700`}
           >
             {offline ? t('Turn off offline mode') : t('Turn on offline mode')}
           </button>
@@ -260,7 +260,7 @@ function UpdatesGroup(props: { onWhatsNew: () => void }) {
       <div className="mt-3 flex gap-2">
         {s.canUpdate &&
           (s.state === 'ready' ? (
-            <button onClick={() => void api.installUpdate()} className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white dark:bg-white dark:text-stone-900">{t('Restart and update')}</button>
+            <button onClick={() => void api.installUpdate()} className="h-9 rounded-lg bg-brass px-4 text-[13px] font-medium text-on-accent hover:bg-brass-hover">{t('Restart and update')}</button>
           ) : (
             <Btn onClick={() => void api.checkForUpdates().then(setS)}>{t('Check now')}</Btn>
           ))}
@@ -292,7 +292,7 @@ function UpdatesGroup(props: { onWhatsNew: () => void }) {
                   setBusy(false)
                 }
               }}
-              className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white disabled:opacity-40 dark:bg-white dark:text-stone-900"
+              className="h-9 rounded-lg bg-brass px-4 text-[13px] font-medium text-on-accent hover:bg-brass-hover disabled:opacity-40"
             >{t('Save')}</button>
             {s.tokenSet && <Btn onClick={() => void api.setUpdateToken(null).then(setS)}>{t('Remove')}</Btn>}
           </div>
@@ -338,7 +338,7 @@ function SmartSearchGroup() {
           )}
           {s.enabled && s.phase === 'indexing' && (
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
-              <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${pct}%` }} />
+              <div className="h-full rounded-full bg-brass transition-all" style={{ width: `${pct}%` }} />
             </div>
           )}
           <div className="mt-4 flex gap-2">
@@ -350,7 +350,7 @@ function SmartSearchGroup() {
             ) : (
               <button
                 onClick={() => void api.setSmartSearch(true)}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brass px-4 text-[13px] font-medium text-on-accent hover:bg-brass-hover"
               >
                 <Sparkles className="size-4" />{' '}{t('Turn on smart search')}</button>
             )}
@@ -401,7 +401,7 @@ function CaptionsGroup() {
           )}
           {s.enabled && s.phase === 'describing' && (
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
-              <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${pct}%` }} />
+              <div className="h-full rounded-full bg-brass transition-all" style={{ width: `${pct}%` }} />
             </div>
           )}
           <div className="mt-4 flex gap-2">
@@ -413,7 +413,7 @@ function CaptionsGroup() {
             ) : (
               <button
                 onClick={() => void api.setCaptionsEnabled(true)}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brass px-4 text-[13px] font-medium text-on-accent hover:bg-brass-hover"
               >
                 <MessageSquareText className="size-4" />
                 {s.described > 0 ? t('Continue describing') : t('Turn on automatic descriptions')}

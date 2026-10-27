@@ -78,7 +78,7 @@ function Bar(props: { value: number; total: number; indeterminate?: boolean }) {
       {props.indeterminate ? (
         <div className="skeleton h-full w-full" />
       ) : (
-        <div className="h-full rounded-full bg-accent-500 transition-[width] duration-300 ease-out" style={{ width: `${pct}%` }} />
+        <div className="h-full rounded-full bg-brass transition-[width] duration-300 ease-out" style={{ width: `${pct}%` }} />
       )}
     </div>
   )
@@ -267,7 +267,7 @@ function Ready({ p, s }: { p: ImportProgress; s: ImportSummary }) {
               setBusy(true)
               await api.commitImport(p.importId)
             }}
-            className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] disabled:opacity-40 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
+            className="h-9 rounded-lg bg-brass px-4 text-[13.5px] font-medium text-on-accent hover:bg-brass-hover transition active:scale-[0.98] disabled:opacity-40"
           >
             {nothingNew ? t('Record sources & finish') : t('Import {newAssets}', { newAssets: plural(s.newAssets, 'new item') })}
           </button>
@@ -421,7 +421,7 @@ function Completed(props: { s: ImportSummary; onShowPhotos: () => void; onClose:
         <button onClick={props.onClose} className="h-9 rounded-lg px-4 text-[13.5px] font-medium text-stone-600 transition hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">{t('Close')}</button>
         <button
           onClick={props.onShowPhotos}
-          className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
+          className="h-9 rounded-lg bg-brass px-4 text-[13.5px] font-medium text-on-accent hover:bg-brass-hover transition active:scale-[0.98]"
         >{t('View photos')}</button>
       </div>
     </div>
@@ -434,7 +434,7 @@ function Message(props: { icon: ReactNode; title: string; body: string; onClose:
       <Header icon={props.icon} title={props.title} tone="warn" />
       <p className="mx-8 mt-3 text-[13.5px] leading-relaxed text-stone-600 dark:text-stone-400">{props.body}</p>
       <div className="mx-8 mt-7 flex justify-end">
-        <button onClick={props.onClose} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">{t('OK')}</button>
+        <button onClick={props.onClose} className="h-9 rounded-lg bg-brass px-4 text-[13.5px] font-medium text-on-accent hover:bg-brass-hover">{t('OK')}</button>
       </div>
     </div>
   )

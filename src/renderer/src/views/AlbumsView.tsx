@@ -36,7 +36,7 @@ export function AlbumsView(props: { version: number }) {
         actions={
           <button
             onClick={() => setCreating(true)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brass px-3.5 text-[13px] font-medium text-on-accent hover:bg-brass-hover transition"
           >
             <Plus className="size-4" />{' '}{t('New album')}</button>
         }
@@ -324,7 +324,7 @@ function AlbumDetail(props: { id: number; version: number; onBack: () => void })
         />
       )}
       {webStatus && (
-        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-stone-900 px-4 py-2 text-[13px] text-white shadow-lg dark:bg-white dark:text-stone-900">{webStatus}</div>
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink/95 px-4 py-2 text-[13px] text-on-ink shadow-lg">{webStatus}</div>
       )}
       {renaming && (
         <PromptDialog

@@ -45,25 +45,22 @@ export function StorageView({ library, version }: { library: LibraryInfo; versio
 }
 
 /**
- * The one question Safety answers first: does every item have a second copy? With no backup at all, the backup
- * panel's own warning says it (with the button to fix it), so this shows only once a backup exists.
+ * Some items still have only one copy: said first, in amber. With no backup at all, or with every item backed up,
+ * the backup panel below says it (with the button to fix it), so this stays out of the way.
  */
 function SafetyStatement({ library }: { library: LibraryInfo }) {
   const { assetCount, unprotectedCount } = library
-  if (assetCount === 0 || unprotectedCount >= assetCount) return null
-  const safe = unprotectedCount === 0
+  if (assetCount === 0 || unprotectedCount === 0 || unprotectedCount >= assetCount) return null
   return (
-    <section className={`flex items-center gap-4 rounded-[14px] px-5 py-4 ${safe ? 'bg-safe-soft' : 'bg-brass-soft'}`}>
-      <div className={`grid size-11 shrink-0 place-items-center rounded-lg bg-card ${safe ? 'text-safe' : 'text-brass-ink'}`}>
-        {safe ? <ShieldCheck className="size-[22px]" strokeWidth={1.75} /> : <ShieldAlert className="size-[22px]" strokeWidth={1.75} />}
+    <section className="flex items-center gap-4 rounded-[14px] bg-warn-soft px-5 py-4">
+      <div className="grid size-11 shrink-0 place-items-center rounded-lg bg-card text-warn">
+        <ShieldAlert className="size-[22px]" strokeWidth={1.75} />
       </div>
       <div className="min-w-0 flex-1">
         <div className="font-[family-name:var(--font-display)] text-[19px] font-[650] leading-6 tracking-[-0.01em] text-ink">
-          {safe ? t('Every item has a backup copy') : t('{count} items have only one copy', { count: n(unprotectedCount) })}
+          {t('{count} items have only one copy', { count: n(unprotectedCount) })}
         </div>
-        <div className="mt-0.5 text-[14px] leading-5 text-ink">
-          {safe ? t('Plug your backup drives in now and then, and they are brought up to date.') : t('Plug in your backup drive and they are copied straight away.')}
-        </div>
+        <div className="mt-0.5 text-[14px] leading-5 text-ink">{t('Plug in your backup drive and they are copied straight away.')}</div>
       </div>
     </section>
   )
@@ -124,7 +121,7 @@ function VerifyCard() {
         ) : (
           <button
             onClick={() => void api.startVerify().then(setV)}
-            className="h-9 shrink-0 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+            className="h-9 shrink-0 rounded-lg bg-stone-100 px-3.5 text-[13px] font-medium text-ink transition hover:bg-stone-200 active:scale-[0.98] dark:bg-stone-800 dark:hover:bg-stone-700"
           >
             {v ? t('Verify again') : t('Verify library')}
           </button>
@@ -132,14 +129,14 @@ function VerifyCard() {
       </div>
       {running && (
         <div className="ml-14 mt-3 h-1.5 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
-          <div className="h-full rounded-full bg-accent-500 transition-[width] duration-300" style={{ width: `${pct}%` }} />
+          <div className="h-full rounded-full bg-brass transition-[width] duration-300" style={{ width: `${pct}%` }} />
         </div>
       )}
       {!running && problems > 0 && issues.length > 0 && (
         <div className="scroll-thin ml-14 mt-4 max-h-64 space-y-1.5 overflow-y-auto pr-2">
           {issues.map((i) => (
             <div key={i.fileId} className="flex items-baseline gap-3 text-[12.5px]">
-              <span className={`w-20 shrink-0 font-medium ${i.status === 'missing' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+              <span className={`w-20 shrink-0 font-medium ${i.status === 'missing' ? 'text-warn' : 'text-red-600 dark:text-red-400'}`}>
                 {i.status === 'missing' ? t('Missing') : t('Changed')}
               </span>
               <span className="min-w-0 flex-1 truncate" title={i.relativePath}>

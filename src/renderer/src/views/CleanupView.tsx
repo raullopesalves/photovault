@@ -217,7 +217,7 @@ function GroupCard(props: { group: Group; onOpen: () => void }) {
           <span className="text-brass-ink">{g.icon}</span>
           {g.title}
         </div>
-        <div className="mt-1.5 font-mono text-[28px] leading-8 tracking-[-0.02em] tabular-nums">
+        <div className="mt-1.5 text-[28px] leading-8 tracking-[-0.02em] tabular-nums">
           {n(g.count)}
           {g.unit && <span className="ml-1.5 font-sans text-[12.5px] tracking-normal text-ink-muted">{g.unit}</span>}
         </div>
@@ -272,7 +272,7 @@ function GroupDetail(props: { group: Group & { query: AssetQuery }; version: num
               <button
                 disabled={!counts || visible === 0}
                 onClick={() => setConfirm('hide')}
-                className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900`}
+                className={`${btn} bg-brass text-on-accent hover:bg-brass-hover`}
               >
                 <EyeOff className="size-3.5" />{' '}{t('Hide all from Photos')}</button>
             )}

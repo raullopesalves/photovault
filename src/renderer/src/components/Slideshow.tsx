@@ -91,7 +91,7 @@ export function Slideshow(props: {
 
   const top = shown[shown.length - 1]
   return (
-    <ModalPanel className={`no-drag fixed inset-0 z-[60] bg-black ${controls ? '' : 'cursor-none'}`} onMouseMove={wake} onClick={wake} aria-label={t('Slideshow')}>
+    <ModalPanel className={`dark-surface no-drag fixed inset-0 z-[60] bg-black ${controls ? '' : 'cursor-none'}`} onMouseMove={wake} onClick={wake} aria-label={t('Slideshow')}>
       {shown.map((s) =>
         s.video ? (
           <video

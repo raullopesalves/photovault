@@ -7,13 +7,13 @@ export function Welcome(props: { error?: string; onCreate: () => void; onOpen: (
     <div className="drag relative flex h-full items-center justify-center overflow-hidden">
       <main className="no-drag relative w-[520px] text-center animate-rise-in">
         <Mark size={72} className="mx-auto mb-8" />
-        <h1 className="font-[family-name:var(--font-display)] text-[44px] font-[750] leading-[48px] tracking-[-0.025em]">{t('Your photos, permanently yours.')}</h1>
+        <h1 className="text-balance font-[family-name:var(--font-display)] text-[44px] font-bold leading-[48px] tracking-[-0.025em]">{t('Your photos, permanently yours.')}</h1>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-stone-600 dark:text-stone-400">{t('Photo Vault keeps your originals as ordinary files in a folder you choose, detects exact duplicates and remembers where every photo came from.')}</p>
 
         <div className="mt-10 flex flex-col items-center gap-3">
           <button
             onClick={props.onCreate}
-            className="h-11 w-72 rounded-xl bg-stone-900 text-[14px] font-medium text-white shadow-sm transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
+            className="h-11 w-72 rounded-xl bg-brass text-[14px] font-medium text-on-accent hover:bg-brass-hover shadow-sm transition active:scale-[0.98]"
           >{t('Create a library')}</button>
           <button
             onClick={props.onOpen}

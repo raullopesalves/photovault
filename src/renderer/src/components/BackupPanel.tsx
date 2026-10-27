@@ -42,11 +42,11 @@ export function BackupPanel(props: { version: number }) {
   return (
     <div className="space-y-4">
       <div
-        className={`flex items-start gap-4 rounded-[14px] p-5 ${fully ? 'bg-safe-soft' : 'bg-brass-soft'}`}
+        className={`flex items-start gap-4 rounded-[14px] p-5 ${fully ? 'bg-safe-soft' : 'bg-warn-soft'}`}
       >
         <div
           className={`grid size-11 shrink-0 place-items-center rounded-xl ${
-            fully ? 'bg-card text-safe' : 'bg-card text-brass-ink'
+            fully ? 'bg-card text-safe' : 'bg-card text-warn'
           }`}
         >
           {fully ? <ShieldCheck className="size-6" /> : <CircleAlert className="size-6" />}
@@ -73,7 +73,7 @@ export function BackupPanel(props: { version: number }) {
             setError(err instanceof Error ? err.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(err))
           }
           refresh()
-        }} className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900`}>
+        }} className={`${btn} bg-brass text-on-accent hover:bg-brass-hover`}>
           <Plus className="size-3.5" />{' '}{t('Add backup location')}</button>
       </div>
       {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[13px] text-red-800 dark:bg-red-500/10 dark:text-red-300">{error}</div>}
@@ -121,7 +121,7 @@ export function BackupPanel(props: { version: number }) {
             </div>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
               <div
-                className="h-full rounded-full bg-accent-500 transition-[width] duration-300"
+                className="h-full rounded-full bg-brass transition-[width] duration-300"
                 style={{ width: `${running ? (running.bytesDone / Math.max(1, running.bytesTotal)) * 100 : pct}%` }}
               />
             </div>
@@ -141,7 +141,7 @@ export function BackupPanel(props: { version: number }) {
                 <button onClick={() => void api.cancelBackup()} className={soft}>{t('Stop')}</button>
               ) : (
                 <>
-                  <button disabled={!!progress || !tg.reachable} onClick={() => void run(tg.id, false)} className={`${btn} bg-stone-900 text-white hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900`}>{t('Back up now')}</button>
+                  <button disabled={!!progress || !tg.reachable} onClick={() => void run(tg.id, false)} className={soft}>{t('Back up now')}</button>
                   <button disabled={!!progress || !tg.reachable} onClick={() => void run(tg.id, true)} className={soft} title={t('Re-read every copy and compare its fingerprint; repairs missing or damaged copies')}>{t('Verify all copies')}</button>
                 </>
               )}

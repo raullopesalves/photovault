@@ -2,79 +2,77 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* The Mount identity (design system "Photo Vault", D90). Fonts are bundled (OFL), so the app works offline. */
+/* Photo Vault's identity (D102): the category standard, played straight. Windows 11's own type (Segoe UI Variable),
+   neutral greys, one blue accent, amber only for "needs attention". System fonts, so nothing is bundled. */
 @theme {
-  --font-sans: 'Schibsted Grotesk Variable', 'Segoe UI Variable Text', 'Segoe UI Variable', system-ui, sans-serif;
-  --font-display: 'Schibsted Grotesk Variable', 'Segoe UI Variable Display', 'Segoe UI Variable', system-ui, sans-serif;
-  --font-mono: 'Fragment Mono', 'Cascadia Mono', ui-monospace, Consolas, monospace;
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Segoe UI Variable Display', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Cascadia Mono', Consolas, ui-monospace, monospace;
 
-  /* Mat-board greys with a faint green cast replace Tailwind's stone, so every view takes the new neutrals:
+  /* Neutral greys replace Tailwind's stone, so every view takes them:
      50 = mat, 100 = shelf, 200 = line, 500 = line-strong, 600 = ink-muted, 900 = ink, 950 = dark mat. */
-  --color-stone-50: #f4f4f0;
-  --color-stone-100: #e9eae4;
-  --color-stone-200: #d6d8d0;
-  --color-stone-300: #b9bdb4;
-  --color-stone-400: #979d95;
-  --color-stone-500: #7c827b;
-  --color-stone-600: #565d57;
-  --color-stone-700: #3f4540;
-  --color-stone-800: #2a2f2b;
-  --color-stone-900: #1a1e1b;
-  --color-stone-950: #121412;
+  --color-stone-50: #f8f9fa;
+  --color-stone-100: #f1f3f4;
+  --color-stone-200: #dadce0;
+  --color-stone-300: #bdc1c6;
+  --color-stone-400: #9aa0a6;
+  --color-stone-500: #80868b;
+  --color-stone-600: #5f6368;
+  --color-stone-700: #3c4043;
+  --color-stone-800: #2d2e31;
+  --color-stone-900: #202124;
+  --color-stone-950: #131314;
 
-  /* Brass, the one accent. 500 is the fill (dark text on it: text-on-accent), 600 brass as text on light grounds,
-     400 brass as text and fills on dark grounds, 50 the soft ground behind brass text. */
-  --color-accent-50: #f3e7cc;
-  --color-accent-100: #ead7a8;
-  --color-accent-300: #e3b968;
-  --color-accent-400: #d8a94f;
-  --color-accent-500: #ad7e25;
-  --color-accent-600: #7a5612;
-  --color-on-accent: #1a1e1b;
+  /* Blue, the one accent. 500 is the fill (white text on it: text-on-accent), 600 blue as text on light grounds,
+     400 blue as text on dark grounds, 50 the soft ground behind blue text. */
+  --color-accent-50: #e8f0fe;
+  --color-accent-100: #d2e3fc;
+  --color-accent-300: #a8c7fa;
+  --color-accent-400: #8ab4f8;
+  --color-accent-500: #1a5fd6;
+  --color-accent-600: #1a56c7;
 
-  /* Status colours follow Mount too: red is risk (#b23a24 / #f0826b), emerald is safe (#2d7350 / #6cc795), amber is
-     brass, so every warning, error and "verified" note across the app speaks the same palette. */
-  --color-red-50: #f7e0da;
-  --color-red-100: #f2cfc6;
-  --color-red-200: #f4b4a6;
-  --color-red-300: #f29a86;
-  --color-red-400: #f0826b;
-  --color-red-500: #d4553b;
-  --color-red-600: #b23a24;
-  --color-red-700: #93301d;
-  --color-red-800: #6e2516;
-  --color-red-900: #4a1a10;
-  --color-red-950: #3d1d16;
-  --color-emerald-50: #ddeee3;
-  --color-emerald-100: #c9e5d3;
-  --color-emerald-200: #a7d8b9;
-  --color-emerald-300: #86cfa6;
-  --color-emerald-400: #6cc795;
-  --color-emerald-500: #3f9a69;
-  --color-emerald-600: #2d7350;
-  --color-emerald-700: #245e41;
-  --color-emerald-800: #1c4a33;
-  --color-emerald-900: #163a28;
-  --color-emerald-950: #16301f;
-  --color-amber-50: #f8eedb;
-  --color-amber-100: #f3e7cc;
-  --color-amber-200: #ead7a8;
-  --color-amber-300: #e3b968;
-  --color-amber-400: #d8a94f;
-  --color-amber-500: #ad7e25;
-  --color-amber-600: #8f6619;
-  --color-amber-700: #7a5612;
-  --color-amber-800: #5e420e;
-  --color-amber-900: #46310b;
-  --color-amber-950: #2e2007;
+  /* Status colours: red is damage, emerald is safe, amber is "needs attention". */
+  --color-red-50: #fce8e6;
+  --color-red-100: #fad2cf;
+  --color-red-200: #f6aea9;
+  --color-red-300: #f28b82;
+  --color-red-400: #ee675c;
+  --color-red-500: #d93025;
+  --color-red-600: #c5221f;
+  --color-red-700: #a50e0e;
+  --color-red-800: #8a0b0b;
+  --color-red-900: #5c0808;
+  --color-red-950: #3d1e1c;
+  --color-emerald-50: #e6f4ea;
+  --color-emerald-100: #ceead6;
+  --color-emerald-200: #a8dab5;
+  --color-emerald-300: #81c995;
+  --color-emerald-400: #5bb974;
+  --color-emerald-500: #1e8e3e;
+  --color-emerald-600: #137333;
+  --color-emerald-700: #0d652d;
+  --color-emerald-800: #0b5226;
+  --color-emerald-900: #083d1c;
+  --color-emerald-950: #193323;
+  --color-amber-50: #fef7e0;
+  --color-amber-100: #feefc3;
+  --color-amber-200: #fde293;
+  --color-amber-300: #fdd663;
+  --color-amber-400: #fcc934;
+  --color-amber-500: #f9ab00;
+  --color-amber-600: #e37400;
+  --color-amber-700: #a35200;
+  --color-amber-800: #7a3d00;
+  --color-amber-900: #522900;
+  --color-amber-950: #3a2d0a;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --ease-mount: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
-/* Semantic Mount tokens for new components: bg-mat, bg-shelf, text-ink, text-brass-ink, … (switch with .dark). */
+/* Semantic tokens: bg-mat, bg-shelf, text-ink, text-brass-ink (the accent; the name predates the blue), … (switch with .dark). */
 @theme inline {
   --color-mat: var(--mat);
   --color-shelf: var(--shelf);
@@ -88,29 +86,37 @@
   --color-brass: var(--brass);
   --color-brass-ink: var(--brass-ink);
   --color-brass-soft: var(--brass-soft);
+  --color-brass-hover: var(--brass-hover);
+  --color-on-accent: var(--on-accent);
   --color-safe: var(--safe);
   --color-safe-soft: var(--safe-soft);
   --color-risk: var(--risk);
   --color-risk-soft: var(--risk-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
 }
 
 :root {
-  --mat: #f4f4f0;
-  --shelf: #e9eae4;
+  --mat: #f8f9fa;
+  --shelf: #f1f3f4;
   --card: #ffffff;
-  --line: #d6d8d0;
-  --line-strong: #7c827b;
-  --ink: #1a1e1b;
-  --ink-muted: #565d57;
-  --ink-faint: #646a63; /* 4.6:1 on the shelf, 5.0:1 on the mat */
-  --on-ink: #f4f4f0;
-  --brass: #ad7e25;
-  --brass-ink: #7a5612;
-  --brass-soft: #f3e7cc;
-  --safe: #2d7350;
-  --safe-soft: #ddeee3;
-  --risk: #b23a24;
-  --risk-soft: #f7e0da;
+  --line: #dadce0;
+  --line-strong: #80868b;
+  --ink: #1f1f1f;
+  --ink-muted: #5f6368;
+  --ink-faint: #686c71; /* 4.7:1 on the shelf, 5.0:1 on the mat */
+  --on-ink: #ffffff;
+  --brass: #1a5fd6;
+  --brass-hover: #1a56c7;
+  --on-accent: #ffffff;
+  --brass-ink: #1a56c7;
+  --brass-soft: #e8f0fe;
+  --safe: #137333;
+  --safe-soft: #e6f4ea;
+  --risk: #c5221f;
+  --risk-soft: #fce8e6;
+  --warn: #a35200;
+  --warn-soft: #fef3d9;
   --dur-instant: 80ms;
   --dur-quick: 140ms;
   --dur-base: 220ms;
@@ -118,25 +124,36 @@
   --dur-develop: 420ms;
 }
 .dark {
-  --mat: #121412;
-  --shelf: #191c19;
-  --card: #212521;
-  --line: #2f3430;
-  --line-strong: #737a72;
-  --ink: #ecede7;
-  --ink-muted: #a2a9a1;
-  --ink-faint: #8f968e; /* 4.5:1 on stone-800, 5.1:1 on a card */
-  --on-ink: #121412;
-  --brass: #d8a94f;
-  --brass-ink: #e3b968;
-  --brass-soft: #3a2e17;
-  --safe: #6cc795;
-  --safe-soft: #16301f;
-  --risk: #f0826b;
-  --risk-soft: #3d1d16;
+  --mat: #131314;
+  --shelf: #1b1c1e;
+  --card: #232427;
+  --line: #34363a;
+  --line-strong: #7c8086;
+  --ink: #e8eaed;
+  --ink-muted: #a8acb2;
+  --ink-faint: #979ba1; /* 4.9:1 on stone-800, 5.6:1 on a card */
+  --on-ink: #131314;
+  --brass: #a8c7fa;
+  --brass-hover: #c2d7fb;
+  --on-accent: #0b1d3a;
+  --brass-ink: #a8c7fa;
+  --brass-soft: #1c2b45;
+  --safe: #81c995;
+  --safe-soft: #193323;
+  --risk: #f28b82;
+  --risk-soft: #3d1e1c;
+  --warn: #fdd663;
+  --warn-soft: #3a2d0a;
 }
 
 @layer base {
+  :focus-visible {
+    outline-color: var(--brass-ink);
+  }
+  /* The viewer, editor and slideshow are dark in both themes. */
+  .dark-surface :focus-visible {
+    outline-color: #a8c7fa;
+  }
   html,
   body,
   #root {
@@ -164,7 +181,7 @@
 
 .scroll-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgb(120 113 108 / 0.35) transparent;
+  scrollbar-color: rgb(128 134 139 / 0.35) transparent;
 }
 
 /* Full-height scrollers: on Windows the window's minimise / maximise / close buttons sit over the top-right
@@ -178,13 +195,13 @@
   margin-top: 44px;
 }
 .scroll-page::-webkit-scrollbar-thumb {
-  background: rgb(120 113 108 / 0.35);
+  background: rgb(128 134 139 / 0.35);
   background-clip: padding-box;
   border: 2px solid transparent;
   border-radius: 999px;
 }
 .scroll-page::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(120 113 108 / 0.55);
+  background-color: rgb(128 134 139 / 0.55);
 }
 
 @keyframes fade-in {
@@ -246,7 +263,7 @@
   animation: ken-burns 9s ease-out both;
 }
 .skeleton {
-  background: linear-gradient(90deg, rgb(120 113 108 / 0.1) 25%, rgb(120 113 108 / 0.18) 50%, rgb(120 113 108 / 0.1) 75%);
+  background: linear-gradient(90deg, rgb(128 134 139 / 0.1) 25%, rgb(128 134 139 / 0.18) 50%, rgb(128 134 139 / 0.1) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }
@@ -281,10 +298,10 @@
 
 /* Map view */
 .pv-map {
-  background: #e7e5e4;
+  background: #e8eaed;
 }
 .dark .pv-map {
-  background: #0c0a09;
+  background: #131314;
 }
 .pv-map .leaflet-control-attribution {
   font-size: 10px;
@@ -298,7 +315,7 @@
   border-radius: 12px;
   border: 2.5px solid white;
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
-  background: #d6d3d1;
+  background: #dadce0;
   transition: transform 0.15s;
 }
 .pv-pin-inner:hover {
@@ -318,7 +335,7 @@
   height: 22px;
   padding: 0 6px;
   border-radius: 11px;
-  background: #1c1917;
+  background: #202124;
   color: white;
   font: 600 11px/22px system-ui, sans-serif;
   text-align: center;
@@ -331,7 +348,7 @@
   margin: 3px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #ef4444;
+  background: #d93025;
   border: 3px solid white;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.35);
 }

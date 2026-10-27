@@ -76,7 +76,7 @@ export function BackgroundWork(props: { onOpen: () => void }) {
         <span key={j.key} className="block" title={`${j.label}: ${j.detail}`}>
           <span className="flex items-baseline justify-between gap-2 text-xs leading-4">
             <span className="truncate text-ink">{j.label}</span>
-            <span className="shrink-0 font-mono text-[11px] tabular-nums text-ink-muted">
+            <span className="shrink-0 text-[11px] tabular-nums text-ink-muted">
               {j.progress !== null && !j.detail.includes('MB') ? `${Math.floor(j.progress * 100)}%` : j.detail}
             </span>
           </span>

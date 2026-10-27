@@ -132,7 +132,7 @@ export function FilterBar(props: {
           <button onClick={() => set({ types: q.types?.includes('video') ? undefined : ['video'] })} aria-pressed={!!q.types?.includes('video')} className={`${chipBase} ${q.types?.includes('video') ? chipOn : chipOff}`}>
             <Play className={`size-3.5 ${q.types?.includes('video') ? 'fill-current' : ''}`} />
             {t('Videos')}
-            {facets ? <span className="font-mono text-[12px]">{n(facets.videos)}</span> : null}
+            {facets ? <span className="tabular-nums text-[12px]">{n(facets.videos)}</span> : null}
           </button>
         ) : null}
 
@@ -265,7 +265,7 @@ export function FilterBar(props: {
 
 const chipBase = 'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium transition'
 const chipOff = 'bg-stone-200/60 text-stone-700 hover:bg-stone-200 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:bg-stone-800'
-const chipOn = 'bg-stone-900 text-white dark:bg-white dark:text-stone-900'
+const chipOn = 'bg-brass-soft font-semibold text-brass-ink'
 
 interface Option {
   key: string
@@ -310,7 +310,7 @@ function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; la
       <button ref={chip} onClick={() => setOpen((o) => !o)} className={`${chipBase} ${selected ? chipOn : chipOff}`} aria-expanded={open} aria-haspopup="dialog">
         <SlidersHorizontal className="size-3.5" />
         {t('Filters')}
-        {selected > 0 && <span className="grid h-4 min-w-4 place-items-center rounded-full bg-white/25 px-1 font-mono text-[10.5px] tabular-nums dark:bg-stone-900/20">{selected}</span>}
+        {selected > 0 && <span className="grid h-4 min-w-4 place-items-center rounded-full bg-white/25 px-1 text-[10.5px] tabular-nums dark:bg-stone-900/20">{selected}</span>}
         <ChevronDown className={`size-3.5 opacity-60 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
@@ -318,7 +318,7 @@ function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; la
           ref={panel}
           role="dialog"
           aria-label={t('Filters')}
-          className="absolute right-0 top-full z-20 mt-1.5 grid w-[612px] grid-cols-3 gap-x-1 gap-y-3 rounded-[14px] border border-line bg-card p-2 shadow-[0_6px_20px_rgba(26,30,27,0.12)] animate-pop"
+          className="absolute right-0 top-full z-20 mt-1.5 grid w-[612px] grid-cols-3 gap-x-1 gap-y-3 rounded-[14px] border border-line bg-card p-2 shadow-[0_6px_20px_rgba(32,33,36,0.12)] animate-pop"
         >
           {props.sections.map((sec) => (
             <section key={sec.key} className="flex min-w-0 flex-col">
@@ -340,7 +340,7 @@ function FiltersMenu(props: { sections: Array<{ key: string; icon: ReactNode; la
                       {o.checked && <Check className="size-3" strokeWidth={3} />}
                     </span>
                     <span className="min-w-0 flex-1 truncate">{o.label}</span>
-                    {o.count !== undefined && <span className="font-mono text-[12px] tabular-nums text-ink-muted">{n(o.count)}</span>}
+                    {o.count !== undefined && <span className="text-[12px] tabular-nums text-ink-muted">{n(o.count)}</span>}
                   </button>
                 ))}
               </div>

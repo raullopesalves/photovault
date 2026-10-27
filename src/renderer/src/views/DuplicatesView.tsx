@@ -167,7 +167,7 @@ function ProbableList(props: { version: number; kind: 'probable' | 'similar' }) 
         {!similar && data.unresolvedGroups > 0 && (
           <button
             onClick={() => setConfirmAll(true)}
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-[13px] font-medium text-white transition hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-brass px-3.5 text-[13px] font-medium text-on-accent hover:bg-brass-hover transition"
           >
             <Sparkles className="size-4" />{' '}{t('Keep the best of each, hide')}{' '}{n(data.extraCopies)}
           </button>
@@ -263,7 +263,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
                   </div>
                 )}
                 {selected && (
-                  <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10.5px] font-semibold text-on-accent">
+                  <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-brass px-1.5 py-0.5 text-[10.5px] font-semibold text-on-accent">
                     <Check className="size-3" strokeWidth={3} />{' '}{t('Keep')}</span>
                 )}
                 {m.asset.hidden && (
@@ -341,7 +341,7 @@ function NearGroup(props: { group: NearDuplicateGroup; similar: boolean; onPrevi
             await api.setHidden(others.map((o) => o.asset.id), true)
             setBusy(false)
           }}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-stone-900 px-3 text-[12.5px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-brass px-3 text-[12.5px] font-medium text-on-accent hover:bg-brass-hover disabled:opacity-40"
         >
           <EyeOff className="size-3.5" />{' '}{t('Keep selected, hide')}{' '}{others.length === 1 ? t('the other') : t('the other {length}', { length: others.length })}
         </button>

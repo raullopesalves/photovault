@@ -262,7 +262,7 @@ export function Lightbox(props: {
   return (
     // no-drag: the sidebar underneath is a window-drag region, which would otherwise swallow clicks on the left arrow.
     <ModalPanel
-      className={`no-drag fixed inset-0 z-40 flex bg-[#0b0c0b] text-stone-100 animate-fade-in transition-opacity duration-[var(--dur-gentle)] ease-[var(--ease-out-soft)] ${closing ? 'pointer-events-none opacity-0' : ''}`}
+      className={`dark-surface no-drag fixed inset-0 z-40 flex bg-[#0b0b0c] text-stone-100 animate-fade-in transition-opacity duration-[var(--dur-gentle)] ease-[var(--ease-out-soft)] ${closing ? 'pointer-events-none opacity-0' : ''}`}
      aria-label={t('Photo viewer')}>
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="drag absolute inset-x-0 top-0 z-10 flex h-14 items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-4 pr-40">
@@ -302,7 +302,7 @@ export function Lightbox(props: {
             {detail?.mediaType === 'photo' && showFaces && (
               <button
                 onClick={() => setAddingFace((a) => !a)}
-                className={`mr-1 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition ${addingFace ? 'bg-accent-500 text-on-accent' : 'bg-white/10 hover:bg-white/20'}`}
+                className={`mr-1 inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition ${addingFace ? 'bg-brass text-on-accent' : 'bg-white/10 hover:bg-white/20'}`}
                 title={t('Draw a box around a face that was not found')}
               >
                 <UserPlus className="size-3.5" /> {addingFace ? t('Draw around the face…') : t('Add a face')}
@@ -340,7 +340,8 @@ export function Lightbox(props: {
             )}
             <button
               onClick={toggleHidden}
-              className={`grid size-9 place-items-center rounded-full transition hover:bg-white/10 ${detail?.hidden ? 'text-amber-300' : ''}`}
+              className={`grid size-9 place-items-center rounded-full transition hover:bg-white/10 ${detail?.hidden ? 'bg-white/15' : ''}`}
+              aria-pressed={!!detail?.hidden}
               aria-label={detail?.hidden ? t('Show in Photos') : t('Hide from Photos')}
               title={detail?.hidden ? t('Hidden from Photos — click to show again') : t('Hide from Photos (nothing is deleted)')}
             >
@@ -540,7 +541,7 @@ export function Lightbox(props: {
         )}
 
       {showInfo && (
-        <aside aria-label={t('Details')} className="scroll-page w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.08] bg-[#151715] px-6 pb-8 pt-16 animate-fade-in">
+        <aside aria-label={t('Details')} className="scroll-page w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.08] bg-[#161618] px-6 pb-8 pt-16 animate-fade-in">
           {detail ? <InfoPanel d={detail} onChanged={() => void api.asset(detail.id).then(setDetail)} /> : <div className="skeleton h-6 w-40 rounded" />}
         </aside>
       )}

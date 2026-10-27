@@ -72,7 +72,7 @@ function EmptyLibrary(props: { onImport: (kind: ImportKind) => void }) {
         <div className="mt-8 flex justify-center gap-3">
           <button
             onClick={() => props.onImport('folder')}
-            className="inline-flex h-11 items-center gap-2 rounded-xl bg-stone-900 px-6 text-[14px] font-medium text-white shadow-sm transition hover:bg-stone-800 active:scale-[0.98] dark:bg-white dark:text-stone-900 dark:hover:bg-stone-200"
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-brass px-6 text-[14px] font-medium text-on-accent hover:bg-brass-hover shadow-sm transition active:scale-[0.98]"
           >
             <FolderInput className="size-4" strokeWidth={2} />{t('Import a folder')}</button>
           <button

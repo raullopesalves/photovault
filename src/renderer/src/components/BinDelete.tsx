@@ -84,7 +84,7 @@ export function BinDeleteDialog(props: { ids: number[] | 'all'; count: number; s
               </ul>
             )}
             <div className="mt-6 flex justify-end">
-              <button onClick={() => props.onClose(true)} className="h-9 rounded-lg bg-stone-900 px-4 text-[13.5px] font-medium text-white dark:bg-white dark:text-stone-900">{t('Done')}</button>
+              <button onClick={() => props.onClose(true)} className="h-9 rounded-lg bg-brass px-4 text-[13.5px] font-medium text-on-accent hover:bg-brass-hover">{t('Done')}</button>
             </div>
           </>
         )}

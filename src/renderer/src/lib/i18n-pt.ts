@@ -33,7 +33,6 @@ export const PT: Record<string, string> = {
   "Kept aside": "Postos de parte",
   "Out of the Photos timeline, still in albums and search.": "Fora da cronologia de Fotografias, mas nos álbuns e na pesquisa.",
   "{count} items have only one copy": "{count} itens têm uma só cópia",
-  "Plug your backup drives in now and then, and they are brought up to date.": "Ligue os discos de cópia de segurança de vez em quando e são atualizados.",
   "Plug in your backup drive and they are copied straight away.": "Ligue o disco de cópia de segurança e são copiados de imediato.",
   "Kept out of Photos": "Fora de Fotografias",
   "Past imports": "Importações anteriores",

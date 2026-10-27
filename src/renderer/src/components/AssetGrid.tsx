@@ -509,7 +509,7 @@ export function AssetGrid(props: {
                           aria-label={all ? t('Deselect this month') : t('Select this month')}
                           className={`-ml-6 mr-1.5 mb-[3px] grid size-[18px] place-items-center rounded-full transition ${
                             all
-                              ? 'bg-accent-500 text-on-accent opacity-100'
+                              ? 'bg-brass text-on-accent opacity-100'
                               : `border-2 border-stone-400 text-transparent hover:border-accent-500 focus-visible:opacity-100 dark:border-stone-500 ${selecting ? 'opacity-100' : 'opacity-0 group-hover/month:opacity-100'}`
                           }`}
                         >
@@ -520,7 +520,7 @@ export function AssetGrid(props: {
                     <span className="font-[family-name:var(--font-display)] text-[19px] font-[650] leading-6 tracking-[-0.01em] text-ink">
                       {props.query?.sort === 'added' ? t('Added {v0}', { v0: monthLabel(row.month) }) : monthLabel(row.month)}
                     </span>
-                    <span className="ml-2.5 font-mono text-[13px] tabular-nums text-ink-muted">{n(row.count)}</span>
+                    <span className="ml-2.5 text-[13px] tabular-nums text-ink-muted">{n(row.count)}</span>
                     {row.month === 'undated' && (
                       <span className="ml-3 truncate text-xs text-ink-muted">{t('No date in the files and none could be inferred — sorted by file date. Recognise some? Select them and use “Set date”.')}</span>
                     )}

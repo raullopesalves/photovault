@@ -51,7 +51,7 @@ export function LocationPicker(props: {
       const dark = document.documentElement.classList.contains('dark')
       L.geoJSON(feature(topo, topo.objects.countries), {
         interactive: false,
-        style: { color: dark ? '#57534e' : '#d6d3d1', weight: 0.8, fillColor: dark ? '#292524' : '#fafaf9', fillOpacity: 1 }
+        style: { color: dark ? '#5f6368' : '#dadce0', weight: 0.8, fillColor: dark ? '#2d2e31' : '#f8f9fa', fillOpacity: 1 }
       })
         .addTo(m)
         .bringToBack()
@@ -107,7 +107,7 @@ export function LocationPicker(props: {
           <button
             onClick={() => setDetailed((d) => !d)}
             className={`absolute left-14 top-3 z-[500] inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] font-medium shadow-md ${
-              detailed ? 'bg-accent-500 text-on-accent' : 'bg-white text-stone-700 dark:bg-stone-800 dark:text-stone-200'
+              detailed ? 'bg-brass text-on-accent' : 'bg-white text-stone-700 dark:bg-stone-800 dark:text-stone-200'
             }`}
             title={detailed ? t('OpenStreetMap (the visible area is requested from tile.openstreetmap.org)') : t('Offline map — click for streets and towns')}
           >
@@ -133,7 +133,7 @@ export function LocationPicker(props: {
           <button
             disabled={!pos}
             onClick={() => pos && props.onPick(pos)}
-            className="h-9 rounded-lg bg-stone-900 px-4 text-[13px] font-medium text-white hover:bg-stone-800 disabled:opacity-40 dark:bg-white dark:hover:bg-stone-200 dark:text-stone-900"
+            className="h-9 rounded-lg bg-brass px-4 text-[13px] font-medium text-on-accent hover:bg-brass-hover disabled:opacity-40"
           >{t('Save location')}</button>
         </div>
       </ModalPanel>

@@ -1,6 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <!-- The Mount mark as an app icon: an ink tile, the mount's window set high, a brass label below. -->
-  <rect x="64" y="64" width="896" height="896" rx="200" fill="#1a1e1b"/>
-  <rect x="267" y="239" width="490" height="357" rx="10" fill="#f4f4f0"/>
-  <rect x="414" y="708" width="196" height="56" rx="28" fill="#d8a94f"/>
+  <!-- Photo Vault: a camera aperture whose opening is a keyhole. Six blades, light from above. Sizes of 32 px and below use icon-small.svg. -->
+  <defs>
+    <filter id="contact" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="18"/></filter>
+    <linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/><stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="hole" cx="0.5" cy="0.42" r="0.6"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e8eef8"/></radialGradient>
+    <radialGradient id="b0" gradientUnits="userSpaceOnUse" cx="512" cy="500" r="420"><stop offset="0.35" stop-color="#1a5fd6"/><stop offset="1" stop-color="#4f8dff"/></radialGradient>
+    <radialGradient id="b1" gradientUnits="userSpaceOnUse" cx="512" cy="500" r="420"><stop offset="0.35" stop-color="#14945f"/><stop offset="1" stop-color="#3fcf8e"/></radialGradient>
+    <radialGradient id="b2" gradientUnits="userSpaceOnUse" cx="512" cy="500" r="420"><stop offset="0.35" stop-color="#f0a400"/><stop offset="1" stop-color="#ffd34d"/></radialGradient>
+    <radialGradient id="b3" gradientUnits="userSpaceOnUse" cx="512" cy="500" r="420"><stop offset="0.35" stop-color="#ec5b24"/><stop offset="1" stop-color="#ff9a5c"/></radialGradient>
+    <radialGradient id="b4" gradientUnits="userSpaceOnUse" cx="512" cy="500" r="420"><stop offset="0.35" stop-color="#d23d78"/><stop offset="1" stop-color="#ff7aa8"/></radialGradient>
+    <radialGradient id="b5" gradientUnits="userSpaceOnUse" cx="512" cy="500" r="420"><stop offset="0.35" stop-color="#6b4fe0"/><stop offset="1" stop-color="#a08bff"/></radialGradient>
+  </defs>
+  <circle cx="512" cy="524" r="414" fill="#0b1d3a" opacity="0.30" filter="url(#contact)"/>
+  <path d="M302.00 136.27 A 420 420 0 0 1 722.00 136.27 L 660.54 479.12 A 150 150 0 0 0 568.19 360.92 Z" fill="url(#b0)"/>
+  <path d="M722.00 136.27 A 420 420 0 0 1 932.00 500.00 L 604.35 618.20 A 150 150 0 0 0 660.54 479.12 Z" fill="url(#b1)"/>
+  <path d="M932.00 500.00 A 420 420 0 0 1 722.00 863.73 L 455.81 639.08 A 150 150 0 0 0 604.35 618.20 Z" fill="url(#b2)"/>
+  <path d="M722.00 863.73 A 420 420 0 0 1 302.00 863.73 L 363.46 520.88 A 150 150 0 0 0 455.81 639.08 Z" fill="url(#b3)"/>
+  <path d="M302.00 863.73 A 420 420 0 0 1 92.00 500.00 L 419.65 381.80 A 150 150 0 0 0 363.46 520.88 Z" fill="url(#b4)"/>
+  <path d="M92.00 500.00 A 420 420 0 0 1 302.00 136.27 L 568.19 360.92 A 150 150 0 0 0 419.65 381.80 Z" fill="url(#b5)"/>
+  <path d="M722.00 136.27 L 660.54 479.12" stroke="#0b1d3a" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>
+  <path d="M932.00 500.00 L 604.35 618.20" stroke="#0b1d3a" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>
+  <path d="M722.00 863.73 L 455.81 639.08" stroke="#0b1d3a" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>
+  <path d="M302.00 863.73 L 363.46 520.88" stroke="#0b1d3a" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>
+  <path d="M92.00 500.00 L 419.65 381.80" stroke="#0b1d3a" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>
+  <path d="M302.00 136.27 L 568.19 360.92" stroke="#0b1d3a" stroke-opacity="0.18" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="512" cy="500" r="420" fill="url(#light)"/>
+  <circle cx="512" cy="500" r="154" fill="url(#hole)"/>
+  <circle cx="512" cy="466" r="54" fill="#1f2a44"/>
+  <path d="M482 494 L 542 494 L 560 586 Q 562 596 552 596 L 472 596 Q 462 596 464 586 Z" fill="#1f2a44"/>
 </svg>
