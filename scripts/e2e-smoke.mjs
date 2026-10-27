@@ -159,17 +159,17 @@ await page.waitForTimeout(500)
 await page.screenshot({ path: join(shots, '05-lightbox.png') })
 
 // Navigation both ways.
-const shownSrc = () => page.locator('img[alt]:not([alt=""])').first().getAttribute('src')
+const shownSrc = () => page.locator('[role="dialog"] img[alt]:not([alt=""])').first().getAttribute('src')
 const firstSrc = await shownSrc()
 await page.click('button[aria-label="Next"]')
-await page.waitForFunction((src) => document.querySelector('img[alt]:not([alt=""])')?.getAttribute('src') !== src, firstSrc)
+await page.waitForFunction((src) => document.querySelector('[role="dialog"] img[alt]:not([alt=""])')?.getAttribute('src') !== src, firstSrc)
 await page.click('button[aria-label="Previous"]')
-await page.waitForFunction((src) => document.querySelector('img[alt]:not([alt=""])')?.getAttribute('src') === src, firstSrc)
+await page.waitForFunction((src) => document.querySelector('[role="dialog"] img[alt]:not([alt=""])')?.getAttribute('src') === src, firstSrc)
 const navOk = (await shownSrc()) === firstSrc
 
 // Zoom: wheel towards the cursor, then double-click back to fit.
 await page.waitForTimeout(400)
-const box = await page.locator('img[alt]:not([alt=""])').first().boundingBox()
+const box = await page.locator('[role="dialog"] img[alt]:not([alt=""])').first().boundingBox()
 await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3)
 await page.mouse.wheel(0, -600)
 await page.waitForSelector('text=/^\\d+%$/')
