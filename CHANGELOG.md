@@ -2,6 +2,11 @@
 
 Each version's notes are shown on its release page and in the app (Guide → What's new). The release script refuses to publish a version that has no section here.
 
+## 0.16.1 (2026-10-27)
+
+- **Updates need no token.** Photo Vault is now open source (MIT licence) and its releases are public, so installed copies find new versions on their own. A token saved in Settings → Updates is still used, but no longer needed.
+- Fixed: two catalogue snapshots taken in the same instant could overwrite each other.
+
 ## 0.16.0 (2026-10-23)
 
 - **If something goes wrong, the app recovers.** A page that fails shows "Something went wrong" with a way back instead of a blank window, and the rest of the app keeps working. Crashes are written to the library's log, and background work (smart search, descriptions, people) restarts on its own.
