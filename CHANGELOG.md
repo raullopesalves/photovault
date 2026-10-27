@@ -2,6 +2,12 @@
 
 Each version's notes are shown on its release page and in the app (Guide → What's new). The release script refuses to publish a version that has no section here.
 
+## 0.17.0 (2026-10-27)
+
+- **A new look.** A new icon: a camera aperture whose opening is a keyhole, drawn separately for small sizes so it stays sharp in the taskbar. The app now looks at home on Windows 11: Windows' own Segoe UI type, calm neutral greys, one blue for what you select and the main action on each page, and amber only for things that need your attention, such as photos without a backup.
+- **Easier to read and use.** Every colour still meets the contrast standard in both themes; keyboard focus is always shown in the app's blue; selected photos sit on a light blue background, as in other photo apps.
+- **Smaller download.** The two bundled fonts are gone; the app uses the fonts already on your computer.
+
 ## 0.16.2 (2026-10-27)
 
 - Fixed: installed copies could not check for updates at all, because the update module failed to load. Copies that seemed stuck on an older version were affected. From this version on, Settings → Updates → Check now works, and the release process checks it before publishing.
